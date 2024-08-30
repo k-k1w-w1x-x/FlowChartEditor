@@ -16,6 +16,7 @@ public:
     ~MainWidget();
 
 private slots:
+    // void update();
     // void createRectangle();
     // void createDiamond();
     // void createLine();
