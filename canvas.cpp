@@ -34,24 +34,20 @@ void Canvas::paintEvent(QPaintEvent *event)
 
     // 绘制图形元素
     for (FlowElement *element : elements) {
-        element->draw(painter,element->borderDots);
+        element->draw(element->borderDots);
 
-        // 只有当选中时才绘制控制点
-        // if (element == selectedElement) {
-        //     painter.setPen(QPen(Qt::DashLine));
-        //     painter.setBrush(Qt::NoBrush);
-        //     // painter.drawRect(element->boundingRect().adjusted(-5, -5, 5, 5));  // 绘制选中框
+        painter.setPen(element->pen);
+        painter.drawPath(element->mainItem->path());
+        if (element->selected) {
+            QPen pen(Qt::red);
+            pen.setWidth(3);
+            painter.setPen(pen);
 
-        //     // // 绘制控制点
-        //     // RectangleElement *rectangle = dynamic_cast<RectangleElement*>(element);
-        //     // if (rectangle) {
-        //     //     const QRect *controlPoints = rectangle->getControlPoints();
-        //     //     painter.setBrush(Qt::black);
-        //     //     for (int i = 0; i < 8; ++i) {
-        //     //         painter.drawRect(controlPoints[i]);
-        //     //     }
-        //     // }
-        // }
+            for (QGraphicsRectItem *borderDotPosition : *element->borderDots) {
+                QRectF rect = borderDotPosition->rect();
+                painter.drawRect(rect);
+            }
+        }
     }
 }
 
@@ -71,103 +67,34 @@ void Canvas::drawGrid(QPainter &painter)
 }
 
 
-// void Canvas::keyPressEvent(QKeyEvent *event)  // 确保这个定义与.h中的声明匹配
-// {
-//     if (!selectedElement) {
-//         qDebug() << "No element selected";
-//         return;
-//     }
-
-//     if (event->key() == Qt::Key_Backspace) {
-//         qDebug() << "Deleting selected element";
-//         elements.removeOne(selectedElement);
-//         delete selectedElement;
-//         selectedElement = nullptr;
-//         update();  // 更新画布
-//     }
-// }
-
-// void Canvas::mousePressEvent(QMouseEvent *event)
-// {
-//     if (event->button() == Qt::LeftButton) {
-//         selectedElement = getElementAt(event->pos());
-//         if (selectedElement) {
-//             lastMousePosition = event->pos();
-//             setFocus();  // 确保 Canvas 获得焦点以接收键盘事件
-//             qDebug() << "Element selected";
-
-//             // 检查是否点击了控制点
-//             RectangleElement *rectangle = dynamic_cast<RectangleElement*>(selectedElement);
-//             if (rectangle && rectangle->isControlPoint(event->pos(), activeControlPointIndex)) {
-//                 qDebug() << "Control point selected at index:" << activeControlPointIndex;
-//             } else {
-//                 activeControlPointIndex = -1;  // 未选中控制点
-//             }
-//         } else {
-//             qDebug() << "No element selected";
-//         }
-//         update();  // 更新画布以显示选中的状态
-//     } else if (event->button() == Qt::RightButton) {
-//         FlowElement *element = getElementAt(event->pos());
-//         if (element) {
-//             RectangleElement *rectangle = dynamic_cast<RectangleElement*>(element);
-//             if (rectangle) {
-//                 QColor newBorderColor = QColorDialog::getColor(rectangle->getBorderColor(), this, "Select Border Color");
-//                 if (newBorderColor.isValid()) {
-//                     rectangle->setBorderColor(newBorderColor);
-//                 }
-//                 QColor newFillColor = QColorDialog::getColor(rectangle->getFillColor(), this, "Select Fill Color");
-//                 if (newFillColor.isValid()) {
-//                     rectangle->setFillColor(newFillColor);
-//                 }
-//                 update();  // 更新画布显示
-//             }
-//         }
-//     }
-// }
-
-// void Canvas::mouseMoveEvent(QMouseEvent *event)
-// {
-//     if (selectedElement && (event->buttons() & Qt::LeftButton)) {
-//         if (activeControlPointIndex != -1) {
-//             // 处理控制点的拖动以调整大小
-//             RectangleElement *rectangle = dynamic_cast<RectangleElement*>(selectedElement);
-//             if (rectangle) {
-//                 rectangle->resize(activeControlPointIndex, event->pos());
-//                 update();  // 更新画布以显示调整后的图形
-//             }
-//         } else {
-//             // 移动整个图形
-//             QPoint offset = event->pos() - lastMousePosition;
-//             selectedElement->move(offset);
-//             lastMousePosition = event->pos();
-//             update();
-//         }
-//     }
-// }
-
-// void Canvas::mouseReleaseEvent(QMouseEvent *event)
-// {
-//     if (event->button() == Qt::LeftButton) {
-//         activeControlPointIndex = -1;  // 释放控制点
-//     }
-// }
-
-// FlowElement* Canvas::getElementAt(const QPoint &pos)
-// {
-//     for (FlowElement *element : elements) {
-//         if (element->contains(pos)) {
-//             return element;
-//         }
-//     }
-//     return nullptr;
-// }
 
 void Canvas::addShape(FlowElement *element)
 {
     elements.append(element);
     qDebug()<<"addShape";
     update();
+}
+
+void Canvas::mousePressEvent(QMouseEvent *event)
+{
+    QPointF clickedPoint = event->pos();
+    bool elementClicked = false;
+
+    for (FlowElement* element : elements) {
+        if (element->contains(clickedPoint)) {
+            qDebug() << "clicked";
+
+            // 标记选中的元素
+            element->selected=true;
+            elementClicked = true;
+        } else {
+            element->selected=false;
+        }
+    }
+
+    if (elementClicked) {
+        update();  // 触发重绘
+    }
 }
 
 
