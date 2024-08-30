@@ -34,7 +34,7 @@ void Canvas::paintEvent(QPaintEvent *event)
 
     // 绘制图形元素
     for (FlowElement *element : elements) {
-        element->draw(painter);
+        element->draw(painter,element->borderDots);
 
         // 只有当选中时才绘制控制点
         // if (element == selectedElement) {

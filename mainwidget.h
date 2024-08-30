@@ -21,6 +21,13 @@ public:
     MainWidget(QWidget *parent = nullptr);
     ~MainWidget();
 
+private slots:
+    // void update();
+    // void createRectangle();
+    // void createDiamond();
+    // void createLine();
+    // void createArrow();
+
 private:
     Ui::MainWidget *ui;
     Canvas *canvas;
