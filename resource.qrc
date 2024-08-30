@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/menu">
+        <file>undo.png</file>
+        <file>save.png</file>
+    </qresource>
+</RCC>

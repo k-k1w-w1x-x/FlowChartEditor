@@ -1,0 +1,8 @@
+<RCC>
+    <qresource prefix="/type">
+        <file>rect.png</file>
+        <file>parallelogram.png</file>
+        <file>rhombus.png</file>
+        <file>triangle.png</file>
+    </qresource>
+</RCC>
