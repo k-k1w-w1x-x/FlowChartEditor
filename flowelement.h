@@ -10,7 +10,7 @@ class FlowElement
 public:
     // 带参数的构造函数
     FlowElement( QPainterPath* initialPath,
-                QVector<QGraphicsRectItem>* borderDotPositions);
+                 QVector<QGraphicsRectItem>* borderDotPositions);
     void draw(QPainter &painter);
 
     // // 虚析构函数，确保派生类正确清理

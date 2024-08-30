@@ -383,6 +383,7 @@ Makefile: ../../FlowElementChart.pro ../../../../DownLoad/software/Qt/6.7.2/ming
 		../../../../DownLoad/software/Qt/6.7.2/mingw_64/mkspecs/features/qt_config.prf \
 		../../../../DownLoad/software/Qt/6.7.2/mingw_64/mkspecs/win32-g++/qmake.conf \
 		../../../../DownLoad/software/Qt/6.7.2/mingw_64/mkspecs/features/spec_post.prf \
+		.qmake.stash \
 		../../../../DownLoad/software/Qt/6.7.2/mingw_64/mkspecs/features/exclusive_builds.prf \
 		../../../../DownLoad/software/Qt/6.7.2/mingw_64/mkspecs/features/toolchain.prf \
 		../../../../DownLoad/software/Qt/6.7.2/mingw_64/mkspecs/features/default_pre.prf \
@@ -412,8 +413,9 @@ Makefile: ../../FlowElementChart.pro ../../../../DownLoad/software/Qt/6.7.2/ming
 		../../../../DownLoad/software/Qt/6.7.2/mingw_64/lib/Qt6Gui.prl \
 		../../../../DownLoad/software/Qt/6.7.2/mingw_64/lib/Qt6Core.prl \
 		../../../../DownLoad/software/Qt/6.7.2/mingw_64/lib/Qt6EntryPoint.prl \
-		.qmake.stash \
-		../../../../DownLoad/software/Qt/6.7.2/mingw_64/mkspecs/features/build_pass.prf
+		../../../../DownLoad/software/Qt/6.7.2/mingw_64/mkspecs/features/build_pass.prf \
+		../../resource.qrc \
+		../../type.qrc
 	$(QMAKE) -o Makefile ..\..\FlowElementChart.pro -spec win32-g++ "CONFIG+=debug" "CONFIG+=qml_debug"
 ../../../../DownLoad/software/Qt/6.7.2/mingw_64/mkspecs/features/spec_pre.prf:
 ../../../../DownLoad/software/Qt/6.7.2/mingw_64/mkspecs/features/device_config.prf:
@@ -728,6 +730,7 @@ Makefile: ../../FlowElementChart.pro ../../../../DownLoad/software/Qt/6.7.2/ming
 ../../../../DownLoad/software/Qt/6.7.2/mingw_64/mkspecs/features/qt_config.prf:
 ../../../../DownLoad/software/Qt/6.7.2/mingw_64/mkspecs/win32-g++/qmake.conf:
 ../../../../DownLoad/software/Qt/6.7.2/mingw_64/mkspecs/features/spec_post.prf:
+.qmake.stash:
 ../../../../DownLoad/software/Qt/6.7.2/mingw_64/mkspecs/features/exclusive_builds.prf:
 ../../../../DownLoad/software/Qt/6.7.2/mingw_64/mkspecs/features/toolchain.prf:
 ../../../../DownLoad/software/Qt/6.7.2/mingw_64/mkspecs/features/default_pre.prf:
@@ -757,8 +760,9 @@ Makefile: ../../FlowElementChart.pro ../../../../DownLoad/software/Qt/6.7.2/ming
 ../../../../DownLoad/software/Qt/6.7.2/mingw_64/lib/Qt6Gui.prl:
 ../../../../DownLoad/software/Qt/6.7.2/mingw_64/lib/Qt6Core.prl:
 ../../../../DownLoad/software/Qt/6.7.2/mingw_64/lib/Qt6EntryPoint.prl:
-.qmake.stash:
 ../../../../DownLoad/software/Qt/6.7.2/mingw_64/mkspecs/features/build_pass.prf:
+../../resource.qrc:
+../../type.qrc:
 qmake: FORCE
 	@$(QMAKE) -o Makefile ..\..\FlowElementChart.pro -spec win32-g++ "CONFIG+=debug" "CONFIG+=qml_debug"
 
