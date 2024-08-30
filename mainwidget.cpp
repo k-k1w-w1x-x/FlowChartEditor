@@ -1,6 +1,5 @@
 #include "mainwidget.h"
 #include "canvas.h"
-#include "rectangleelement.h"
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QPushButton>
@@ -18,7 +17,7 @@ MainWidget::MainWidget(QWidget *parent)
     QPushButton *button = new QPushButton("Rectangle", this);
     button->setFixedSize(100, 40);
     button->setIcon(QIcon(":/type/rect.png"));
-    connect(button, &QPushButton::clicked, this, &MainWidget::createRectangle);
+    // connect(button, &QPushButton::clicked, this, &MainWidget::createRectangle);
     leftLayout->addWidget(button);
 
     this->resize(800, 600);
@@ -35,6 +34,21 @@ MainWidget::MainWidget(QWidget *parent)
     mainLayout->addWidget(canvas);
 
     setLayout(mainLayout);  // 设置主布局为窗口的布局
+
+    QPainterPath *path = new QPainterPath();
+
+    // 创建一个文档形状的路径
+    path->moveTo(0, 0);
+    path->lineTo(100, 0); // 上边
+    path->lineTo(100, 80); // 右边
+    path->cubicTo(90, 90, 60, 90, 50, 80); // 底部的波浪
+    path->cubicTo(40, 70, 10, 70, 0, 80); // 波浪连接
+    path->lineTo(0, 0); // 左边回到起点
+    QVector<QGraphicsRectItem>*x = new QVector<QGraphicsRectItem>;
+
+    FlowElement *test = new FlowElement(path,x);
+    canvas->addShape(test);
+
 }
 
 MainWidget::~MainWidget() {

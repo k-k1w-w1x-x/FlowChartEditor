@@ -17,10 +17,10 @@ public:
 
 protected:
     void paintEvent(QPaintEvent *event) override;
-    void keyPressEvent(QKeyEvent *event) override;
-    void mousePressEvent(QMouseEvent *event) override;
-    void mouseMoveEvent(QMouseEvent *event) override;
-    void mouseReleaseEvent(QMouseEvent *event) override;
+    // void keyPressEvent(QKeyEvent *event) override;
+    // void mousePressEvent(QMouseEvent *event) override;
+    // void mouseMoveEvent(QMouseEvent *event) override;
+    // void mouseReleaseEvent(QMouseEvent *event) override;
 
 private:
     void drawGrid(QPainter &painter);  // 绘制网格线
@@ -32,7 +32,7 @@ private:
     int gridSpacing;  // 网格线的间隔
     QColor gridColor; // 网格线的颜色
 
-    FlowElement* getElementAt(const QPoint &pos);
+    // FlowElement* getElementAt(const QPoint &pos);
 };
 
 #endif // CANVAS_H

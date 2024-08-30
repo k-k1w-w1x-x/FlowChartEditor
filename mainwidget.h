@@ -4,7 +4,7 @@
 #include <QWidget>
 #include <QVBoxLayout>
 #include <QPushButton>
-
+#include<qmainwindow.h>
 class Canvas;
 
 class MainWidget : public QWidget
@@ -16,7 +16,7 @@ public:
     ~MainWidget();
 
 private slots:
-    void createRectangle();
+    // void createRectangle();
     // void createDiamond();
     // void createLine();
     // void createArrow();
