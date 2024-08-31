@@ -177,6 +177,7 @@ void GraphicsTextItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 
         }
     } else
+    if (textInteractionFlags() == Qt::NoTextInteraction)
     {
         setCursor(Qt::SizeAllCursor);
         QTransform transform;
