@@ -1,11 +1,11 @@
 #ifndef CANVAS_H
 #define CANVAS_H
 
-#include <QWidget>
-#include <QList>
+#include <QGraphicsView>
+#include <QGraphicsScene>
 #include "flowelement.h"
 
-class Canvas : public QWidget
+class Canvas : public QGraphicsView
 {
     Q_OBJECT
 
@@ -14,26 +14,26 @@ public:
     void addShape(FlowElement *element);
     void setGridSpacing(int spacing);  // 设置网格间隔
     void setGridColor(const QColor &color);  // 设置网格颜色
-    void mousePressEvent(QMouseEvent *event);
 
 protected:
-    void paintEvent(QPaintEvent *event) override;
-    // void keyPressEvent(QKeyEvent *event) override;
-    // void mousePressEvent(QMouseEvent *event) override;
-    // void mouseMoveEvent(QMouseEvent *event) override;
-    // void mouseReleaseEvent(QMouseEvent *event) override;
+    void drawBackground(QPainter *painter, const QRectF &rect) override;
+    void mousePressEvent(QMouseEvent *event) override;
+    void mouseReleaseEvent(QMouseEvent *event) override;
+    void mouseMoveEvent(QMouseEvent *event) override;
 
 private:
-    void drawGrid(QPainter &painter);  // 绘制网格线
-    QList<FlowElement*> elements;
-    FlowElement *selectedElement;
-    QPoint lastMousePosition;
-    int activeControlPointIndex;
-
+    void drawGrid(QPainter &painter, const QRectF &rect);  // 绘制网格线
+    QGraphicsScene *scene;
     int gridSpacing;  // 网格线的间隔
     QColor gridColor; // 网格线的颜色
+    QList<FlowElement*> elements ;
 
-    // FlowElement* getElementAt(const QPoint &pos);
+    FlowElement *selectedElement;
+    QPointF lastMousePosition;
+    bool isDragging;
+    FlowElement* clickedSelectedElement;
+public slots:
+    void onColorButtonClicked();
 };
 
 #endif // CANVAS_H

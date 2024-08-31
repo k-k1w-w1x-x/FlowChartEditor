@@ -13,17 +13,9 @@ MainWidget::MainWidget(QWidget *parent)
     , ui(new Ui::MainWidget), canvas(new Canvas(this))
 {
     ui->setupUi(this);
-    // // 创建主布局管理器，将其设置为水平布局 以后这段通过ui实现
-    // QHBoxLayout *mainLayout = new QHBoxLayout(this);
-
-    // // 左侧栏布局，用于放置按钮
-    // QVBoxLayout *leftLayout = new QVBoxLayout();
 
     // 设置窗口大小
     this->resize(800, 600);
-
-    // 将左侧布局添加到主布局中
-    // ui->mainLayout->addLayout(leftLayout);
 
     // 设置 Canvas 的网格属性
     canvas->setGridSpacing(20);  // 设置网格间隔为 20 像素
@@ -32,7 +24,7 @@ MainWidget::MainWidget(QWidget *parent)
     // 将 Canvas 添加到主布局的右侧部分
     ui->mainLayout->addWidget(canvas);
 
-    setLayout(ui->mainLayout);  // 设置主布局为窗口的布局
+    // 创建一个 FlowRectElement 并将其添加到 Canvas (QGraphicsScene) 中
     FlowRectElement* rectElement = new FlowRectElement();
     canvas->addShape(rectElement);
 }
