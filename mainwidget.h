@@ -20,6 +20,9 @@ class MainWidget : public QWidget
 public:
     MainWidget(QWidget *parent = nullptr);
     ~MainWidget();
+    void init_left_button();
+    void init_top_button();
+    void init_menu_layout();
 
 private:
     Ui::MainWidget *ui;
@@ -29,5 +32,19 @@ private:
     QPushButton *diamondButton;
     QPushButton *lineButton;
     QPushButton *arrowButton;
+
+    QMenuBar *menuBar;
+    QMenu *fileMenu;
+    QMenu *editMenu;
+    QMenu *redoMenu;
+    QMenu *undoMenu;
+
+    QAction *newAction;
+    QAction *openAction;
+    QAction *saveAction;
+    QAction *exitAction;
+    QAction *copyAction;
+    QAction *pasteAction;
+
 };
 #endif // MAINWIDGET_H
