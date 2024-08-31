@@ -5,12 +5,14 @@
 #include <QPainter>
 #include <QColorDialog>
 #include <QDebug>
+#include <QGraphicsSceneMouseEvent>
+#include <QGraphicsItem>
 
 Canvas::Canvas(QWidget *parent)
-    : QWidget(parent), selectedElement(nullptr), activeControlPointIndex(-1),
+    : QGraphicsScene(parent), selectedElement(nullptr), activeControlPointIndex(-1),
     gridSpacing(20), gridColor(Qt::lightGray)
 {
-    setFocusPolicy(Qt::StrongFocus);  // 确保 Canvas 能接收键盘焦点
+    // setFocusPolicy(Qt::StrongFocus);  // 确保 Canvas 能接收键盘焦点
 }
 
 void Canvas::setGridSpacing(int spacing)
@@ -25,27 +27,25 @@ void Canvas::setGridColor(const QColor &color)
     update();  // 更新画布，重新绘制网格线
 }
 
-void Canvas::paintEvent(QPaintEvent *event)
+void Canvas::drawBackground(QPainter* painter, const QRectF& rect)
 {
-    QPainter painter(this);
-
     // 绘制网格线
-    drawGrid(painter);
+    drawGrid(*painter);
 
     // 绘制图形元素
     for (FlowElement *element : elements) {
         element->draw(element->borderDots);
 
-        painter.setPen(element->pen);
-        painter.drawPath(element->mainItem->path());
+        painter->setPen(element->pen);
+        painter->drawPath(element->mainItem->path());
         if (element->selected) {
             QPen pen(Qt::red);
             pen.setWidth(3);
-            painter.setPen(pen);
+            painter->setPen(pen);
 
             for (QGraphicsRectItem *borderDotPosition : *element->borderDots) {
                 QRectF rect = borderDotPosition->rect();
-                painter.drawRect(rect);
+                painter->drawRect(rect);
             }
         }
     }
@@ -75,30 +75,38 @@ void Canvas::addShape(FlowElement *element)
     update();
 }
 
-void Canvas::mousePressEvent(QMouseEvent *event)
+// void Canvas::mousePressEvent(QMouseEvent *event)
+// {
+//     QPointF clickedPoint = event->pos();
+//     bool elementClicked = false;
+//     qDebug() << "mousePressEvent";
+//     for (FlowElement* element : elements) {
+//         if (element->contains(clickedPoint)) {
+//             qDebug() << "clicked";
+
+//             // 标记选中的元素
+//             element->selected=true;
+//             elementClicked = true;
+//         } else {
+//             qDebug() << "no-clicked";
+//             element->selected=false;
+//         }
+//     }
+
+//     if (elementClicked) {
+//         update();  // 触发重绘
+//     }
+// }
+
+void Canvas::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
 {
-    QPointF clickedPoint = event->pos();
-    bool elementClicked = false;
-   qDebug() << "mousePressEvent";
-    for (FlowElement* element : elements) {
-        if (element->contains(clickedPoint)) {
-            qDebug() << "clicked";
-
-            // 标记选中的元素
-            element->selected=true;
-            elementClicked = true;
-        } else {
-            qDebug() << "no-clicked";
-            element->selected=false;
-        }
+    QGraphicsTextItem *item = qgraphicsitem_cast<QGraphicsTextItem*>(itemAt(event->scenePos(), QTransform()));
+    if (item == nullptr)
+    {
+        GraphicsTextItem *textItem = new GraphicsTextItem("Text here.");
+        textItem->setPos(event->scenePos());
+        this->addItem(textItem);
+        graphicTextItems.push_back(textItem);
     }
-
-    if (elementClicked) {
-        update();  // 触发重绘
-    }
+    QGraphicsScene::mouseDoubleClickEvent(event);
 }
-
-
-
-
-

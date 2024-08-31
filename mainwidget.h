@@ -5,6 +5,7 @@
 #include <QVBoxLayout>
 #include <QPushButton>
 #include<qmainwindow.h>
+#include <queue>
 
 class Canvas;
 QT_BEGIN_NAMESPACE

@@ -12,6 +12,7 @@ SOURCES += \
     canvas.cpp \
     flowelement.cpp \
     flowrectelement.cpp \
+    graphicstextitem.cpp \
     main.cpp \
     mainwidget.cpp \
     rectangleelement.cpp
@@ -20,6 +21,7 @@ HEADERS += \
     canvas.h \
     flowelement.h \
     flowrectelement.h \
+    graphicstextitem.h \
     mainwidget.h \
     rectangleelement.h
 
