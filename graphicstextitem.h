@@ -16,7 +16,6 @@ protected:
     void focusOutEvent(QFocusEvent *event) override;
     void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event) override;
     void keyPressEvent(QKeyEvent *event) override;
-    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
     void hoverMoveEvent(QGraphicsSceneHoverEvent *event) override;
     void hoverLeaveEvent(QGraphicsSceneHoverEvent *event) override;
     void mousePressEvent(QGraphicsSceneMouseEvent *event) override;
@@ -24,11 +23,11 @@ protected:
     void mouseReleaseEvent(QGraphicsSceneMouseEvent *event) override;
 
 private:
-    QRectF topLeft, topRight, bottomLeft, bottomRight, top, bottom, left, right;
     int scaling, resizing;
-    QPointF initialScenePos, initialPos;
-    QRectF initialRect;
+    QPointF initialScenePos;
     QTransform initialTransform;
+    qreal initialWidth, initialHeight;
+    QRectF topLeft, topRight, bottomLeft, bottomRight, top, bottom, left, right;
 };
 
 #endif // GRAPHICSTEXTITEM_H

@@ -42,24 +42,6 @@ QRectF GraphicsTextItem::boundingRect() const
     return rect;
 }
 
-void GraphicsTextItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
-{
-    if (isSelected())
-    {
-
-        painter->save();
-        painter->setPen(Qt::red);
-        painter->setBrush(Qt::red);
-        QRectF rect = QGraphicsTextItem::boundingRect();
-        painter->drawEllipse(QRectF(rect.topLeft().x() - 1, rect.topLeft().y() - 1, 2, 2));
-        painter->drawEllipse(QRectF(rect.topRight().x() - 1, rect.topRight().y() - 1, 2, 2));
-        painter->drawEllipse(QRectF(rect.bottomLeft().x() - 1, rect.bottomLeft().y() - 1, 2, 2));
-        painter->drawEllipse(QRectF(rect.bottomRight().x() - 1, rect.bottomRight().y() - 1, 2, 2));
-        painter->restore();
-    }
-    QGraphicsTextItem::paint(painter, option, widget);
-}
-
 void GraphicsTextItem::focusOutEvent(QFocusEvent *event)
 {
     qDebug() << "!!!!";
@@ -129,7 +111,11 @@ void GraphicsTextItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
         scaling = 0;
         resizing = 0;
         if (topLeft.contains(pos) || topRight.contains(pos) || bottomLeft.contains(pos) || bottomRight.contains(pos))
+            scaling = 3;
+        if (top.contains(pos) || bottom.contains(pos))
             scaling = 1;
+        if (left.contains(pos) || right.contains(pos))
+            scaling = 2;
         if (topLeft.contains(pos) || top.contains(pos) || left.contains(pos))
             resizing = 1;
         if (topRight.contains(pos) || right.contains(pos))
@@ -139,9 +125,9 @@ void GraphicsTextItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
         if (bottomRight.contains(pos))
             resizing = 4;
         initialScenePos = event->scenePos();
-        initialRect = boundingRect();
-        initialPos = this->pos();
         initialTransform = transform();
+        initialWidth = boundingRect().width() * initialTransform.m11();
+        initialHeight = boundingRect().height() * initialTransform.m22();
     }
     QGraphicsTextItem::mousePressEvent(event);
 }
@@ -151,38 +137,83 @@ void GraphicsTextItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
     QPointF pos = event->scenePos();
     if (resizing)
     {
-        qreal width = initialRect.width(), height = initialRect.height();
+        qreal width = initialWidth, height = initialHeight, deltax = initialTransform.m31(), deltay = initialTransform.m32();
         prepareGeometryChange();
         if (resizing == 1)
         {
-            width += initialScenePos.x() - pos.x();
-            if (scaling)
+            if (scaling & 2)
+            {
+                width += initialScenePos.x() - pos.x();
+                deltax += pos.x() - initialScenePos.x();
+            }
+            if (scaling & 1)
+            {
                 height += initialScenePos.y() - pos.y();
-            qDebug() << width << ' ' << height;
-            // QTransform transform;
-            // transform.translate(initialScenePos.x() - pos.x(), initialScenePos.y() - pos.y());
-            // setPos(initialPos.x() + initialRect.width() - width, initialPos.y() + initialRect.height() - height, width, height);
-            // setPos(pos.x(), pos.y());
-            // setTransform(transform);
+                deltay += pos.y() - initialScenePos.y();
+            }
+            QTransform transform;
+            transform.translate(deltax, deltay);
+            transform.scale(width / initialWidth * initialTransform.m11(), height / initialHeight * initialTransform.m22());
+            setTransform(transform);
+            update();
         }
         if (resizing == 2)
         {
-
+            if (scaling & 2)
+            {
+                width += pos.x() - initialScenePos.x();
+            }
+            if (scaling & 1)
+            {
+                height += initialScenePos.y() - pos.y();
+                deltay += pos.y() - initialScenePos.y();
+            }
+            QTransform transform;
+            transform.translate(deltax, deltay);
+            transform.scale(width / initialWidth * initialTransform.m11(), height / initialHeight * initialTransform.m22());
+            setTransform(transform);
+            update();
         }
         if (resizing == 3)
         {
+            if (scaling & 2)
+            {
+                width += initialScenePos.x() - pos.x();
+                deltax += pos.x() - initialScenePos.x();
+            }
+            if (scaling & 1)
+            {
+                height += pos.y() - initialScenePos.y();
+            }
+            QTransform transform;
+            transform.translate(deltax, deltay);
+            transform.scale(width / initialWidth * initialTransform.m11(), height / initialHeight * initialTransform.m22());
+            setTransform(transform);
+            update();
         }
         if (resizing == 4)
         {
-
+            if (scaling & 2)
+                width += pos.x() - initialScenePos.x();
+            if (scaling & 1)
+                height += pos.y() - initialScenePos.y();
+            QTransform transform;
+            transform.translate(deltax, deltay);
+            transform.scale(width / initialWidth * initialTransform.m11(), height / initialHeight * initialTransform.m22());
+            setTransform(transform);
+            update();
         }
     } else
     if (textInteractionFlags() == Qt::NoTextInteraction)
     {
         setCursor(Qt::SizeAllCursor);
+        qreal deltax = initialTransform.m31() + pos.x() - initialScenePos.x(),
+              deltay = initialTransform.m32() + pos.y() - initialScenePos.y();
         QTransform transform;
-        transform.translate(pos.x() - initialScenePos.x(), pos.y() - initialScenePos.y());
-        setTransform(initialTransform * transform);
+        transform.translate(deltax, deltay);
+        transform.scale(initialTransform.m11(), initialTransform.m22());
+        setTransform(transform);
+        update();
     }
     QGraphicsTextItem::mouseMoveEvent(event);
 }
@@ -192,6 +223,5 @@ void GraphicsTextItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
     scaling = resizing = 0;
     QGraphicsTextItem::mouseReleaseEvent(event);
 }
-
 
 #endif // GRAPHICSTEXTITEM_CPP
