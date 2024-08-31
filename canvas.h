@@ -4,6 +4,7 @@
 #include <QGraphicsView>
 #include <QGraphicsScene>
 #include "flowelement.h"
+#include "flowsubelement.h"
 
 class Canvas : public QGraphicsView
 {

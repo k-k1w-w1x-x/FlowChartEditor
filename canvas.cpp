@@ -68,10 +68,14 @@ void Canvas::addShape(FlowElement *element)
 {
     if (element && element->mainItem) {
         scene->addItem(element->mainItem);
+        if(FlowSubElement* subElement = dynamic_cast<FlowSubElement*>(element)){
+            qDebug()<<"转型成功";
+            scene->addItem(subElement->innerItem);
+        }
         elements.append(element);
-        for (auto borderDot : element->borderDots) {
-            scene->addItem(borderDot);
-            borderDot->setVisible(false);
+        for (auto controlDot : element->controlDots) {
+            scene->addItem(controlDot);
+            controlDot->setVisible(false);
         }
     }
 }
@@ -96,14 +100,14 @@ void Canvas::mousePressEvent(QMouseEvent *event)
             elementClicked = true;
 
             // 如果选中元素，显示四个边界点
-            for (auto borderDot : element->borderDots) {
-                borderDot->setVisible(true);
+            for (auto controlDot : element->controlDots) {
+                controlDot->setVisible(true);
             }
             element->selected = true;
         } else {
             // 如果未选中元素，隐藏边界点
-            for (auto borderDot : element->borderDots) {
-                borderDot->setVisible(false);
+            for (auto controlDot : element->controlDots) {
+                controlDot->setVisible(false);
             }
             element->selected = false;
         }

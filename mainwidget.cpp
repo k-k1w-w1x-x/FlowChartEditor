@@ -27,6 +27,15 @@ MainWidget::MainWidget(QWidget *parent)
     // 创建一个 FlowRectElement 并将其添加到 Canvas (QGraphicsScene) 中
     FlowRectElement* rectElement = new FlowRectElement();
     canvas->addShape(rectElement);
+    //菱形
+    FlowDiamondElement* diamondElement = new FlowDiamondElement();
+    canvas->addShape(diamondElement);
+    FlowParaElement* paraElement = new FlowParaElement();
+    canvas->addShape(paraElement);
+    FlowCircleElement* circleElement = new FlowCircleElement();
+    canvas->addShape(circleElement);
+    FlowSubElement* subElement = new FlowSubElement();
+    canvas->addShape(subElement);
 }
 
 MainWidget::~MainWidget()

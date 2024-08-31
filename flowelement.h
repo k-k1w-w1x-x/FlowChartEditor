@@ -15,6 +15,7 @@ public:
     void move(int dx, int dy);  // 改为 delta 移动量
     QGraphicsPathItem *mainItem;
     QVector<QGraphicsRectItem*> borderDots;
+    QVector<QGraphicsRectItem*> controlDots;
     bool selected = false;
     QColor contentColor = Qt::white;
 
