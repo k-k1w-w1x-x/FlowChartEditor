@@ -10,7 +10,9 @@ class FlowElement
 public:
     // 带参数的构造函数
     FlowElement();
-    void draw(QPainter &painter,QVector<QGraphicsRectItem*>* borderDotPositions);
+    void draw(QVector<QGraphicsRectItem*>* borderDotPositions);
+    bool contains(const QPointF &point);
+    bool selected = false;
 
     // // 虚析构函数，确保派生类正确清理
     // virtual ~FlowElement();
@@ -28,8 +30,9 @@ public:
     // virtual QGraphicsPathItem* updateMainItem()=0;
 
 public:
-    QGraphicsPathItem *mainItem;                // 主图形项
-    QVector<QGraphicsRectItem*>* borderDots;      // 边界点的集合
+    QGraphicsPathItem *mainItem = new QGraphicsPathItem;                // 主图形项
+    QVector<QGraphicsRectItem*>* borderDots;    // 边界点的集合
+    QPen pen ;
 };
 
 #endif // FLOWELEMENT_H
