@@ -85,6 +85,12 @@ void Canvas::mousePressEvent(QMouseEvent *event)
     // 遍历所有元素，检查是否点击了某个元素
     for (FlowElement *element : elements) {
         if (element->mainItem->contains(clickedPoint)) {
+            // 进入拖动模式
+            if(element->selected){
+                isDragging = true;
+                lastMousePosition = clickedPoint;
+                setDragMode(QGraphicsView::NoDrag);
+            }
             qDebug()<<"clicked";
             clickedSelectedElement = element;
             elementClicked = true;
@@ -94,10 +100,6 @@ void Canvas::mousePressEvent(QMouseEvent *event)
                 borderDot->setVisible(true);
             }
             element->selected = true;
-
-            // 进入拖动模式
-            isDragging = true;
-            lastMousePosition = clickedPoint;
         } else {
             // 如果未选中元素，隐藏边界点
             for (auto borderDot : element->borderDots) {
@@ -138,7 +140,7 @@ void Canvas::mouseReleaseEvent(QMouseEvent *event)
     if (event->button() == Qt::LeftButton) {
         isDragging = false;
     }
-
+    setDragMode(QGraphicsView::RubberBandDrag);
     QGraphicsView::mouseReleaseEvent(event);
 }
 

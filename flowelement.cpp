@@ -45,10 +45,6 @@ void FlowElement::move(int dx, int dy) {
     for(QGraphicsRectItem *borderDot : borderDots) {
         borderDot->moveBy(dx, dy);
     }
-
-    // 然后移动主图形项
-    mainItem->moveBy(dx, dy);
-
     // 重新绘制路径
     draw();
 }
