@@ -14,6 +14,7 @@ public:
     void addShape(FlowElement *element);
     void setGridSpacing(int spacing);  // 设置网格间隔
     void setGridColor(const QColor &color);  // 设置网格颜色
+    void mousePressEvent(QMouseEvent *event);
 
 protected:
     void paintEvent(QPaintEvent *event) override;

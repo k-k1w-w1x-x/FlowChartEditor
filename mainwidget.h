@@ -24,6 +24,13 @@ public:
     void init_top_button();
     void init_menu_layout();
 
+private slots:
+    // void update();
+    // void createRectangle();
+    // void createDiamond();
+    // void createLine();
+    // void createArrow();
+
 private:
     Ui::MainWidget *ui;
     Canvas *canvas;
