@@ -69,10 +69,12 @@ void MainWidget::init_menu_layout() {
     newAction = new QAction(QIcon(":/menu/new.png"),"New", this);
     openAction = new QAction(QIcon(":/menu/open.png"),"Open", this);
     saveAction = new QAction(QIcon(":/menu/save.png"),"Save", this);
+    downloadAction = new QAction(QIcon(":/menu/download.png"),"download",this);
     exitAction = new QAction("Exit", this);
     fileMenu->addAction(saveAction);
     fileMenu->addAction(newAction);
     fileMenu->addAction(openAction);
+    fileMenu->addAction(downloadAction);
 
     //横线分隔
     fileMenu->addSeparator();
@@ -84,9 +86,11 @@ void MainWidget::init_menu_layout() {
     editMenu->addAction(copyAction);
     editMenu->addAction(pasteAction);
 
-    //redo按钮信号
+    //redo按钮信号!!!!
     //connect(redoMenu, &QMenu::aboutToShow, this, &QWidget::close);
 
+    //Action按钮信号!!!
+    //connect(saveAction, &QAction::triggered, this, &QWidget::close);
 }
 
 void MainWidget::init_left_button() {
