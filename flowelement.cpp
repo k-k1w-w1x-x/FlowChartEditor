@@ -1,45 +1,60 @@
-#include <flowelement.h>
+#include "flowelement.h"
 #include <QPainter>
 #include <QDebug>
 
 FlowElement::FlowElement() {
-    mainItem = new QGraphicsPathItem();
+    mainItem = new QGraphicsPathItem(this);
 }
 
-void FlowElement::draw(QVector<QGraphicsRectItem*>* borderDotPositions)
-{
+void FlowElement::draw() {
     qDebug() << "draw";
 
-    if (!borderDotPositions || borderDotPositions->size() < 2) {
-        qDebug() << "Not enough border dots to draw.";
-        return;
-    }
-
     QPainterPath path;
-    path.moveTo(borderDotPositions->at(0)->rect().center());
 
     // 依次取出两个小矩形的中心点，并绘制线条
-    for (int i = 0; i < borderDotPositions->size() - 1; ++i) {
+    path.moveTo(borderDots[0]->scenePos() + borderDots[0]->rect().center());
+
+    // 依次取出两个小矩形的中心点，并绘制线条
+    for (int i = 1; i < borderDots.size(); ++i) {
         qDebug() << "drawwwwwww";
-        QPointF end = borderDotPositions->at(i + 1)->rect().center();
-        path.lineTo(end);
+        path.lineTo(borderDots[i]->scenePos() + borderDots[i]->rect().center());
+    }
+    for(QGraphicsRectItem* borderDot : borderDots){
+        borderDot->setBrush(Qt::red);
+        QPen pen(Qt::red);
+        borderDot->setPen(pen);
     }
 
     path.closeSubpath();
 
     // 设置主图形项路径
     mainItem->setPath(path);
-
+    mainItem->setBrush(QBrush(contentColor));
     // 设置默认线条宽度
     QPen pen(Qt::black);
-    pen.setWidth(3);
+    pen.setWidth(2);
     mainItem->setPen(pen);
 }
 
-bool FlowElement::contains(const QPointF &point) {
-    // 检查点是否在 mainItem 的路径内
-    if(mainItem->contains(point)){
-        qDebug()<<"FlowElement::contains=True";
-    }
+bool FlowElement::contains(const QPointF &point) const {
     return mainItem->contains(point);
+}
+
+void FlowElement::move(int dx, int dy) {
+    // 先移动各个控制点（边界点）
+    for(QGraphicsRectItem *borderDot : borderDots) {
+        borderDot->moveBy(dx, dy);
+    }
+    // 重新绘制路径
+    draw();
+}
+QRectF FlowElement::boundingRect() const {
+    // 返回项的边界矩形
+    return QRectF(150, 100, 100, 100);  // 根据你的需求调整大小和位置
+}
+
+void FlowElement::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) {
+    // 绘制图形项的外观
+    painter->setBrush(Qt::blue);  // 例如使用蓝色填充
+    painter->drawRect(boundingRect());
 }

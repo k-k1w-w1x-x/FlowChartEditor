@@ -8,6 +8,7 @@
 #include <QMenuBar>
 #include <QGraphicsRectItem>
 #include <QVector>
+#include <QFileDialog>
 
 MainWidget::MainWidget(QWidget *parent)
     : QWidget(parent)
@@ -60,6 +61,18 @@ void MainWidget::init_menu_layout() {
     fileMenu->addAction(saveAction);
     fileMenu->addAction(newAction);
     fileMenu->addAction(openAction);
+    connect(openAction, &QAction::triggered, [=](){
+        QString filePath = QFileDialog::getOpenFileName(this, "选择打开文件", "", "All Files (*)");
+        if (!filePath.isEmpty()) {
+            qDebug() << filePath;
+        }
+    });
+    connect(newAction, &QAction::triggered, [=](){
+        QString filePath = QFileDialog::getOpenFileName(this, "选择新建文件夹", "", "All Files (*)");
+        if (!filePath.isEmpty()) {
+            qDebug() << filePath;
+        }
+    });
 
     //横线分隔
     fileMenu->addSeparator();
@@ -86,6 +99,9 @@ void MainWidget::init_left_button() {
     QIcon icon1(":/type/rect.png");
     ui->rect_button->setIcon(icon1);
     ui->rect_button->setIconSize(QSize(32, 32));
+    connect(ui->rect_button, &QPushButton::clicked, [=](){
+        qDebug() << "hello";
+    });
 
     //文档矩形
     ui->rect3_button->setFixedSize(60,50);
@@ -123,6 +139,18 @@ void MainWidget::init_left_button() {
     ui->rect4_button->setIcon(icon7);
     ui->rect4_button->setIconSize(QSize(50, 50));
 
+    // 创建一个 FlowRectElement 并将其添加到 Canvas (QGraphicsScene) 中
+    FlowRectElement* rectElement = new FlowRectElement();
+    canvas->addShape(rectElement);
+    //菱形
+    FlowDiamondElement* diamondElement = new FlowDiamondElement();
+    canvas->addShape(diamondElement);
+    FlowParaElement* paraElement = new FlowParaElement();
+    canvas->addShape(paraElement);
+    FlowCircleElement* circleElement = new FlowCircleElement();
+    canvas->addShape(circleElement);
+    FlowSubElement* subElement = new FlowSubElement();
+    canvas->addShape(subElement);
 }
 
 MainWidget::~MainWidget()

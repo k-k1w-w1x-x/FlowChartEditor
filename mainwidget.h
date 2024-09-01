@@ -5,6 +5,11 @@
 #include <QVBoxLayout>
 #include <QPushButton>
 #include<qmainwindow.h>
+#include "flowrectelement.h"
+#include "flowdiamondelement.h"
+#include "flowparaelement.h"
+#include "flowcircleelement.h"
+#include "flowsubelement.h"
 
 class Canvas;
 QT_BEGIN_NAMESPACE
