@@ -73,6 +73,10 @@ void FlowSubElement::draw(){
 }
 
 void FlowSubElement::scale(int index, double dx, double dy) {
+    if(!inBorder(index)){
+        dx = deltax[index];
+        dy = deltay[index];
+    }
     // 移动被选中的控制点
     controlDots.at(index)->moveBy(dx, dy);
 

@@ -1,7 +1,6 @@
 #include "flowelement.h"
 #include <QPainter>
 #include <QDebug>
-
 FlowElement::FlowElement() {
     mainItem = new QGraphicsPathItem(this);
 }
@@ -62,6 +61,10 @@ QRectF FlowElement::boundingRect() const {
 void FlowElement::scale(int index,double dx,double dy)//默认4个控制点，如果不是需要重写，规定从左上角开始顺时针
 {
     qDebug()<<"开始缩放";
+    if(!inBorder(index)){
+        dx = deltax[index];
+        dy = deltay[index];
+    }
     controlDots.at(index)->moveBy(dx, dy);
     if(index==0){
         borderDots.at(1)->moveBy(0, dy);
@@ -80,4 +83,25 @@ void FlowElement::scale(int index,double dx,double dy)//默认4个控制点，�
         borderDots.at(0)->moveBy(dx, 0);
     }
     draw();
+}
+
+bool FlowElement::inBorder(int idx){
+    int oppIdx = (idx+2) % 4;
+    if(idx == 0){
+        return(controlDots[idx]->scenePos().x() <= controlDots[oppIdx]->scenePos().x()
+                & controlDots[idx]->scenePos().y() <= controlDots[oppIdx]->scenePos().y());
+    }
+    if(idx == 1){
+        return(controlDots[idx]->scenePos().x() >= controlDots[oppIdx]->scenePos().x()
+                & controlDots[idx]->scenePos().y() <= controlDots[oppIdx]->scenePos().y());
+    }
+    if(idx == 2){
+        return(controlDots[idx]->scenePos().x() >= controlDots[oppIdx]->scenePos().x()
+                & controlDots[idx]->scenePos().y() >= controlDots[oppIdx]->scenePos().y());
+    }
+    if(idx == 3){
+        return(controlDots[idx]->scenePos().x() <= controlDots[oppIdx]->scenePos().x()
+                & controlDots[idx]->scenePos().y() >= controlDots[oppIdx]->scenePos().y());
+    }
+
 }

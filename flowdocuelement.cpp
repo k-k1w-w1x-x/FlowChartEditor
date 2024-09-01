@@ -1,7 +1,6 @@
 #include "flowdocuelement.h"
 #include <QGraphicsRectItem>
 #define DOT_SIZE 5
-
 FlowDocuElement::FlowDocuElement(): FlowElement()
 {
     borderDots.append(new QGraphicsRectItem(QRectF(0, 0, DOT_SIZE, DOT_SIZE), this));  // 左上角
@@ -64,6 +63,11 @@ void FlowDocuElement::draw() {
 }
 void FlowDocuElement::scale(int index, double dx, double dy)
 {
+
+    if(!inBorder(index)){
+        dx = deltax[index];
+        dy = deltay[index];
+    }
     qDebug() << "开始缩放";
     controlDots.at(index)->moveBy(dx, dy);
 
