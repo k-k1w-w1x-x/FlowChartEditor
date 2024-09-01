@@ -59,10 +59,10 @@ QRectF FlowElement::boundingRect() const {
     return QRectF(150, 100, 100, 100);  // 根据你的需求调整大小和位置
 }
 
-void FlowElement::scale(int index,int dx,int dy)//默认4个控制点，如果不是需要重写，规定从左上角开始顺时针
+void FlowElement::scale(int index,double dx,double dy)//默认4个控制点，如果不是需要重写，规定从左上角开始顺时针
 {
     qDebug()<<"开始缩放";
-    borderDots.at(index)->moveBy(dx, dy);
+    controlDots.at(index)->moveBy(dx, dy);
     if(index==0){
         borderDots.at(1)->moveBy(0, dy);
         borderDots.at(3)->moveBy(dx, 0);

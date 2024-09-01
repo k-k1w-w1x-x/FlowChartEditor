@@ -96,6 +96,7 @@ void Canvas::mousePressEvent(QMouseEvent *event)
                 clickedControlDot = index;//标记哪个dot被选中了
                 lastMousePosition = clickedPoint;
                 setDragMode(QGraphicsView::NoDrag);//禁用拖拽框
+                elementClicked = true;
                 break;
             }
             index++;
@@ -121,11 +122,13 @@ void Canvas::mousePressEvent(QMouseEvent *event)
             }
             element->selected = true;
         } else {
-            // 如果未选中元素，隐藏边界点
-            for (auto controlDot : element->controlDots) {
-                controlDot->setVisible(false);
+            // 如果未选中元素且不在缩放状态中，隐藏边界点
+            if(!isScaling){
+                for (auto controlDot : element->controlDots) {
+                    controlDot->setVisible(false);
+                }
+                element->selected = false;
             }
-            element->selected = false;
         }
     }
 

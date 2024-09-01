@@ -71,3 +71,53 @@ void FlowSubElement::draw(){
 
     mainItem->setPen(pen);
 }
+
+void FlowSubElement::scale(int index, double dx, double dy) {
+    // 移动被选中的控制点
+    controlDots.at(index)->moveBy(dx, dy);
+
+    if (index == 0) {  // 左上角
+        borderDots.at(1)->moveBy(0, dy);       // 右上角
+        borderDots.at(3)->moveBy(dx, 0);       // 左下角
+
+        // 内部控制点的相应缩放
+        borderDots.at(4)->moveBy(dx * 0.9, dy);   // 内部左上角
+        borderDots.at(5)->moveBy(dx * 0.1, dy);       // 内部右上角
+        borderDots.at(6)->moveBy(dx * 0.1, 0);        // 内部右下角
+        borderDots.at(7)->moveBy(dx * 0.9, 0);    // 内部左下角
+
+    } else if (index == 1) {  // 右上角
+        borderDots.at(0)->moveBy(0, dy);       // 左上角
+        borderDots.at(2)->moveBy(dx, 0);       // 右下角
+
+        // 内部控制点的相应缩放
+        borderDots.at(5)->moveBy(dx * 0.9, dy);   // 内部右上角
+        borderDots.at(4)->moveBy(dx * 0.1, dy);       // 内部左上角
+        borderDots.at(7)->moveBy(dx * 0.1, 0);        // 内部左下角
+        borderDots.at(6)->moveBy(dx * 0.9, 0);    // 内部右下角
+
+    } else if (index == 2) {  // 右下角
+        borderDots.at(3)->moveBy(0, dy);       // 左下角
+        borderDots.at(1)->moveBy(dx, 0);       // 右上角
+
+        // 内部控制点的相应缩放
+        borderDots.at(6)->moveBy(dx * 0.9, dy);   // 内部右下角
+        borderDots.at(7)->moveBy(dx * 0.1, dy);       // 内部左下角
+        borderDots.at(4)->moveBy(dx * 0.1, 0);        // 内部左上角
+        borderDots.at(5)->moveBy(dx * 0.9, 0);    // 内部右上角
+
+    } else if (index == 3) {  // 左下角
+        borderDots.at(2)->moveBy(0, dy);       // 右下角
+        borderDots.at(0)->moveBy(dx, 0);       // 左上角
+
+        // 内部控制点的相应缩放
+        borderDots.at(7)->moveBy(dx * 0.9, dy);   // 内部左下角
+        borderDots.at(6)->moveBy(dx * 0.1, dy);       // 内部右下角
+        borderDots.at(5)->moveBy(dx * 0.1, 0);        // 内部右上角
+        borderDots.at(4)->moveBy(dx * 0.9, 0);    // 内部左上角
+    }
+
+    // 重绘图形
+    draw();
+}
+

@@ -22,7 +22,7 @@ public:
 
     virtual QRectF boundingRect() const override; // 定义边界矩形
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = nullptr) override; // 定义绘制操作
-    virtual void scale(int index,int dx,int dy) ; //放大缩小
+    virtual void scale(int index,double dx,double dy) ; //放大缩小
 protected:
 
 };

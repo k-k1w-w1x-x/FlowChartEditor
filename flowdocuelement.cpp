@@ -62,5 +62,49 @@ void FlowDocuElement::draw() {
     pen.setWidth(2);
     mainItem->setPen(pen);
 }
+void FlowDocuElement::scale(int index, double dx, double dy)
+{
+    qDebug() << "开始缩放";
+    controlDots.at(index)->moveBy(dx, dy);
 
+    if (index == 0) {  // 左上角
+        borderDots.at(1)->moveBy(0, dy);  // 右上角
+        borderDots.at(6)->moveBy(dx, 0);  // 左下角
+
+        // 过渡点
+        borderDots.at(3)->moveBy(dx * 0.25, dy * 0.2);  // 过渡点1
+        borderDots.at(4)->moveBy(dx * 0.5, 0);          // 过渡点2
+        borderDots.at(5)->moveBy(dx * 0.75, -dy * 0.2); // 过渡点3
+
+    } else if (index == 1) {  // 右上角
+        borderDots.at(0)->moveBy(0, dy);  // 左上角
+        borderDots.at(2)->moveBy(dx, 0);  // 右下角
+
+        // 过渡点
+        borderDots.at(3)->moveBy(dx * 0.75, dy * 0.2);  // 过渡点1
+        borderDots.at(4)->moveBy(dx * 0.5, 0);          // 过渡点2
+        borderDots.at(5)->moveBy(dx * 0.25, -dy * 0.2); // 过渡点3
+
+    } else if (index == 2) {  // 右下角
+        borderDots.at(1)->moveBy(dx, 0);  // 右上角
+        borderDots.at(6)->moveBy(0, dy);  // 左下角
+
+        // 过渡点
+        borderDots.at(3)->moveBy(dx * 0.75, dy * 0.8);  // 过渡点1
+        borderDots.at(4)->moveBy(dx * 0.5, dy);          // 过渡点2
+        borderDots.at(5)->moveBy(dx * 0.25, dy * 1.2); // 过渡点3
+
+    } else if (index == 3) {  // 左下角
+        borderDots.at(2)->moveBy(0, dy);  // 右下角
+        borderDots.at(0)->moveBy(dx, 0);  // 左上角
+
+        // 过渡点
+        borderDots.at(3)->moveBy(dx * 0.25, dy * 0.8);  // 过渡点1
+        borderDots.at(4)->moveBy(dx * 0.5, dy);          // 过渡点2
+        borderDots.at(5)->moveBy(dx * 0.75, dy * 1.2); // 过渡点3
+    }
+
+    // 重绘图形
+    draw();
+}
 

@@ -6,6 +6,7 @@ class FlowDocuElement: public FlowElement
 public:
     FlowDocuElement();
     void draw();
+    void scale(int index, double dx, double dy);
 };
 
 #endif // FLOWDOCUELEMENT_H
