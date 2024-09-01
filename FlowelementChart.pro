@@ -11,17 +11,13 @@ CONFIG += c++17
 SOURCES += \
     canvas.cpp \
     flowelement.cpp \
-    flowrectelement.cpp \
     main.cpp \
-    mainwidget.cpp \
-    rectangleelement.cpp
+    mainwidget.cpp
 
 HEADERS += \
     canvas.h \
     flowelement.h \
-    flowrectelement.h \
-    mainwidget.h \
-    rectangleelement.h
+    mainwidget.h
 
 FORMS += \
     mainwidget.ui

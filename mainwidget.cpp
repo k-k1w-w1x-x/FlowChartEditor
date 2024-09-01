@@ -14,17 +14,9 @@ MainWidget::MainWidget(QWidget *parent)
     , ui(new Ui::MainWidget), canvas(new Canvas(this))
 {
     ui->setupUi(this);
-    // // 创建主布局管理器，将其设置为水平布局 以后这段通过ui实现
-    // QHBoxLayout *mainLayout = new QHBoxLayout(this);
-
-    // // 左侧栏布局，用于放置按钮
-    // QVBoxLayout *leftLayout = new QVBoxLayout();
 
     // 设置窗口大小
     this->resize(800, 600);
-
-    // 将左侧布局添加到主布局中
-    // ui->mainLayout->addLayout(leftLayout);
 
     // 设置 Canvas 的网格属性
     canvas->setGridSpacing(20);  // 设置网格间隔为 20 像素
@@ -42,11 +34,6 @@ MainWidget::MainWidget(QWidget *parent)
     path->cubicTo(40, 70, 10, 70, 0, 80); // 波浪连接
     path->lineTo(0, 0); // 左边回到起点
     QVector<QGraphicsRectItem>*x = new QVector<QGraphicsRectItem>;
-
-    FlowElement *test = new FlowRectElement();
-    canvas->addShape(test);
-
-
 
     //初始化左侧按钮
     init_left_button();
@@ -69,12 +56,10 @@ void MainWidget::init_menu_layout() {
     newAction = new QAction(QIcon(":/menu/new.png"),"New", this);
     openAction = new QAction(QIcon(":/menu/open.png"),"Open", this);
     saveAction = new QAction(QIcon(":/menu/save.png"),"Save", this);
-    downloadAction = new QAction(QIcon(":/menu/download.png"),"download",this);
     exitAction = new QAction("Exit", this);
     fileMenu->addAction(saveAction);
     fileMenu->addAction(newAction);
     fileMenu->addAction(openAction);
-    fileMenu->addAction(downloadAction);
 
     //横线分隔
     fileMenu->addSeparator();
