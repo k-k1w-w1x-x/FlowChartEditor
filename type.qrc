@@ -1,0 +1,12 @@
+<RCC>
+    <qresource prefix="/type">
+        <file>rect.png</file>
+        <file>parallelogram.png</file>
+        <file>rhombus.png</file>
+        <file>triangle.png</file>
+        <file>rect2.png</file>
+        <file>circle.png</file>
+        <file>rect3.png</file>
+        <file>rect4.png</file>
+    </qresource>
+</RCC>
