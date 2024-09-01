@@ -30,8 +30,10 @@ private:
     QList<FlowElement*> elements ;
 
     QPointF lastMousePosition;
-    bool isDragging;
-    FlowElement* clickedSelectedElement;
+    bool isDragging=false;
+    bool isScaling=false;
+    FlowElement* clickedSelectedElement = nullptr;
+    int clickedControlDot;
 public slots:
     void onColorButtonClicked();
 };

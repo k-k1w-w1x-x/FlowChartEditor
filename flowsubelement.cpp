@@ -30,7 +30,6 @@ FlowSubElement::FlowSubElement() : FlowElement() {
 }
 
 void FlowSubElement::draw(){
-    qDebug() << "draw";
 
     QPainterPath path;
     QPainterPath path1;
@@ -39,7 +38,6 @@ void FlowSubElement::draw(){
 
     // 依次取出两个小矩形的中心点，并绘制线条
     for (int i = 1; i < 4; ++i) {
-        qDebug() << "drawwwwwww";
         path.lineTo(borderDots[i]->scenePos() + borderDots[i]->rect().center());
     }
     for(QGraphicsRectItem* borderDot : borderDots){

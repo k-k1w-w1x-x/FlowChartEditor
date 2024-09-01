@@ -15,7 +15,6 @@ FlowRadiusElement::FlowRadiusElement() {
 }
 
 void FlowRadiusElement::draw() {
-    qDebug() << "draw";
     for(QGraphicsRectItem* borderDot : borderDots){
         borderDot->setBrush(Qt::red);
         QPen pen(Qt::red);

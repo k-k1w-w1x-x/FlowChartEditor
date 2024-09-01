@@ -83,17 +83,33 @@ void Canvas::addShape(FlowElement *element)
 void Canvas::mousePressEvent(QMouseEvent *event)
 {
     QPointF clickedPoint = mapToScene(event->pos());
-    clickedSelectedElement = nullptr;
+    // clickedSelectedElement = nullptr;
     bool elementClicked = false;
+
+    if(clickedSelectedElement){
+        int index = 0;//标记哪个dot被选中了
+        for(QGraphicsRectItem* controlDot : clickedSelectedElement->controlDots){
+            QPointF localPoint = controlDot->mapFromScene(clickedPoint);
+            if(controlDot->contains(localPoint)){//若在选中状态下有控制点被点击
+                qDebug()<<"进入缩放模式";
+                isScaling = true;
+                clickedControlDot = index;//标记哪个dot被选中了
+                lastMousePosition = clickedPoint;
+                setDragMode(QGraphicsView::NoDrag);//禁用拖拽框
+                break;
+            }
+            index++;
+        }
+    }
 
     // 遍历所有元素，检查是否点击了某个元素
     for (FlowElement *element : elements) {
         if (element->mainItem->contains(clickedPoint)) {
             // 进入拖动模式
-            if(element->selected){
+            if(element->selected&&!isScaling){//若在选中状态下且不在缩放状态中
                 isDragging = true;
                 lastMousePosition = clickedPoint;
-                setDragMode(QGraphicsView::NoDrag);
+                setDragMode(QGraphicsView::NoDrag);//禁用拖拽框
             }
             qDebug()<<"clicked";
             clickedSelectedElement = element;
@@ -126,6 +142,17 @@ void Canvas::mousePressEvent(QMouseEvent *event)
 
 void Canvas::mouseMoveEvent(QMouseEvent *event)
 {
+    if(isScaling && clickedSelectedElement){
+        qDebug()<<"缩放且鼠标移动";
+        QPointF currentPosition = mapToScene(event->pos());
+        QPointF offset = currentPosition - lastMousePosition;
+
+        clickedSelectedElement->scale(clickedControlDot,offset.x(), offset.y());
+        lastMousePosition = currentPosition;
+
+        scene->update();
+    }
+
     if (isDragging && clickedSelectedElement) {
         QPointF currentPosition = mapToScene(event->pos());
         QPointF offset = currentPosition - lastMousePosition;
@@ -141,8 +168,10 @@ void Canvas::mouseMoveEvent(QMouseEvent *event)
 
 void Canvas::mouseReleaseEvent(QMouseEvent *event)
 {
+
     if (event->button() == Qt::LeftButton) {
         isDragging = false;
+        isScaling = false;
     }
     setDragMode(QGraphicsView::RubberBandDrag);
     QGraphicsView::mouseReleaseEvent(event);
