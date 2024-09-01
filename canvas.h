@@ -29,7 +29,6 @@ private:
     QColor gridColor; // 网格线的颜色
     QList<FlowElement*> elements ;
 
-    FlowElement *selectedElement;
     QPointF lastMousePosition;
     bool isDragging;
     FlowElement* clickedSelectedElement;

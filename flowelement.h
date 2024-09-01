@@ -4,6 +4,7 @@
 #include <QGraphicsItem>
 #include <QGraphicsRectItem>
 #include <QVector>
+#include <QPainter>
 
 class FlowElement : public QGraphicsItem {
 public:

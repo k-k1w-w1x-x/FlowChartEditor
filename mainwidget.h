@@ -10,6 +10,9 @@
 #include "flowparaelement.h"
 #include "flowcircleelement.h"
 #include "flowsubelement.h"
+#include "flowradiuselement.h"
+#include "flowdocuelement.h"
+#include "flowplaygroundelement.h"
 
 class Canvas;
 QT_BEGIN_NAMESPACE

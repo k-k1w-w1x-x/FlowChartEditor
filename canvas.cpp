@@ -8,7 +8,7 @@
 #include <QDebug>
 
 Canvas::Canvas(QWidget *parent)
-    : QGraphicsView(parent), selectedElement(nullptr), gridSpacing(20),
+    : QGraphicsView(parent),  gridSpacing(20),
     gridColor(Qt::lightGray), clickedSelectedElement(nullptr), isDragging(false)
 {
     scene = new QGraphicsScene(this);

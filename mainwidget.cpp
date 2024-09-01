@@ -36,6 +36,12 @@ MainWidget::MainWidget(QWidget *parent)
     canvas->addShape(circleElement);
     FlowSubElement* subElement = new FlowSubElement();
     canvas->addShape(subElement);
+    FlowRadiusElement* radiusElement = new FlowRadiusElement();
+    canvas->addShape(radiusElement);
+    FlowDocuElement* docuElement = new FlowDocuElement();
+    canvas->addShape(docuElement);
+    FlowPlaygroundElement* playgroundElement = new FlowPlaygroundElement();
+    canvas->addShape(playgroundElement);
 }
 
 MainWidget::~MainWidget()
