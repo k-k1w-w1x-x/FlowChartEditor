@@ -8,5 +8,6 @@
         <file>new.png</file>
         <file>open.png</file>
         <file>download.png</file>
+        <file>color_change.png</file>
     </qresource>
 </RCC>

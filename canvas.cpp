@@ -19,15 +19,15 @@ Canvas::Canvas(QWidget *parent)
     setViewportUpdateMode(BoundingRectViewportUpdate);
     setDragMode(QGraphicsView::RubberBandDrag);
 
-    // 创建一个垂直布局，用于在画布左侧放置按钮
-    QVBoxLayout *layout = new QVBoxLayout(this);
+    // // 创建一个垂直布局，用于在画布左侧放置按钮
+    // QVBoxLayout *layout = new QVBoxLayout(this);
 
-    // 创建按钮并添加到布局中
-    QPushButton *colorButton = new QPushButton("Change Color", this);
-    layout->addWidget(colorButton);
+    // // 创建按钮并添加到布局中
+    // QPushButton *colorButton = new QPushButton("Change Color", this);
+    // layout->addWidget(colorButton);
 
-    // 连接按钮点击事件到槽函数
-    connect(colorButton, &QPushButton::clicked, this, &Canvas::onColorButtonClicked);
+    // // 连接按钮点击事件到槽函数
+    // connect(colorButton, &QPushButton::clicked, this, &Canvas::onColorButtonClicked);
 }
 
 void Canvas::setGridSpacing(int spacing)
