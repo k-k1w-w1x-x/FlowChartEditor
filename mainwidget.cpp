@@ -10,12 +10,13 @@
 #include <QVector>
 #include <QFileDialog>
 #include <QSvgGenerator>
+#include <QLineEdit>
 
 MainWidget::MainWidget(QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::MainWidget), canvas(new Canvas(this))
 {
-    canvas->setSceneRect(0, 0, 800, 600);
+    canvas->setSceneRect(0, 0, 1600, 1600);
     ui->setupUi(this);
 
     // 设置窗口大小
@@ -25,6 +26,8 @@ MainWidget::MainWidget(QWidget *parent)
     canvas->setGridSpacing(20);  // 设置网格间隔为 20 像素
     canvas->setGridColor(Qt::lightGray);  // 设置网格颜色为浅灰色
     // 将 Canvas 添加到主布局的右侧部分
+    // setLayout(ui->mainLayout);
+    ui->mainLayout->setSizeConstraint(QLayout::SetDefaultConstraint);
     ui->mainLayout->addWidget(canvas);
 
     QPainterPath *path = new QPainterPath();
@@ -60,7 +63,13 @@ MainWidget::MainWidget(QWidget *parent)
 }
 
 void MainWidget::init_menu_layout() {
+
+    ui->searchBox->setFixedSize(400, 35);
+    ui->searchButton->setFixedSize(40, 40);
+    ui->searchButton->setIcon(QIcon(":/menu/search.png"));
+
     menuBar = new QMenuBar(this);
+    ui->menuWidget->setLayout(ui->menu_layout);
     ui->menu_layout->setMenuBar(menuBar);
 
     // 创建菜单

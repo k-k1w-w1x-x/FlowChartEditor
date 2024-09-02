@@ -10,35 +10,32 @@ CONFIG += c++17
 
 SOURCES += \
     canvas.cpp \
+    flowelement.cpp \
+    main.cpp \
+    mainwidget.cpp \
     flowcircleelement.cpp \
     flowdiamondelement.cpp \
     flowdocuelement.cpp \
-    flowelement.cpp \
     flowparaelement.cpp \
     flowplaygroundelement.cpp \
     flowradiuselement.cpp \
     flowrectelement.cpp \
     flowsubelement.cpp \
-    graphicstextitem.cpp \
-    main.cpp \
-    mainwidget.cpp
+    graphicstextitem.cpp
 
 HEADERS += \
     canvas.h \
+    flowelement.h \
+    mainwidget.h \
     flowcircleelement.h \
     flowdiamondelement.h \
     flowdocuelement.h \
-    flowelement.h \
-    graphicstextitem.h \
-    mainwidget.h \
     flowparaelement.h \
     flowplaygroundelement.h \
     flowradiuselement.h \
     flowrectelement.h \
     flowsubelement.h \
-    mainwidget.h \
-    rectangleelement.h
-
+    graphicstextitem.h
 FORMS += \
     mainwidget.ui
 

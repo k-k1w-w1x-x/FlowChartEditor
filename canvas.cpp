@@ -6,12 +6,14 @@
 #include <QPainter>
 #include <QColorDialog>
 #include <QDebug>
+#include <qgraphicsitem.h>
 bool clickmove = false;
 bool clickscale = false;
 Canvas::Canvas(QWidget *parent)
     : QGraphicsView(parent),  gridSpacing(20),
     gridColor(Qt::lightGray), clickedSelectedElement(nullptr), isDragging(false)
 {
+    setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
     scene = new QGraphicsScene(this);
     setScene(scene);
 
