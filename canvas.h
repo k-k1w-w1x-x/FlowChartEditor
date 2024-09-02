@@ -30,6 +30,7 @@ private:
     int gridSpacing;  // 网格线的间隔
     QColor gridColor; // 网格线的颜色
     QList<FlowElement*> elements ;
+    QList<FlowElement*> dragSelectedElements ;
 
     QPointF lastMousePosition;
 
