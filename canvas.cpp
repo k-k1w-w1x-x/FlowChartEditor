@@ -6,6 +6,7 @@
 #include <QPainter>
 #include <QColorDialog>
 #include <QDebug>
+#include<keyeventFilter.h>
 bool clickmove = false;
 bool clickscale = false;
 Canvas::Canvas(QWidget *parent)
@@ -29,6 +30,16 @@ Canvas::Canvas(QWidget *parent)
 
     // 连接按钮点击事件到槽函数
     connect(colorButton, &QPushButton::clicked, this, &Canvas::onColorButtonClicked);
+    // 初始化并安装 KeyEventFilter
+    keyEventFilter = new KeyEventFilter(this);
+    this->installEventFilter(keyEventFilter);
+
+    // 连接 KeyEventFilter 的信号到相应的槽函数
+    connect(keyEventFilter, &KeyEventFilter::copyTriggered, this, &Canvas::onCopy);
+    connect(keyEventFilter, &KeyEventFilter::pasteTriggered, this, &Canvas::onPaste);
+    connect(keyEventFilter, &KeyEventFilter::undoTriggered, this, &Canvas::onUndo);
+    connect(keyEventFilter, &KeyEventFilter::redoTriggered, this, &Canvas::onRedo);
+    connect(keyEventFilter, &KeyEventFilter::findTriggered, this, &Canvas::onFind);
 }
 
 void Canvas::setGridSpacing(int spacing)
@@ -161,7 +172,7 @@ void Canvas::mouseMoveEvent(QMouseEvent *event)
             QPointF currentPosition = mapToScene(event->pos());
             QPointF offset = currentPosition - lastMousePosition;
 
-            clickedSelectedElement->scale(clickedControlDot,offset.x(), offset.y());
+            clickedSelectedElement->mySetScale(clickedControlDot,offset.x(), offset.y());
             lastMousePosition = currentPosition;
 
             scene->update();
@@ -269,7 +280,93 @@ void Canvas::onColorButtonClicked()
         qDebug() << "No element selected. Color change ignored.";
     }
 }
+//键盘操作
 
+// 添加一个剪切板列表
+
+
+void Canvas::onCopy()
+{
+    qDebug() << "onCopy() called";
+
+
+
+    // 获取选中的元素
+    QList<FlowElement *> SelectedElementTemp = this->dragSelectedElements;
+    if (SelectedElementTemp.empty()) {
+        return; // 如果没有选中任何元素，则直接返回
+    }
+    for(const auto&item:clipboard){
+        delete(item);
+    }
+    clipboard.clear();
+
+    // // 清空之前的选择元素列表
+    // selectedElements.clear();
+
+    // 遍历选中的图形项，并将它们深拷贝
+    for (const auto &item : SelectedElementTemp) {
+        FlowElement *clonedElement = item->deepClone(); // 深拷贝元素
+        clipboard.append(clonedElement);
+    }
+
+
+/*
+    // 此时，selectedElements 列表中包含了深拷贝的元素
+    // qDebug() << "复制了" << selectedItems.size() << "个元素";
+    if (clickedSelectedElement) {
+        FlowElement* SelectedElement = clickedSelectedElement->deepClone(); // 深拷贝元素
+        if (SelectedElement) {
+            clipboard.clear(); // 清空剪切板
+            clipboard.append(SelectedElement); // 将深拷贝的元素加入剪切板
+            qDebug() << "复制了一个元素到剪切板";
+        }
+    } else {
+        qDebug() << "没有选中任何元素，无法复制";
+    }
+*/
+
+}
+
+
+void Canvas::onPaste() {
+    qDebug() << "Paste action triggered";
+
+    if (clipboard.isEmpty()) {
+        qDebug() << "剪切板为空，无法粘贴";
+        return;
+    }
+
+    // 遍历剪切板中的元素
+    for (FlowElement* element : clipboard) {
+        FlowElement* clonedElement = element->deepClone(); // 深拷贝元素
+        clipboard.clear();
+        clipboard.append(clonedElement);
+        if (clonedElement) {
+            // 将粘贴的元素稍微偏移位置
+            clonedElement->move(10, 10); // 向右下偏移 10 像素
+            addShape(clonedElement); // 将深拷贝的元素添加到场景中
+            qDebug() << "粘贴了一个元素";
+        } else {
+            qDebug() << "deepClone 失败，无法粘贴该元素";
+        }
+    }
+}
+
+void Canvas::onUndo() {
+    qDebug() << "Undo action triggered";
+    // 具体的撤销操作
+}
+
+void Canvas::onRedo() {
+    qDebug() << "Redo action triggered";
+    // 具体的重做操作
+}
+
+void Canvas::onFind() {
+    qDebug() << "Find action triggered";
+    // 具体的查找操作
+}
 void Canvas::mouseDoubleClickEvent(QMouseEvent *event)
 {
     QPointF pos = mapToScene(event->pos());

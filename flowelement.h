@@ -22,7 +22,8 @@ public:
 
     virtual QRectF boundingRect() const override; // 定义边界矩形
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = nullptr) override; // 定义绘制操作
-    virtual void scale(int index,double dx,double dy) ; //放大缩小
+    virtual FlowElement* deepClone() ;
+    virtual void mySetScale(int index,double dx,double dy) ; //放大缩小 重命名了scale()函数
     bool inBorder(int idx);
     int deltax[4]={-1,1,1,-1};
     int deltay[4]={-1,-1,1,1};

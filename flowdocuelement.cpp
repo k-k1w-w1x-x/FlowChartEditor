@@ -61,7 +61,7 @@ void FlowDocuElement::draw() {
     pen.setWidth(2);
     mainItem->setPen(pen);
 }
-void FlowDocuElement::scale(int index, double dx, double dy)
+void FlowDocuElement::mySetScale(int index, double dx, double dy)
 {
 
     if(!inBorder(index)){

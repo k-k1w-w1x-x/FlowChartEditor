@@ -20,6 +20,7 @@ SOURCES += \
     flowrectelement.cpp \
     flowsubelement.cpp \
     graphicstextitem.cpp \
+    keyeventfilter.cpp \
     main.cpp \
     mainwidget.cpp
 
@@ -30,6 +31,7 @@ HEADERS += \
     flowdocuelement.h \
     flowelement.h \
     graphicstextitem.h \
+    keyeventFilter.h \
     mainwidget.h \
     flowparaelement.h \
     flowplaygroundelement.h \

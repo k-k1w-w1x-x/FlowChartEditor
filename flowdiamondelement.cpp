@@ -18,7 +18,7 @@ FlowDiamondElement::FlowDiamondElement(): FlowElement()
     // 绘制路径
     draw();
 }
-void FlowDiamondElement::scale(int index, double dx, double dy)
+void FlowDiamondElement::mySetScale(int index, double dx, double dy)
 {
     qDebug() << "开始缩放";
     if(!inBorder(index)){

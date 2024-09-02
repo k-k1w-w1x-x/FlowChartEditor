@@ -17,3 +17,39 @@ FlowRectElement::FlowRectElement() : FlowElement() {
     // 绘制路径
     draw();
 }
+
+FlowRectElement *FlowRectElement::deepClone()
+{
+    FlowRectElement* clonedElement = new FlowRectElement();
+    clonedElement->borderDots.clear();
+    clonedElement->controlDots.clear();
+
+    clonedElement->contentColor = this->contentColor;
+    clonedElement->selected = this->selected;
+
+    clonedElement->mainItem->setPath(this->mainItem->path());
+    clonedElement->mainItem->setBrush(this->mainItem->brush());
+    clonedElement->mainItem->setPen(this->mainItem->pen());
+
+    for (QGraphicsRectItem* borderDot : this->borderDots) {
+        QGraphicsRectItem* newDot = new QGraphicsRectItem(borderDot->rect());
+        newDot->setBrush(borderDot->brush());
+        newDot->setPen(borderDot->pen());
+        newDot->setPos(borderDot->pos());
+        clonedElement->borderDots.append(newDot);
+    }
+
+    for (QGraphicsRectItem* controlDot : this->controlDots) {
+        QGraphicsRectItem* newDot = new QGraphicsRectItem(controlDot->rect());
+        newDot->setBrush(controlDot->brush());
+        newDot->setPen(controlDot->pen());
+        newDot->setPos(controlDot->pos());
+        clonedElement->controlDots.append(newDot);
+    }
+
+    clonedElement->setPos(this->pos());
+    clonedElement->setRotation(this->rotation());
+    clonedElement->setScale(this->scale());
+
+    return clonedElement;
+}

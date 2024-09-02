@@ -6,6 +6,7 @@
 class FlowRectElement : public FlowElement {
 public:
     FlowRectElement();
+    FlowRectElement* deepClone();
 };
 
 #endif // FLOWRECTELEMENT_H

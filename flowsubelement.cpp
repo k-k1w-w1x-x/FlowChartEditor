@@ -72,7 +72,7 @@ void FlowSubElement::draw(){
     mainItem->setPen(pen);
 }
 
-void FlowSubElement::scale(int index, double dx, double dy) {
+void FlowSubElement::mySetScale(int index, double dx, double dy) {
     if(!inBorder(index)){
         dx = deltax[index];
         dy = deltay[index];

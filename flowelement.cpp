@@ -40,8 +40,9 @@ bool FlowElement::contains(const QPointF &point) const {
 
 void FlowElement::move(int dx, int dy) {
     // 先移动各个控制点（边界点）
-    for(QGraphicsRectItem *borderDot : borderDots) {
+    for(QGraphicsRectItem * borderDot : borderDots) {
         borderDot->moveBy(dx, dy);
+        qDebug()<<borderDot->pos();
     }
     // 重新绘制路径
     draw();
@@ -58,7 +59,7 @@ QRectF FlowElement::boundingRect() const {
     return QRectF(150, 100, 100, 100);  // 根据你的需求调整大小和位置
 }
 
-void FlowElement::scale(int index,double dx,double dy)//默认4个控制点，如果不是需要重写，规定从左上角开始顺时针
+void FlowElement::mySetScale(int index,double dx,double dy)//默认4个控制点，如果不是需要重写，规定从左上角开始顺时针
 {
     qDebug()<<"开始缩放";
     if(!inBorder(index)){
@@ -84,7 +85,38 @@ void FlowElement::scale(int index,double dx,double dy)//默认4个控制点，�
     }
     draw();
 }
+FlowElement* FlowElement::deepClone() {
+    FlowElement* clonedElement = new FlowElement();
 
+    clonedElement->contentColor = this->contentColor;
+    clonedElement->selected = this->selected;
+
+    clonedElement->mainItem->setPath(this->mainItem->path());
+    clonedElement->mainItem->setBrush(this->mainItem->brush());
+    clonedElement->mainItem->setPen(this->mainItem->pen());
+
+    for (QGraphicsRectItem* borderDot : this->borderDots) {
+        QGraphicsRectItem* newDot = new QGraphicsRectItem(borderDot->rect());
+        newDot->setBrush(borderDot->brush());
+        newDot->setPen(borderDot->pen());
+        newDot->setPos(borderDot->pos());
+        clonedElement->borderDots.append(newDot);
+    }
+
+    for (QGraphicsRectItem* controlDot : this->controlDots) {
+        QGraphicsRectItem* newDot = new QGraphicsRectItem(controlDot->rect());
+        newDot->setBrush(controlDot->brush());
+        newDot->setPen(controlDot->pen());
+        newDot->setPos(controlDot->pos());
+        clonedElement->controlDots.append(newDot);
+    }
+
+    clonedElement->setPos(this->pos());
+    clonedElement->setRotation(this->rotation());
+    clonedElement->setScale(this->scale());
+
+    return clonedElement;
+}
 bool FlowElement::inBorder(int idx){
     int oppIdx = (idx+2) % 4;
     if(idx == 0){
