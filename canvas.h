@@ -31,12 +31,13 @@ private:
     QColor gridColor; // 网格线的颜色
     QList<FlowElement*> elements ;
 
-    FlowElement *selectedElement;
     QPointF lastMousePosition;
-    bool isDragging;
-    FlowElement* clickedSelectedElement;
 
     std::vector<GraphicsTextItem*> graphicTextItems;
+    bool isDragging=false;
+    bool isScaling=false;
+    FlowElement* clickedSelectedElement = nullptr;
+    int clickedControlDot;
 public slots:
     void onColorButtonClicked();
 };

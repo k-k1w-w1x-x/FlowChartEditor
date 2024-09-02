@@ -14,6 +14,7 @@ MainWidget::MainWidget(QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::MainWidget), canvas(new Canvas(this))
 {
+    canvas->setSceneRect(0, 0, 800, 600);
     ui->setupUi(this);
 
     // 设置窗口大小
@@ -110,8 +111,8 @@ void MainWidget::init_left_button() {
     ui->rect3_button->setIcon(icon2);
     ui->rect3_button->setIconSize(QSize(32, 32));
     connect(ui->rect3_button, &QPushButton::clicked, [=](){
-        FlowRectElement* rectElement = new FlowRectElement();
-        canvas->addShape(rectElement);
+        FlowDocuElement* documentElement = new FlowDocuElement();
+        canvas->addShape(documentElement);
     });
 
     //菱形
@@ -160,6 +161,10 @@ void MainWidget::init_left_button() {
     QIcon icon7(":/type/rect4.png");
     ui->rect4_button->setIcon(icon7);
     ui->rect4_button->setIconSize(QSize(50, 50));
+    connect(ui->rect4_button, &QPushButton::clicked, [=](){
+        FlowPlaygroundElement* playgroundElement = new FlowPlaygroundElement();
+        canvas->addShape(playgroundElement);
+    });
 
     // // 创建一个 FlowRectElement 并将其添加到 Canvas (QGraphicsScene) 中
     // FlowRectElement* rectElement = new FlowRectElement();

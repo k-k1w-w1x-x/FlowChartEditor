@@ -12,8 +12,11 @@ SOURCES += \
     canvas.cpp \
     flowcircleelement.cpp \
     flowdiamondelement.cpp \
+    flowdocuelement.cpp \
     flowelement.cpp \
     flowparaelement.cpp \
+    flowplaygroundelement.cpp \
+    flowradiuselement.cpp \
     flowrectelement.cpp \
     flowsubelement.cpp \
     graphicstextitem.cpp \
@@ -24,10 +27,13 @@ HEADERS += \
     canvas.h \
     flowcircleelement.h \
     flowdiamondelement.h \
+    flowdocuelement.h \
     flowelement.h \
     graphicstextitem.h \
     mainwidget.h \
     flowparaelement.h \
+    flowplaygroundelement.h \
+    flowradiuselement.h \
     flowrectelement.h \
     flowsubelement.h \
     mainwidget.h \
