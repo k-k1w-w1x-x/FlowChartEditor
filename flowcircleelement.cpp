@@ -25,16 +25,17 @@ void FlowCircleElement::draw() {
 
     QPainterPath path;
 
-    // 获取控制点的外接矩形，并计算出圆的中心和半径
-    if (borderDots.size() >= 2) {
-        QPointF center = (borderDots[0]->scenePos() + borderDots[2]->scenePos()) / 2; // 计算圆心
-        qreal radiusX = std::abs(borderDots[0]->scenePos().x() - borderDots[1]->scenePos().x()) / 2;
-        qreal radiusY = std::abs(borderDots[0]->scenePos().y() - borderDots[3]->scenePos().y()) / 2;
-        qreal radius = std::min(radiusX, radiusY);  // 取较小的值作为圆的半径
-        center.rx()+=DOT_SIZE/2;
-        center.ry()+=DOT_SIZE/2;
-        // 在路径中添加圆形
-        path.addEllipse(center, radius, radius);
+    // 确保有足够的控制点
+    if (borderDots.size() >= 4) {
+        // 获取外接矩形的左上角和右下角点
+        QPointF topLeft = borderDots[0]->scenePos();
+        QPointF bottomRight = borderDots[2]->scenePos();
+
+        // 计算外接矩形
+        QRectF boundingRect(topLeft, bottomRight);
+
+        // 添加外接矩形内的椭圆
+        path.addEllipse(boundingRect);
     }
 
     // 设置控制点的外观
@@ -50,7 +51,6 @@ void FlowCircleElement::draw() {
         QPen pen(Qt::black);
         arrowDot->setPen(pen);
     }
-
     // 设置主图形项路径
     mainItem->setPath(path);
     mainItem->setBrush(QBrush(contentColor));
@@ -60,4 +60,3 @@ void FlowCircleElement::draw() {
     pen.setWidth(2);
     mainItem->setPen(pen);
 }
-

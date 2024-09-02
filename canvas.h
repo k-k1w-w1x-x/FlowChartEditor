@@ -34,7 +34,7 @@ private:
     bool isDragging=false;
     bool isScaling=false;
     FlowElement* clickedSelectedElement = nullptr;
-    int clickedControlDot;
+    int clickedControlDot ;
 public slots:
     void onColorButtonClicked();
 };

@@ -8,6 +8,7 @@
 #include <QDebug>
 bool clickmove = false;
 bool clickscale = false;
+bool elementClicked = false;
 Canvas::Canvas(QWidget *parent)
     : QGraphicsView(parent),  gridSpacing(20),
     gridColor(Qt::lightGray), clickedSelectedElement(nullptr), isDragging(false)
@@ -90,7 +91,27 @@ void Canvas::mousePressEvent(QMouseEvent *event)
 {
     clickmove = false;
     clickscale = false;
+    elementClicked = false;
     QPointF clickedPoint = mapToScene(event->pos());
+    if(isScaling && dragSelectedElements.size() == 1 ){
+        qDebug()<<"判断一下";
+        clickedSelectedElement = dragSelectedElements.at(0);
+        int index = 0;
+        for(QGraphicsRectItem* controlDot : clickedSelectedElement->controlDots){
+            QPointF localPoint = controlDot->mapFromScene(clickedPoint);
+            if(controlDot->contains(localPoint)){//若在选中状态下有控制点被点击
+                qDebug()<<"进入缩放模式111";
+                clickedControlDot = index;//标记哪个dot被选中了
+                qDebug()<<"index:"<<index;
+                setDragMode(QGraphicsView::NoDrag);//禁用拖拽框
+                elementClicked = true;
+                break;
+            }
+            index++;
+        }
+        qDebug()<<"clickedSelectedElement = dragSelectedElements.at(0);"<<clickedControlDot;
+    }
+
     // // clickedSelectedElement = nullptr;
     // bool elementClicked = false;
 
@@ -146,25 +167,26 @@ void Canvas::mouseMoveEvent(QMouseEvent *event)
     if(isScaling && dragSelectedElements.size() == 1 ){
         qDebug()<<"点点点点";
         clickedSelectedElement = dragSelectedElements.at(0);
-        bool elementClicked = false;
-        int index = 0;//标记哪个dot被选中了
-        for(QGraphicsRectItem* controlDot : clickedSelectedElement->controlDots){
-            QPointF localPoint = controlDot->mapFromScene(lastMousePosition);
-            if(controlDot->contains(localPoint)){//若在选中状态下有控制点被点击
-                qDebug()<<"进入缩放模式";
-                clickedControlDot = index;//标记哪个dot被选中了
-                setDragMode(QGraphicsView::NoDrag);//禁用拖拽框
-                elementClicked = true;
-                break;
-            }
-            index++;
-        }
+
+        // int index = 0;//标记哪个dot被选中了
+        // for(QGraphicsRectItem* controlDot : clickedSelectedElement->controlDots){
+        //     QPointF localPoint = controlDot->mapFromScene(lastMousePosition);
+        //     if(controlDot->contains(localPoint)){//若在选中状态下有控制点被点击
+        //         qDebug()<<"进入缩放模式";
+        //         // clickedControlDot = index;//标记哪个dot被选中了
+        //         // qDebug()<<"index:"<<index;
+        //         setDragMode(QGraphicsView::NoDrag);//禁用拖拽框
+        //         elementClicked = true;
+        //         break;
+        //     }
+        //     // index++;
+        // }
         if(elementClicked){
             qDebug()<<"缩放且鼠标移动";
             clickscale = true;
             QPointF currentPosition = mapToScene(event->pos());
             QPointF offset = currentPosition - lastMousePosition;
-
+            qDebug()<<"clickedSelectedElement"<<clickedControlDot;
             clickedSelectedElement->scale(clickedControlDot,offset.x(), offset.y());
             lastMousePosition = currentPosition;
 
