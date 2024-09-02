@@ -16,6 +16,7 @@ FlowPlaygroundElement::FlowPlaygroundElement() : FlowElement() {
     borderDots.last()->setPos(200, 200);
 
     controlDots = borderDots;
+    calArrowDots();
 
     // 绘制路径
     draw();
@@ -27,6 +28,14 @@ void FlowPlaygroundElement::draw() {
         borderDot->setBrush(Qt::red);
         QPen pen(Qt::red);
         borderDot->setPen(pen);
+    }
+
+    // 设置箭头点的外观
+    resetArrowDots();
+    for(QGraphicsRectItem* arrowDot : arrowDots){
+        arrowDot->setBrush(Qt::black);
+        QPen pen(Qt::black);
+        arrowDot->setPen(pen);
     }
 
     QPainterPath path;
@@ -75,4 +84,32 @@ void FlowPlaygroundElement::drawHalfCircle(QPainterPath &path, const QPointF &po
     // 绘制半圆（180度的弧线）
     path.arcMoveTo(boundingRect, angle + 180);
     path.arcTo(boundingRect, angle + 180, -180);
+}
+
+void FlowPlaygroundElement::calArrowDots(){
+    if(controlDots.size() < 4){
+        return;
+    }
+    arrowDots.append(new QGraphicsRectItem(QRectF(0, 0, DOT_SIZE, DOT_SIZE), this));
+    arrowDots.last()->setPos((controlDots[0]->scenePos()+controlDots[1]->scenePos())/2);
+    arrowDots.append(new QGraphicsRectItem(QRectF(0, 0, DOT_SIZE, DOT_SIZE), this));
+    arrowDots.last()->setX(controlDots[1]->scenePos().x() + (controlDots[2]->scenePos().y() - controlDots[1]->scenePos().y())/2);
+    arrowDots.last()->setY((controlDots[2]->scenePos().y() + controlDots[1]->scenePos().y())/2);
+    arrowDots.append(new QGraphicsRectItem(QRectF(0, 0, DOT_SIZE, DOT_SIZE), this));
+    arrowDots.last()->setPos((controlDots[2]->scenePos()+controlDots[3]->scenePos())/2);
+    arrowDots.append(new QGraphicsRectItem(QRectF(0, 0, DOT_SIZE, DOT_SIZE), this));
+    arrowDots.last()->setX(controlDots[0]->scenePos().x() + (controlDots[0]->scenePos().y() - controlDots[3]->scenePos().y())/2);
+    arrowDots.last()->setY((controlDots[0]->scenePos().y() + controlDots[3]->scenePos().y())/2);
+// ((controlDots[0]->scenePos()+controlDots[(1)%4]->scenePos())/2);
+}
+void FlowPlaygroundElement::resetArrowDots(){
+    if(controlDots.size() < 4){
+        return;
+    }
+    arrowDots.at(0)->setPos((controlDots[0]->scenePos()+controlDots[1]->scenePos())/2);
+    arrowDots.at(1)->setX(controlDots[1]->scenePos().x() + (controlDots[2]->scenePos().y() - controlDots[1]->scenePos().y())/2);
+    arrowDots.at(1)->setY((controlDots[2]->scenePos().y() + controlDots[1]->scenePos().y())/2);
+    arrowDots.at(2)->setPos((controlDots[2]->scenePos()+controlDots[3]->scenePos())/2);
+    arrowDots.at(3)->setX(controlDots[0]->scenePos().x() + (controlDots[0]->scenePos().y() - controlDots[3]->scenePos().y())/2);
+    arrowDots.at(3)->setY((controlDots[0]->scenePos().y() + controlDots[3]->scenePos().y())/2);
 }

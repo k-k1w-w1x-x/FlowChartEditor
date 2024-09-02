@@ -13,6 +13,7 @@ FlowParaElement::FlowParaElement(): FlowElement()
     borderDots.last()->setPos(125, 175);
 
     controlDots = borderDots;
+    calArrowDots();
 
     // 绘制路径
     draw();

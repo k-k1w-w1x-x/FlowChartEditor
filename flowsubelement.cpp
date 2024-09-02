@@ -14,6 +14,7 @@ FlowSubElement::FlowSubElement() : FlowElement() {
     borderDots.last()->setPos(150, 200);
 
     controlDots = borderDots;
+    calArrowDots();
 
     borderDots.append(new QGraphicsRectItem(QRectF(0, 0, DOT_SIZE, DOT_SIZE), this));  // 左上角
     borderDots.last()->setPos(160, 100);
@@ -44,6 +45,13 @@ void FlowSubElement::draw(){
         borderDot->setBrush(Qt::red);
         QPen pen(Qt::red);
         borderDot->setPen(pen);
+    }
+    // 设置箭头点的外观
+    resetArrowDots();
+    for(QGraphicsRectItem* arrowDot : arrowDots){
+        arrowDot->setBrush(Qt::black);
+        QPen pen(Qt::black);
+        arrowDot->setPen(pen);
     }
     path.closeSubpath();
 

@@ -14,6 +14,7 @@ FlowDiamondElement::FlowDiamondElement(): FlowElement()
     borderDots.last()->setPos(250, 200);
 
     controlDots = borderDots;
+    calArrowDots();
 
     // 绘制路径
     draw();
@@ -47,3 +48,16 @@ void FlowDiamondElement::scale(int index, double dx, double dy)
     draw();
 }
 
+void FlowDiamondElement::calArrowDots(){
+    if(controlDots.size() < 4){
+        return;
+    }
+    arrowDots = controlDots;
+}
+
+void FlowDiamondElement::resetArrowDots(){
+    if(controlDots.size() < 4){
+        return;
+    }
+    arrowDots = controlDots;
+}

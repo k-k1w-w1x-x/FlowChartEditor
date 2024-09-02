@@ -13,6 +13,7 @@ FlowRectElement::FlowRectElement() : FlowElement() {
     borderDots.last()->setPos(150, 200);
 
     controlDots = borderDots;
+    calArrowDots();
 
     // 绘制路径
     draw();

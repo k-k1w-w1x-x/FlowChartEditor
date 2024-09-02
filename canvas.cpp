@@ -79,6 +79,10 @@ void Canvas::addShape(FlowElement *element)
             scene->addItem(controlDot);
             controlDot->setVisible(false);
         }
+        for (auto arrowDot : element->arrowDots) {
+            scene->addItem(arrowDot);
+            arrowDot->setVisible(false);
+        }
     }
 }
 
@@ -210,6 +214,9 @@ void Canvas::mouseReleaseEvent(QMouseEvent *event)
             for (auto controlDot : dragSelectedElement->controlDots) {
                 controlDot->setVisible(false);
             }
+            for (auto arrowDot : dragSelectedElement->arrowDots) {
+                arrowDot->setVisible(false);
+            }
         }
         dragSelectedElements.clear();
         qDebug()<<"这里的size"<<dragSelectedElements.size();
@@ -217,7 +224,7 @@ void Canvas::mouseReleaseEvent(QMouseEvent *event)
 
     for (int i = elements.size() - 1; i >= 0; i-- ) {
         FlowElement *element = elements[i];
-        if (element->mainItem->isSelected() && !clickmove) {
+        if (element->mainItem->isSelected() && !clickmove && !clickscale) {
             dragSelectedElements.append(element);
         }
     }
@@ -230,6 +237,10 @@ void Canvas::mouseReleaseEvent(QMouseEvent *event)
             if (element->mainItem->isSelected()) {
                 for (auto controlDot : element->controlDots) {
                     controlDot->setVisible(true);
+                }
+                for (auto arrowDot : element->arrowDots) {
+                    scene->addItem(arrowDot);
+                    arrowDot->setVisible(false);
                 }
                 element->selected = true;
             }
@@ -249,6 +260,10 @@ void Canvas::mouseReleaseEvent(QMouseEvent *event)
             // 如果选中元素，显示四个边界点
             for (auto controlDot : element->controlDots) {
                 controlDot->setVisible(true);
+            }
+            for (auto arrowDot : element->arrowDots) {
+                scene->addItem(arrowDot);
+                arrowDot->setVisible(true);
             }
             element->selected = true;
         }

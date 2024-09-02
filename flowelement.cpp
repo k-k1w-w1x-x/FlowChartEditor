@@ -1,6 +1,7 @@
 #include "flowelement.h"
 #include <QPainter>
 #include <QDebug>
+#define DOT_SIZE 5
 FlowElement::FlowElement() {
     mainItem = new QGraphicsPathItem(this);
 }
@@ -23,6 +24,14 @@ void FlowElement::draw() {
         borderDot->setPen(pen);
     }
 
+    // 设置箭头点的外观
+    resetArrowDots();
+    for(QGraphicsRectItem* arrowDot : arrowDots){
+        arrowDot->setBrush(Qt::black);
+        QPen pen(Qt::black);
+        arrowDot->setPen(pen);
+    }
+
     path.closeSubpath();
 
     // 设置主图形项路径
@@ -42,6 +51,9 @@ void FlowElement::move(int dx, int dy) {
     // 先移动各个控制点（边界点）
     for(QGraphicsRectItem *borderDot : borderDots) {
         borderDot->moveBy(dx, dy);
+    }
+    for(QGraphicsRectItem *arrowDot : arrowDots) {
+        arrowDot->moveBy(dx, dy);
     }
     // 重新绘制路径
     draw();
@@ -83,6 +95,25 @@ void FlowElement::scale(int index,double dx,double dy)//默认4个控制点，�
         borderDots.at(0)->moveBy(dx, 0);
     }
     draw();
+}
+
+void FlowElement::calArrowDots(){
+    if(controlDots.size() < 4){
+        return;
+    }
+    for(int i=0 ;i < controlDots.size() ;i++){
+        arrowDots.append(new QGraphicsRectItem(QRectF(0, 0, DOT_SIZE, DOT_SIZE), this));
+        arrowDots.last()->setPos((controlDots[i]->scenePos()+controlDots[(i+1)%4]->scenePos())/2);
+    }
+}
+
+void FlowElement::resetArrowDots(){
+    if(controlDots.size() < 4){
+        return;
+    }
+    for(int i=0 ;i < controlDots.size() ;i++){
+        arrowDots.at(i)->setPos((controlDots[i]->scenePos()+controlDots[(i+1)%4]->scenePos())/2);
+    }
 }
 
 bool FlowElement::inBorder(int idx){

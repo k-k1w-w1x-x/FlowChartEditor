@@ -23,6 +23,7 @@ FlowDocuElement::FlowDocuElement(): FlowElement()
     borderDots.last()->setPos(150, 150);
 
     controlDots.append(borderDots.last());
+    calArrowDots();
     // 绘制路径
     draw();
 }
@@ -33,6 +34,14 @@ void FlowDocuElement::draw() {
         borderDot->setBrush(Qt::red);
         QPen pen(Qt::red);
         borderDot->setPen(pen);
+    }
+
+    // 设置箭头点的外观
+    resetArrowDots();
+    for(QGraphicsRectItem* arrowDot : arrowDots){
+        arrowDot->setBrush(Qt::black);
+        QPen pen(Qt::black);
+        arrowDot->setPen(pen);
     }
 
     // 初始化绘制路径
