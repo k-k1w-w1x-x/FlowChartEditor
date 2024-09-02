@@ -42,8 +42,11 @@ void FlowElement::move(int dx, int dy) {
     // 先移动各个控制点（边界点）
     for(QGraphicsRectItem * borderDot : borderDots) {
         borderDot->moveBy(dx, dy);
-        qDebug()<<borderDot->pos();
+        // qDebug()<<borderDot->pos();
     }
+    // for(auto&controlDot:controlDots){
+    //     controlDot->moveBy(dx,dy);
+    // }
     // 重新绘制路径
     draw();
 }

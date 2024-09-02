@@ -6,6 +6,7 @@ class FlowDiamondElement: public FlowElement
 public:
     FlowDiamondElement();
     void mySetScale(int index, double dx, double dy);
+    FlowDiamondElement *deepClone();
 };
 
 #endif // FLOWDIAMONDELEMENT_H

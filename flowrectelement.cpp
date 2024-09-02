@@ -31,20 +31,17 @@ FlowRectElement *FlowRectElement::deepClone()
     clonedElement->mainItem->setBrush(this->mainItem->brush());
     clonedElement->mainItem->setPen(this->mainItem->pen());
 
+    int cont=0;
     for (QGraphicsRectItem* borderDot : this->borderDots) {
         QGraphicsRectItem* newDot = new QGraphicsRectItem(borderDot->rect());
         newDot->setBrush(borderDot->brush());
         newDot->setPen(borderDot->pen());
         newDot->setPos(borderDot->pos());
         clonedElement->borderDots.append(newDot);
-    }
-
-    for (QGraphicsRectItem* controlDot : this->controlDots) {
-        QGraphicsRectItem* newDot = new QGraphicsRectItem(controlDot->rect());
-        newDot->setBrush(controlDot->brush());
-        newDot->setPen(controlDot->pen());
-        newDot->setPos(controlDot->pos());
-        clonedElement->controlDots.append(newDot);
+        if(cont<4){
+            clonedElement->controlDots.append(newDot);
+            cont++;
+        }
     }
 
     clonedElement->setPos(this->pos());

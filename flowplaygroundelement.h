@@ -9,6 +9,7 @@ public:
     FlowPlaygroundElement();
     void draw();
     void drawHalfCircle(QPainterPath &path, const QPointF &point1, const QPointF &point2);
+    FlowPlaygroundElement *deepClone();
 };
 
 #endif // FLOWPLAYGROUNDELEMENT_H

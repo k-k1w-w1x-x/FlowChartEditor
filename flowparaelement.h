@@ -5,6 +5,7 @@ class FlowParaElement:public FlowElement
 {
 public:
     FlowParaElement();
+    FlowParaElement *deepClone();
 };
 
 #endif // FLOWPARAELEMENT_H

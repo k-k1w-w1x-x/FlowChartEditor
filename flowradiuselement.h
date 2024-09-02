@@ -7,6 +7,7 @@ class FlowRadiusElement : public FlowElement
 public:
     FlowRadiusElement();
     void draw();
+    FlowRadiusElement *deepClone();
 };
 
 #endif // FLOWRADIUSELEMENT_H

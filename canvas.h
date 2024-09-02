@@ -20,6 +20,9 @@ public:
     void addShape(FlowElement *element);
     void setGridSpacing(int spacing);  // 设置网格间隔
     void setGridColor(const QColor &color);  // 设置网格颜色
+    bool clickmove = false;
+    bool clickscale = false;
+    bool mouseclick = false;
 
 protected:
     void drawBackground(QPainter *painter, const QRectF &rect) override;

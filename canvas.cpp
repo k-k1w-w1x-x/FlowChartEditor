@@ -8,8 +8,7 @@
 #include <QDebug>
 #include<keyeventFilter.h>
 #include <qgraphicsitem.h>
-bool clickmove = false;
-bool clickscale = false;
+
 Canvas::Canvas(QWidget *parent)
     : QGraphicsView(parent),  gridSpacing(20),
     gridColor(Qt::lightGray), clickedSelectedElement(nullptr), isDragging(false)
@@ -98,8 +97,10 @@ void Canvas::addShape(FlowElement *element)
 
 void Canvas::mousePressEvent(QMouseEvent *event)
 {
+    qDebug()<<"mousePress!";
     clickmove = false;
     clickscale = false;
+    mouseclick = true;
     QPointF clickedPoint = mapToScene(event->pos());
     // // clickedSelectedElement = nullptr;
     // bool elementClicked = false;
@@ -153,8 +154,11 @@ void Canvas::mousePressEvent(QMouseEvent *event)
 
 void Canvas::mouseMoveEvent(QMouseEvent *event)
 {
-    if(isScaling && dragSelectedElements.size() == 1 ){
-        qDebug()<<"点点点点";
+    if(!mouseclick){
+        return;
+    }
+    if( isScaling && dragSelectedElements.size() == 1 ){
+        // qDebug()<<"点点点点";
         clickedSelectedElement = dragSelectedElements.at(0);
         bool elementClicked = false;
         int index = 0;//标记哪个dot被选中了
@@ -186,7 +190,7 @@ void Canvas::mouseMoveEvent(QMouseEvent *event)
         QPointF offset = currentPosition - lastMousePosition;
         clickedSelectedElement = dragSelectedElements.at(0);
         if(clickedSelectedElement->contains(lastMousePosition)){
-            qDebug()<<"1个！选中才能动！";
+            // qDebug()<<"1个！选中才能动！"<<isDragging;
             clickedSelectedElement->move(offset.x(), offset.y());
             clickmove = true;
             lastMousePosition = currentPosition;
@@ -210,6 +214,8 @@ void Canvas::mouseMoveEvent(QMouseEvent *event)
 
 void Canvas::mouseReleaseEvent(QMouseEvent *event)
 {
+    mouseclick = false;
+    qDebug()<<"mouseRelease!";
     QPointF releasedPoint = mapToScene(event->pos());
     if (event->button() == Qt::LeftButton) {
         isDragging = false;
@@ -272,16 +278,29 @@ void Canvas::mouseReleaseEvent(QMouseEvent *event)
 
 void Canvas::onColorButtonClicked()
 {
-    if (clickedSelectedElement) {
-        QColor color = QColorDialog::getColor(clickedSelectedElement->contentColor, this, "Select Color");
+    if(!clickedSelectedElement){
+        qDebug() << "No element selected. Color change ignored.";
+        return;
+    }
+    QColor color = QColorDialog::getColor(clickedSelectedElement->contentColor, this, "Select Color");
+    for(const auto&dragselectedElement:dragSelectedElements){
+        // QColor color = QColorDialog::getColor(dragselectedElement->contentColor, this, "Select Color");
         if (color.isValid()) {
-            clickedSelectedElement->contentColor = color;  // 设置选中元素的颜色
-            clickedSelectedElement->draw();
+            dragselectedElement->contentColor = color;  // 设置选中元素的颜色
+            dragselectedElement->draw();
             scene->update();  // 触发重绘，将元素颜色更新
         }
-    } else {
-        qDebug() << "No element selected. Color change ignored.";
     }
+    // if (clickedSelectedElement) {
+    //     QColor color = QColorDialog::getColor(clickedSelectedElement->contentColor, this, "Select Color");
+    //     if (color.isValid()) {
+    //         clickedSelectedElement->contentColor = color;  // 设置选中元素的颜色
+    //         clickedSelectedElement->draw();
+    //         scene->update();  // 触发重绘，将元素颜色更新
+    //     }
+    // } else {
+    //     qDebug() << "No element selected. Color change ignored.";
+    // }
 }
 //键盘操作
 
@@ -343,8 +362,8 @@ void Canvas::onPaste() {
     // 遍历剪切板中的元素
     for (FlowElement* element : clipboard) {
         FlowElement* clonedElement = element->deepClone(); // 深拷贝元素
-        clipboard.clear();
-        clipboard.append(clonedElement);
+        // clipboard.clear();
+        // clipboard.append(clonedElement);
         if (clonedElement) {
             // 将粘贴的元素稍微偏移位置
             clonedElement->move(10, 10); // 向右下偏移 10 像素
@@ -372,6 +391,8 @@ void Canvas::onFind() {
 }
 void Canvas::mouseDoubleClickEvent(QMouseEvent *event)
 {
+    qDebug()<<"doubleclick";
+    mouseclick = false;
     QPointF pos = mapToScene(event->pos());
     QGraphicsTextItem *item = qgraphicsitem_cast<QGraphicsTextItem*>(scene->itemAt(pos, QTransform()));
     if (item == nullptr)

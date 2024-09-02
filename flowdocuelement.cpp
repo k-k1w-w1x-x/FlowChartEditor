@@ -111,4 +111,35 @@ void FlowDocuElement::mySetScale(int index, double dx, double dy)
     // 重绘图形
     draw();
 }
+FlowDocuElement *FlowDocuElement::deepClone()
+{
+    FlowDocuElement* clonedElement = new FlowDocuElement();
+    clonedElement->borderDots.clear();
+    clonedElement->controlDots.clear();
 
+    clonedElement->contentColor = this->contentColor;
+    clonedElement->selected = this->selected;
+
+    clonedElement->mainItem->setPath(this->mainItem->path());
+    clonedElement->mainItem->setBrush(this->mainItem->brush());
+    clonedElement->mainItem->setPen(this->mainItem->pen());
+
+    int cont=0;
+    for (QGraphicsRectItem* borderDot : this->borderDots) {
+        QGraphicsRectItem* newDot = new QGraphicsRectItem(borderDot->rect());
+        newDot->setBrush(borderDot->brush());
+        newDot->setPen(borderDot->pen());
+        newDot->setPos(borderDot->pos());
+        clonedElement->borderDots.append(newDot);
+        if(cont<4){
+            clonedElement->controlDots.append(newDot);
+            cont++;
+        }
+    }
+
+    clonedElement->setPos(this->pos());
+    clonedElement->setRotation(this->rotation());
+    clonedElement->setScale(this->scale());
+
+    return clonedElement;
+}
