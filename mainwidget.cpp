@@ -15,6 +15,7 @@ MainWidget::MainWidget(QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::MainWidget), canvas(new Canvas(this))
 {
+    canvas->setSceneRect(0, 0, 800, 600);
     ui->setupUi(this);
 
     // 设置窗口大小
@@ -115,7 +116,8 @@ void MainWidget::init_left_button() {
     ui->rect_button->setIcon(icon1);
     ui->rect_button->setIconSize(QSize(32, 32));
     connect(ui->rect_button, &QPushButton::clicked, [=](){
-        qDebug() << "hello";
+        FlowRectElement* rectElement = new FlowRectElement();
+        canvas->addShape(rectElement);
     });
 
     //文档矩形
@@ -123,36 +125,61 @@ void MainWidget::init_left_button() {
     QIcon icon2(":/type/rect3.png");
     ui->rect3_button->setIcon(icon2);
     ui->rect3_button->setIconSize(QSize(32, 32));
+    connect(ui->rect3_button, &QPushButton::clicked, [=](){
+        FlowDocuElement* documentElement = new FlowDocuElement();
+        canvas->addShape(documentElement);
+    });
 
     //菱形
     ui->rhombus_button->setFixedSize(60,50);
     QIcon icon3(":/type/rhombus.png");
     ui->rhombus_button->setIcon(icon3);
     ui->rhombus_button->setIconSize(QSize(32, 32));
+    connect(ui->rhombus_button, &QPushButton::clicked, [=](){
+        FlowDiamondElement* diamondElement = new FlowDiamondElement();
+        canvas->addShape(diamondElement);
+    });
 
     //平行四边形
     ui->parallelogram_button->setFixedSize(60,50);
     QIcon icon4(":/type/parallelogram.png");
     ui->parallelogram_button->setIcon(icon4);
     ui->parallelogram_button->setIconSize(QSize(32, 32));
+    connect(ui->parallelogram_button, &QPushButton::clicked, [=](){
+        FlowParaElement* paraElement = new FlowParaElement();
+        canvas->addShape(paraElement);
+    });
 
     //圆形
     ui->circle_button->setFixedSize(60,50);
     QIcon icon5(":/type/circle.png");
     ui->circle_button->setIcon(icon5);
     ui->circle_button->setIconSize(QSize(32, 32));
+    connect(ui->circle_button, &QPushButton::clicked, [=](){
+        FlowCircleElement* circleElement = new FlowCircleElement();
+        canvas->addShape(circleElement);
+    });
 
     //子流程矩形
     ui->rect2_button->setFixedSize(60,50);
     QIcon icon6(":/type/rect2.png");
     ui->rect2_button->setIcon(icon6);
     ui->rect2_button->setIconSize(QSize(40, 40));
+    connect(ui->rect2_button, &QPushButton::clicked, [=](){
+        FlowSubElement* subElement = new FlowSubElement();
+        canvas->addShape(subElement);
+    });
+
 
     //开始结束矩形
     ui->rect4_button->setFixedSize(60,50);
     QIcon icon7(":/type/rect4.png");
     ui->rect4_button->setIcon(icon7);
     ui->rect4_button->setIconSize(QSize(50, 50));
+    connect(ui->rect4_button, &QPushButton::clicked, [=](){
+        FlowPlaygroundElement* playgroundElement = new FlowPlaygroundElement();
+        canvas->addShape(playgroundElement);
+    });
 
     //color按钮
     ui->color_button->setFixedSize(60,50);
@@ -171,6 +198,18 @@ void MainWidget::init_left_button() {
 void MainWidget::onColorButtonClicked() {
     // 调用Canvas的draw方法
     canvas->onColorButtonClicked();
+    // // 创建一个 FlowRectElement 并将其添加到 Canvas (QGraphicsScene) 中
+    // FlowRectElement* rectElement = new FlowRectElement();
+    // canvas->addShape(rectElement);
+    //菱形
+    // FlowDiamondElement* diamondElement = new FlowDiamondElement();
+    // canvas->addShape(diamondElement);
+    // FlowParaElement* paraElement = new FlowParaElement();
+    // canvas->addShape(paraElement);
+    // FlowCircleElement* circleElement = new FlowCircleElement();
+    // canvas->addShape(circleElement);
+    // FlowSubElement* subElement = new FlowSubElement();
+    // canvas->addShape(subElement);
 }
 
 MainWidget::~MainWidget()
