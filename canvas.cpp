@@ -7,12 +7,14 @@
 #include <QColorDialog>
 #include <QDebug>
 #include<keyeventFilter.h>
+#include <qgraphicsitem.h>
 bool clickmove = false;
 bool clickscale = false;
 Canvas::Canvas(QWidget *parent)
     : QGraphicsView(parent),  gridSpacing(20),
     gridColor(Qt::lightGray), clickedSelectedElement(nullptr), isDragging(false)
 {
+    setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
     scene = new QGraphicsScene(this);
     setScene(scene);
 
@@ -21,15 +23,15 @@ Canvas::Canvas(QWidget *parent)
     setViewportUpdateMode(BoundingRectViewportUpdate);
     setDragMode(QGraphicsView::RubberBandDrag);
 
-    // 创建一个垂直布局，用于在画布左侧放置按钮
-    QVBoxLayout *layout = new QVBoxLayout(this);
+    // // 创建一个垂直布局，用于在画布左侧放置按钮
+    // QVBoxLayout *layout = new QVBoxLayout(this);
 
-    // 创建按钮并添加到布局中
-    QPushButton *colorButton = new QPushButton("Change Color", this);
-    layout->addWidget(colorButton);
+    // // 创建按钮并添加到布局中
+    // QPushButton *colorButton = new QPushButton("Change Color", this);
+    // layout->addWidget(colorButton);
 
     // 连接按钮点击事件到槽函数
-    connect(colorButton, &QPushButton::clicked, this, &Canvas::onColorButtonClicked);
+    // connect(colorButton, &QPushButton::clicked, this, &Canvas::onColorButtonClicked);
     // 初始化并安装 KeyEventFilter
     keyEventFilter = new KeyEventFilter(this);
     this->installEventFilter(keyEventFilter);
@@ -40,6 +42,7 @@ Canvas::Canvas(QWidget *parent)
     connect(keyEventFilter, &KeyEventFilter::undoTriggered, this, &Canvas::onUndo);
     connect(keyEventFilter, &KeyEventFilter::redoTriggered, this, &Canvas::onRedo);
     connect(keyEventFilter, &KeyEventFilter::findTriggered, this, &Canvas::onFind);
+
 }
 
 void Canvas::setGridSpacing(int spacing)

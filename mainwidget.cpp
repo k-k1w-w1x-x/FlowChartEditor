@@ -9,12 +9,14 @@
 #include <QGraphicsRectItem>
 #include <QVector>
 #include <QFileDialog>
+#include <QSvgGenerator>
+#include <QLineEdit>
 
 MainWidget::MainWidget(QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::MainWidget), canvas(new Canvas(this))
 {
-    canvas->setSceneRect(0, 0, 800, 600);
+    canvas->setSceneRect(0, 0, 1600, 1600);
     ui->setupUi(this);
 
     // 设置窗口大小
@@ -24,6 +26,8 @@ MainWidget::MainWidget(QWidget *parent)
     canvas->setGridSpacing(20);  // 设置网格间隔为 20 像素
     canvas->setGridColor(Qt::lightGray);  // 设置网格颜色为浅灰色
     // 将 Canvas 添加到主布局的右侧部分
+    // setLayout(ui->mainLayout);
+    ui->mainLayout->setSizeConstraint(QLayout::SetDefaultConstraint);
     ui->mainLayout->addWidget(canvas);
 
     QPainterPath *path = new QPainterPath();
@@ -42,10 +46,30 @@ MainWidget::MainWidget(QWidget *parent)
 
     //初始化顶部布局
     init_menu_layout();
+
+    // 创建一个 QSvgGenerator 对象
+    QSvgGenerator svgGen;
+    svgGen.setFileName("D:\\Desktop\\flow\\FlowElementChart\\output.svg");    // 设置生成的 SVG 文件的名称
+    svgGen.setSize(QSize(400, 300));     // 设置输出 SVG 的大小
+    svgGen.setViewBox(canvas->scene->sceneRect()); // 设置 SVG 的视图框，与场景的矩形区域一致
+    svgGen.setTitle("GraphicsScene SVG Export");
+    svgGen.setDescription("An SVG drawing created by exporting a QGraphicsScene.");
+
+    // 使用 QPainter 将 QGraphicsScene 的内容绘制到 SVG 中
+    QPainter painter;
+    painter.begin(&svgGen);
+    canvas->scene->render(&painter);
+    painter.end();
 }
 
 void MainWidget::init_menu_layout() {
+
+    ui->searchBox->setFixedSize(400, 35);
+    ui->searchButton->setFixedSize(40, 40);
+    ui->searchButton->setIcon(QIcon(":/menu/search.png"));
+
     menuBar = new QMenuBar(this);
+    ui->menuWidget->setLayout(ui->menu_layout);
     ui->menu_layout->setMenuBar(menuBar);
 
     // 创建菜单
@@ -166,6 +190,23 @@ void MainWidget::init_left_button() {
         canvas->addShape(playgroundElement);
     });
 
+    //color按钮
+    ui->color_button->setFixedSize(60,50);
+    connect(ui->color_button,&QPushButton::clicked,this,&MainWidget::onColorButtonClicked);
+    QIcon icon8(":/menu/color_change.png");
+    ui->color_button->setIcon(icon8);
+    ui->color_button->setIconSize(QSize(32, 32));
+
+    // 创建一个 FlowRectElement 并将其添加到 Canvas (QGraphicsScene) 中
+    FlowRectElement* rectElement = new FlowRectElement();
+    rectElement->move(-1000,-1000);
+    canvas->addShape(rectElement);
+
+}
+
+void MainWidget::onColorButtonClicked() {
+    // 调用Canvas的draw方法
+    canvas->onColorButtonClicked();
     // // 创建一个 FlowRectElement 并将其添加到 Canvas (QGraphicsScene) 中
     // FlowRectElement* rectElement = new FlowRectElement();
     // canvas->addShape(rectElement);

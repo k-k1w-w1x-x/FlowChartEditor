@@ -15,6 +15,7 @@ public:
     void onCopy();
     void onPaste();
     QList<FlowElement*> clipboard;
+    QGraphicsScene *scene;
     explicit Canvas(QWidget *parent = nullptr);
     void addShape(FlowElement *element);
     void setGridSpacing(int spacing);  // 设置网格间隔
@@ -30,7 +31,7 @@ protected:
 
 private:
     void drawGrid(QPainter &painter, const QRectF &rect);  // 绘制网格线
-    QGraphicsScene *scene;
+
     int gridSpacing;  // 网格线的间隔
     QColor gridColor; // 网格线的颜色
     QList<FlowElement*> elements ;

@@ -26,6 +26,7 @@ class MainWidget : public QWidget
     Q_OBJECT
 
 public:
+    Canvas *canvas;
     MainWidget(QWidget *parent = nullptr);
     ~MainWidget();
     void init_left_button();
@@ -38,10 +39,11 @@ private slots:
     // void createDiamond();
     // void createLine();
     // void createArrow();
+    void onColorButtonClicked();
 
 private:
     Ui::MainWidget *ui;
-    Canvas *canvas;
+
     QVBoxLayout *sidebarLayout;
     QPushButton *rectangleButton;
     QPushButton *diamondButton;
@@ -60,6 +62,11 @@ private:
     QAction *exitAction;
     QAction *copyAction;
     QAction *pasteAction;
+
+    QGridLayout *mainLayout;
+    QVBoxLayout *topLayout;
+    QVBoxLayout *leftLayout;
+    QVBoxLayout *rightLayout;
 
 };
 #endif // MAINWIDGET_H
