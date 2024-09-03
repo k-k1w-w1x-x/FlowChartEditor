@@ -13,7 +13,7 @@
 
 MainWidget::MainWidget(QWidget *parent)
     : QWidget(parent)
-    , ui(new Ui::MainWidget), canvas(new Canvas(this))
+    , canvas(new Canvas(this)), ui(new Ui::MainWidget)
 {
     canvas->setSceneRect(0, 0, 1600, 1600);
     ui->setupUi(this);
@@ -60,6 +60,27 @@ void MainWidget::init_menu_layout() {
     //箭头没地方绑了先绑这儿
     connect(ui->searchButton, &QPushButton::clicked, [=](){
         canvas->isArrowing=!canvas->isArrowing;
+        if(!canvas->isArrowing && !canvas->arrows.empty() && canvas->arrows.last()->endDot->scenePos().x() == 0 && canvas->arrows.last()->endDot->scenePos().y() == 0){
+            //需要删除操作
+            qDebug()<<"删除";
+            FlowArrowElement *temp = canvas->arrows.last();
+            canvas->arrows.removeLast();
+            delete(temp->startDot);
+            delete(temp->startElementDot);
+            delete(temp->endDot);
+            delete(temp->endElementDot);
+            delete(temp);
+        }
+        if(canvas->isArrowing){
+            for(FlowElement *element : canvas->dragSelectedElements){
+                for(QGraphicsRectItem *controlDot:element->controlDots){
+                    controlDot->setVisible(false);
+                }
+                for(QGraphicsRectItem *arrowDot:element->arrowDots){
+                    arrowDot->setVisible(false);
+                }
+            }
+        }
     });
 
     menuBar = new QMenuBar(this);

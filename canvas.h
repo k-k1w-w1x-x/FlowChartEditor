@@ -30,7 +30,10 @@ public:
     bool mouseclick = false;
     bool elementClicked = false;
     bool isArrowing = false;
+    QList<FlowElement*> dragSelectedElements ;
+    QList<FlowArrowElement*> dragSelectedArrows;
     double Manhattandis(QGraphicsRectItem *p1,QGraphicsRectItem *p2);
+
 
 protected:
     void drawBackground(QPainter *painter, const QRectF &rect) override;
@@ -40,7 +43,6 @@ protected:
     void mouseDoubleClickEvent(QMouseEvent *event) override;
     void keyPressEvent(QKeyEvent *event);
     void drawArrows();
-    QList<FlowElement*> dragSelectedElements ;
 
 private:
     void drawGrid(QPainter &painter, const QRectF &rect);  // 绘制网格线
@@ -52,6 +54,8 @@ private:
     KeyEventFilter *keyEventFilter;
     QPointF lastMousePosition;
 
+
+
     std::vector<GraphicsTextItem*> graphicTextItems;
     bool isDragging=false;
     bool isScaling=false;
@@ -59,7 +63,8 @@ private:
     void onRedo();
     void onFind();
     FlowElement* clickedSelectedElement = nullptr;
-    int clickedControlDot ;
+    int clickedControlDot;
+    int arrowClickedContronDot = 0;
 public slots:
     void onColorButtonClicked();
     void setCross();

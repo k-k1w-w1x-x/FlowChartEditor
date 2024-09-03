@@ -174,6 +174,44 @@ void Canvas::mousePressEvent(QMouseEvent *event)
         qDebug()<<"进入拖动模式";
     }
 
+    if(dragSelectedElements.empty() && dragSelectedArrows.size() == 1){
+        FlowArrowElement *clickedArrow = dragSelectedArrows.at(0);
+        QPointF localstPoint;
+        QPointF localendPoint;
+        if(clickedArrow->startElementDot){
+            localstPoint = clickedArrow->startElementDot->mapFromScene(clickedPoint);
+        }
+        else{
+            localstPoint = clickedArrow->startDot->mapFromScene(clickedPoint);
+        }
+
+        if(clickedArrow->endElementDot){
+            localendPoint = clickedArrow->endElementDot->mapFromScene(clickedPoint);
+        }
+        else{
+            localendPoint = clickedArrow->endDot->mapFromScene(clickedPoint);
+        }
+        if(!clickedArrow->startElementDot && clickedArrow->startDot->contains(localstPoint)){
+            qDebug()<<"点到起点1";
+            arrowClickedContronDot = 1;
+            lastMousePosition = clickedPoint;
+        }
+        if(clickedArrow->startElementDot && clickedArrow->startElementDot->contains(localstPoint)){
+            qDebug()<<"点到起点2";
+            arrowClickedContronDot = 1;
+            lastMousePosition = clickedPoint;
+        }
+        if(!clickedArrow->endElementDot && clickedArrow->endDot->contains(localendPoint)){
+            qDebug()<<"点到终点1";
+            arrowClickedContronDot = 2;
+            lastMousePosition = clickedPoint;
+        }
+        if(clickedArrow->endElementDot && clickedArrow->endElementDot->contains(localendPoint)){
+            qDebug()<<"点到终点2";
+            arrowClickedContronDot = 2;
+            lastMousePosition = clickedPoint;
+        }
+    }
     // 更新场景以反映选中状态的变化
     scene->update();
 
@@ -253,12 +291,30 @@ void Canvas::mouseMoveEvent(QMouseEvent *event)
         lastMousePosition = currentPosition;
         scene->update();
     }
-
+    if(dragSelectedElements.empty() && dragSelectedArrows.size() == 1 && arrowClickedContronDot){
+        setDragMode(QGraphicsView::NoDrag);//禁用拖拽框
+        qDebug()<<"托拽箭头";
+        QPointF currentPosition = mapToScene(event->pos());
+        QPointF offset = currentPosition - lastMousePosition;
+        qDebug()<<offset;
+        dragSelectedArrows.at(0)->mySetScale(arrowClickedContronDot,offset.x(),offset.y());
+        lastMousePosition = currentPosition;
+        setDragMode(QGraphicsView::RubberBandDrag);//启用拖拽框
+    }
     QGraphicsView::mouseMoveEvent(event);
 }
 
 void Canvas::mouseReleaseEvent(QMouseEvent *event)
 {
+    //储存被选中的箭头
+    dragSelectedArrows.clear();
+    arrowClickedContronDot = 0;
+    for(FlowArrowElement *arrow : arrows){
+        if(arrow->mainItem->isSelected()){
+            dragSelectedArrows.append(arrow);
+        }
+    }
+
     if(isArrowing){
         if( arrows.empty() || (!arrows.last()->endDot->scenePos().x() == 0 && !arrows.last()->endDot->scenePos().y() == 0) ){
             qDebug()<<"开始画箭头";
@@ -270,6 +326,10 @@ void Canvas::mouseReleaseEvent(QMouseEvent *event)
             arrows.last()->draw();
             scene->addItem(arrows.last()->mainItem);
             arrows.last()->mainItem->setFlag(QGraphicsItem::ItemIsSelectable, true);
+            scene->addItem(arrows.last()->startDot);
+            scene->addItem(arrows.last()->endDot);
+            arrows.last()->startDot->setVisible(false);
+            arrows.last()->endDot->setVisible(false);
         }
         return;
     }
@@ -342,6 +402,44 @@ void Canvas::mouseReleaseEvent(QMouseEvent *event)
                 arrowDot->setVisible(true);
             }
             element->selected = true;
+        }
+    }
+    if(dragSelectedElements.empty() && dragSelectedArrows.size() == 1){
+        FlowArrowElement *clickedArrow = dragSelectedArrows.at(0);
+        qDebug()<<"only one arrow";
+        //只有一个箭头被选中
+        if(!clickedArrow->startElementDot){
+            clickedArrow->startDot->setVisible(true);
+        }
+        else{
+            clickedArrow->startDot->setVisible(false);
+            clickedArrow->startElementDot->setVisible(true);
+        }
+        if(!clickedArrow->endElementDot){
+            clickedArrow->endDot->setVisible(true);
+        }
+        else{
+            clickedArrow->endDot->setVisible(false);
+            clickedArrow->endElementDot->setVisible(true);
+        }
+
+    }
+    else{
+        for(FlowArrowElement *arrow : arrows){
+            if(!arrow->startElementDot){
+                arrow->startDot->setVisible(false);
+            }
+            else{
+                arrow->startDot->setVisible(false);
+                arrow->startElementDot->setVisible(false);
+            }
+            if(!arrow->endElementDot){
+                arrow->endDot->setVisible(false);
+            }
+            else{
+                arrow->endDot->setVisible(false);
+                arrow->endElementDot->setVisible(false);
+            }
         }
     }
     scene->update();
@@ -538,6 +636,10 @@ void Canvas::keyPressEvent(QKeyEvent *event)
                 if(arrow->startElementDot && arrow->endElementDot){
                     qDebug()<<"小开不算开";
                     arrow->draw();
+                    arrow->startDot->setVisible(false);
+                    arrow->startElementDot->setVisible(true);
+                    arrow->endDot->setVisible(false);
+                    arrow->endElementDot->setVisible(true);
                 }
             }
         }

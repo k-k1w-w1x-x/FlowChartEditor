@@ -41,6 +41,20 @@ void FlowArrowElement::draw()  {
     // 创建一个 QGraphicsPathItem 来显示箭头
     mainItem->setPath(path);
     mainItem->setPen(QPen(Qt::black, 2));  // 设置箭头的颜色和宽度
+
+    QPen pen(Qt::red,1);
+    startDot->setBrush(Qt::red);
+    startDot->setPen(pen);
+    endDot->setBrush(Qt::red);
+    endDot->setPen(pen);
+    if(startElementDot){
+        startElementDot->setBrush(Qt::red);
+        startElementDot->setPen(pen);
+    }
+    if(endElementDot){
+        endElementDot->setBrush(Qt::red);
+        endElementDot->setPen(pen);
+    }
 }
 void FlowArrowElement::move(double dx,double dy)
 {
@@ -61,21 +75,26 @@ void FlowArrowElement::move(double dx,double dy)
 }
 
 void FlowArrowElement::mySetScale(int index,double dx,double dy){
-    if(index==0){
+    qDebug()<<"arrowIdx:"<<index;
+    if(index==1){
         //解绑start
         if(startElementDot){
             //把锁头时的值赋给位置点
-            startDot->scenePos() = startElementDot->scenePos();
+            startDot->setPos(startElementDot->scenePos());
+            startDot->setVisible(true);
+            startElementDot->setVisible(false);
             //解除锁头
             startElementDot = nullptr;
         }
         startDot->moveBy(dx,dy);
     }
-    if(index==1){
+    if(index==2){
         //解绑end
         if(endElementDot){
             //把锁头时的值赋给位置点
-            endDot->scenePos() = endElementDot->scenePos();
+            endDot->setPos(endElementDot->scenePos());
+            endDot->setVisible(true);
+            endElementDot->setVisible(false);
             //解除锁头
             endElementDot = nullptr;
         }
