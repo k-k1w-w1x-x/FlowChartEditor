@@ -9,7 +9,6 @@
 #include <QGraphicsRectItem>
 #include <QVector>
 #include <QFileDialog>
-#include <QSvgGenerator>
 #include <QLineEdit>
 
 MainWidget::MainWidget(QWidget *parent)
@@ -47,19 +46,10 @@ MainWidget::MainWidget(QWidget *parent)
     //初始化顶部布局
     init_menu_layout();
 
-    // 创建一个 QSvgGenerator 对象
-    QSvgGenerator svgGen;
-    svgGen.setFileName("D:\\Desktop\\flow\\FlowElementChart\\output.svg");    // 设置生成的 SVG 文件的名称
-    svgGen.setSize(QSize(400, 300));     // 设置输出 SVG 的大小
-    svgGen.setViewBox(canvas->scene->sceneRect()); // 设置 SVG 的视图框，与场景的矩形区域一致
-    svgGen.setTitle("GraphicsScene SVG Export");
-    svgGen.setDescription("An SVG drawing created by exporting a QGraphicsScene.");
+}
 
-    // 使用 QPainter 将 QGraphicsScene 的内容绘制到 SVG 中
-    QPainter painter;
-    painter.begin(&svgGen);
-    canvas->scene->render(&painter);
-    painter.end();
+void MainWidget::outputSvg() {
+
 }
 
 void MainWidget::init_menu_layout() {
@@ -94,6 +84,12 @@ void MainWidget::init_menu_layout() {
     });
     connect(newAction, &QAction::triggered, [=](){
         QString filePath = QFileDialog::getOpenFileName(this, "选择新建文件夹", "", "All Files (*)");
+        if (!filePath.isEmpty()) {
+            qDebug() << filePath;
+        }
+    });
+    connect(saveAction, &QAction::triggered, [=](){
+        QString filePath = QFileDialog::getOpenFileName(this, "选择保存位置", "", "All Files (*)");
         if (!filePath.isEmpty()) {
             qDebug() << filePath;
         }

@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QKeyEvent>
+#include <flowelement.h>
 
 class KeyEventFilter : public QObject
 {
@@ -17,6 +18,7 @@ signals:
     void undoTriggered();
     void redoTriggered();
     void findTriggered();
+    void deleteTriggered();
 
 protected:
     bool eventFilter(QObject *obj, QEvent *event) override;

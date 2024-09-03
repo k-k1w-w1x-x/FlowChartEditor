@@ -14,6 +14,8 @@ class Canvas : public QGraphicsView
 public:
     void onCopy();
     void onPaste();
+    void onDelete();
+
     QList<FlowElement*> clipboard;
     QGraphicsScene *scene;
     explicit Canvas(QWidget *parent = nullptr);
