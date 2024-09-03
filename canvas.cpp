@@ -549,11 +549,72 @@ double Canvas::Manhattandis(QGraphicsRectItem *p1,QGraphicsRectItem *p2){
 }
 
 void Canvas::drawArrows(){
+    qDebug()<<"调用drawArrows";
+    setCross();
+    //遍历并画箭头
     for(FlowArrowElement *arrow:arrows){
         arrow->draw();
     }
 }
 
 void Canvas::setCross(){
+    qDebug()<<"调用setCross";
+    for(int i = 0; i <= arrows.size() - 1; i++){
+        for(int j = i + 1; j <= arrows.size() - 1; j++){
+            if(isCross(arrows[i],arrows[j])){
+                qDebug()<<"计算交点";
+                double x1 = arrows[i]->startDot->x();
+                double y1 = arrows[i]->startDot->y();
+                double x2 = arrows[i]->endDot->x();
+                double y2 = arrows[i]->endDot->y();
+                double k1 = (y1 - y2)/(x1 - x2);
+                double b1 = y1 - k1 * x1;
 
+                double x3 = arrows[j]->startDot->x();
+                double y3 = arrows[j]->startDot->y();
+                double x4 = arrows[j]->endDot->x();
+                double y4 = arrows[j]->endDot->y();
+                double k2 = (y3 - y4)/(x3 - x4);
+                double b2 = y3 - k2 * x3;
+                double x = (b2 - b1)/(k1 - k2);
+                double y = k1 * x + b1;
+                qDebug()<<"x1:"<<x1<<",y1"<<y1;
+                qDebug()<<"x2:"<<x2<<",y2"<<y2;
+                qDebug()<<"x3:"<<x3<<",y3"<<y3;
+                qDebug()<<"x4:"<<x4<<",y4"<<y4;
+                qDebug()<<"k1:"<<k1<<",k2"<<k2;
+                qDebug()<<"b1:"<<b1<<",b2"<<b2;
+                qDebug()<<"交点:"<<x<<","<<y;
+
+                arrows[i]->passingPoint.setX(x);
+                arrows[i]->passingPoint.setY(y);
+                arrows[j]->passingPoint.setX(x);
+                arrows[j]->passingPoint.setY(y);
+            }
+        }
+    }
+
+}
+
+bool Canvas::isCross(FlowArrowElement *arrow1,FlowArrowElement*arrow2){//判断是否相交
+    qDebug()<<"调用isCross";
+    QPointF a = arrow1->startDot->scenePos().toPoint();
+    QPointF b = arrow1->endDot->scenePos().toPoint();
+    QPointF c = arrow2->startDot->scenePos().toPoint();
+    QPointF d = arrow2->endDot->scenePos().toPoint();
+
+    if(fmax(c.x(),d.x())<fmin(a.x(),b.x())||fmax(a.x(),b.x())<fmin(c.x(),d.x())||fmax(c.y(),d.y())<fmin(a.y(),b.y())||fmax(a.y(),b.y())<fmin(c.y(),d.y()))
+    {
+        qDebug()<<"没交1";
+        return false;
+    }
+    if(crossProduct(b-d,c-d)*crossProduct(a-c,c-d) > 0||crossProduct(d-b,a-b)*crossProduct(c-b,a-b)>0){
+        qDebug()<<"没交2";
+        return false;
+    }
+    qDebug()<<"交了";
+    return true;
+}
+double Canvas::crossProduct(QPointF a,QPointF b){//叉乘
+    return a.x() * b.y() - a.y() * b.x();
 }

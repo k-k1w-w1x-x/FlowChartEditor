@@ -63,6 +63,8 @@ private:
 public slots:
     void onColorButtonClicked();
     void setCross();
+    bool isCross(FlowArrowElement *arrow1,FlowArrowElement*arrow2);
+    double crossProduct(QPointF a,QPointF b);
 };
 
 #endif // CANVAS_H
