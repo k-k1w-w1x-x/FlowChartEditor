@@ -7,6 +7,9 @@ public:
     FlowDiamondElement();
     void mySetScale(int index, double dx, double dy);
     FlowDiamondElement *deepClone();
+    void calArrowDots();
+    void resetArrowDots();
+    void draw();
 };
 
 #endif // FLOWDIAMONDELEMENT_H

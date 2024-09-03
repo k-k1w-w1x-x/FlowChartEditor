@@ -6,6 +6,7 @@ class FlowParaElement:public FlowElement
 public:
     FlowParaElement();
     FlowParaElement *deepClone();
+    void mySetScale(int index,double dx,double dy);
 };
 
 #endif // FLOWPARAELEMENT_H

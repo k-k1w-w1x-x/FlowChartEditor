@@ -92,6 +92,10 @@ void Canvas::addShape(FlowElement *element)
             scene->addItem(controlDot);
             controlDot->setVisible(false);
         }
+        for (auto arrowDot : element->arrowDots) {
+            scene->addItem(arrowDot);
+            arrowDot->setVisible(false);
+        }
     }
 }
 
@@ -101,7 +105,27 @@ void Canvas::mousePressEvent(QMouseEvent *event)
     clickmove = false;
     clickscale = false;
     mouseclick = true;
+    elementClicked = false;
     QPointF clickedPoint = mapToScene(event->pos());
+    if(isScaling && dragSelectedElements.size() == 1 ){
+        qDebug()<<"判断一下";
+        clickedSelectedElement = dragSelectedElements.at(0);
+        int index = 0;
+        for(QGraphicsRectItem* controlDot : clickedSelectedElement->controlDots){
+            QPointF localPoint = controlDot->mapFromScene(clickedPoint);
+            if(controlDot->contains(localPoint)){//若在选中状态下有控制点被点击
+                qDebug()<<"进入缩放模式111";
+                clickedControlDot = index;//标记哪个dot被选中了
+                qDebug()<<"index:"<<index;
+                setDragMode(QGraphicsView::NoDrag);//禁用拖拽框
+                elementClicked = true;
+                break;
+            }
+            index++;
+        }
+        qDebug()<<"clickedSelectedElement = dragSelectedElements.at(0);"<<clickedControlDot;
+    }
+
     // // clickedSelectedElement = nullptr;
     // bool elementClicked = false;
 
@@ -160,25 +184,25 @@ void Canvas::mouseMoveEvent(QMouseEvent *event)
     if( isScaling && dragSelectedElements.size() == 1 ){
         // qDebug()<<"点点点点";
         clickedSelectedElement = dragSelectedElements.at(0);
-        bool elementClicked = false;
-        int index = 0;//标记哪个dot被选中了
-        for(QGraphicsRectItem* controlDot : clickedSelectedElement->controlDots){
-            QPointF localPoint = controlDot->mapFromScene(lastMousePosition);
-            if(controlDot->contains(localPoint)){//若在选中状态下有控制点被点击
-                qDebug()<<"进入缩放模式";
-                clickedControlDot = index;//标记哪个dot被选中了
-                setDragMode(QGraphicsView::NoDrag);//禁用拖拽框
-                elementClicked = true;
-                break;
-            }
-            index++;
-        }
+
+        // int index = 0;//标记哪个dot被选中了
+        // for(QGraphicsRectItem* controlDot : clickedSelectedElement->controlDots){
+        //     QPointF localPoint = controlDot->mapFromScene(lastMousePosition);
+        //     if(controlDot->contains(localPoint)){//若在选中状态下有控制点被点击
+        //         qDebug()<<"进入缩放模式";
+        //         // clickedControlDot = index;//标记哪个dot被选中了
+        //         // qDebug()<<"index:"<<index;
+        //         setDragMode(QGraphicsView::NoDrag);//禁用拖拽框
+        //         elementClicked = true;
+        //         break;
+        //     }
+        //     // index++;
+        // }
         if(elementClicked){
             qDebug()<<"缩放且鼠标移动";
             clickscale = true;
             QPointF currentPosition = mapToScene(event->pos());
             QPointF offset = currentPosition - lastMousePosition;
-
             clickedSelectedElement->mySetScale(clickedControlDot,offset.x(), offset.y());
             lastMousePosition = currentPosition;
 
@@ -230,6 +254,9 @@ void Canvas::mouseReleaseEvent(QMouseEvent *event)
             for (auto controlDot : dragSelectedElement->controlDots) {
                 controlDot->setVisible(false);
             }
+            for (auto arrowDot : dragSelectedElement->arrowDots) {
+                arrowDot->setVisible(false);
+            }
         }
         dragSelectedElements.clear();
         qDebug()<<"这里的size"<<dragSelectedElements.size();
@@ -237,7 +264,7 @@ void Canvas::mouseReleaseEvent(QMouseEvent *event)
 
     for (int i = elements.size() - 1; i >= 0; i-- ) {
         FlowElement *element = elements[i];
-        if (element->mainItem->isSelected() && !clickmove) {
+        if (element->mainItem->isSelected() && !clickmove && !clickscale) {
             dragSelectedElements.append(element);
         }
     }
@@ -250,6 +277,10 @@ void Canvas::mouseReleaseEvent(QMouseEvent *event)
             if (element->mainItem->isSelected()) {
                 for (auto controlDot : element->controlDots) {
                     controlDot->setVisible(true);
+                }
+                for (auto arrowDot : element->arrowDots) {
+                    scene->addItem(arrowDot);
+                    arrowDot->setVisible(false);
                 }
                 element->selected = true;
             }
@@ -269,6 +300,10 @@ void Canvas::mouseReleaseEvent(QMouseEvent *event)
             // 如果选中元素，显示四个边界点
             for (auto controlDot : element->controlDots) {
                 controlDot->setVisible(true);
+            }
+            for (auto arrowDot : element->arrowDots) {
+                scene->addItem(arrowDot);
+                arrowDot->setVisible(true);
             }
             element->selected = true;
         }

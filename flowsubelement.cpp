@@ -14,6 +14,7 @@ FlowSubElement::FlowSubElement() : FlowElement() {
     borderDots.last()->setPos(150, 200);
 
     controlDots = borderDots;
+    calArrowDots();
 
     borderDots.append(new QGraphicsRectItem(QRectF(0, 0, DOT_SIZE, DOT_SIZE), this));  // 左上角
     borderDots.last()->setPos(160, 100);
@@ -45,6 +46,13 @@ void FlowSubElement::draw(){
         QPen pen(Qt::red);
         borderDot->setPen(pen);
     }
+    // 设置箭头点的外观
+    resetArrowDots();
+    for(QGraphicsRectItem* arrowDot : arrowDots){
+        arrowDot->setBrush(Qt::black);
+        QPen pen(Qt::black);
+        arrowDot->setPen(pen);
+    }
     path.closeSubpath();
 
 
@@ -72,10 +80,158 @@ void FlowSubElement::draw(){
     mainItem->setPen(pen);
 }
 
+
 void FlowSubElement::mySetScale(int index, double dx, double dy) {
-    if(!inBorder(index)){
-        dx = deltax[index];
-        dy = deltay[index];
+    if(!inBorder(index)[0]||!inBorder(index)[1])//若越界
+    {
+        qDebug()<<"越界了";
+        int oppIdx = (index+2) % 4;//对角点
+        if((!inBorder(index)[0])&&(!inBorder(index)[1])){//xy都越界
+            qDebug()<<"xy都越界";
+            dx = deltax[index];
+            dy = deltay[index];
+            double x = controlDots.at(oppIdx)->scenePos().x();
+            double y = controlDots.at(oppIdx)->scenePos().y();
+            controlDots.at(index)->setPos(x+dx,y+dy);
+            if(index==0){
+                borderDots.at(1)->setPos(x+0, y+dy);
+                borderDots.at(3)->setPos(x+dx, y+0);
+
+                // 内部控制点的相应缩放
+                borderDots.at(4)->setPos(x+dx * 0.9, y+dy);   // 内部左上角
+                borderDots.at(5)->setPos(x+dx * 0.1, y+dy);       // 内部右上角
+                borderDots.at(6)->setPos(x+dx * 0.1, y+0);        // 内部右下角
+                borderDots.at(7)->setPos(x+dx * 0.9, y+0);    // 内部左下角
+            }
+            if(index==1){
+                borderDots.at(0)->setPos(x+0, y+dy);
+                borderDots.at(2)->setPos(x+dx, y+0);
+
+                // 内部控制点的相应缩放
+                borderDots.at(5)->setPos(x+dx * 0.9, y+dy);   // 内部右上角
+                borderDots.at(4)->setPos(x+dx * 0.1, y+dy);       // 内部左上角
+                borderDots.at(7)->setPos(x+dx * 0.1, y+0);        // 内部左下角
+                borderDots.at(6)->setPos(x+dx * 0.9, y+0);    // 内部右下角
+            }
+            if(index==2){
+                borderDots.at(3)->setPos(x+0, y+dy);
+                borderDots.at(1)->setPos(x+dx, y+0);
+
+                // 内部控制点的相应缩放
+                borderDots.at(6)->setPos(x+dx * 0.9, y+dy);   // 内部右下角
+                borderDots.at(7)->setPos(x+dx * 0.1, y+dy);       // 内部左下角
+                borderDots.at(4)->setPos(x+dx * 0.1, y+0);        // 内部左上角
+                borderDots.at(5)->setPos(x+dx * 0.9, y+0);    // 内部右上角
+            }
+            if(index==3){
+                borderDots.at(2)->setPos(x+0, y+dy);
+                borderDots.at(0)->setPos(x+dx, y+0);
+
+                // 内部控制点的相应缩放
+                borderDots.at(7)->setPos(x+dx * 0.9, y+dy);   // 内部左下角
+                borderDots.at(6)->setPos(x+dx * 0.1, y+dy);       // 内部右下角
+                borderDots.at(5)->setPos(x+dx * 0.1, y+0);        // 内部右上角
+                borderDots.at(4)->setPos(x+dx * 0.9, y+0);    // 内部左上角
+            }
+        }
+        else if(!inBorder(index)[0]&&inBorder(index)[1]){//仅x越界
+            qDebug()<<"仅x越界";
+            dx = deltax[index];
+            double x = controlDots.at(oppIdx)->scenePos().x();
+            double y = controlDots.at(index)->scenePos().y();
+            double oppY = controlDots.at(oppIdx)->scenePos().y();
+            controlDots.at(index)->setPos(x+dx,y+dy);
+            if(index==0){
+                borderDots.at(1)->setPos(x+0, y+dy);
+                borderDots.at(3)->setPos(x+dx, oppY+0);
+
+                // 内部控制点的相应缩放
+                borderDots.at(4)->setPos(x+dx * 0.9, y+dy);   // 内部左上角
+                borderDots.at(5)->setPos(x+dx * 0.1, y+dy);       // 内部右上角
+                borderDots.at(6)->setPos(x+dx * 0.1, oppY+0);        // 内部右下角
+                borderDots.at(7)->setPos(x+dx * 0.9, oppY+0);    // 内部左下角
+            }
+            if(index==1){
+                borderDots.at(0)->setPos(x+0, y+dy);
+                borderDots.at(2)->setPos(x+dx, oppY+0);
+
+                // 内部控制点的相应缩放
+                borderDots.at(5)->setPos(x+dx * 0.9, y+dy);   // 内部右上角
+                borderDots.at(4)->setPos(x+dx * 0.1, y+dy);       // 内部左上角
+                borderDots.at(7)->setPos(x+dx * 0.1, oppY+0);        // 内部左下角
+                borderDots.at(6)->setPos(x+dx * 0.9, oppY+0);    // 内部右下角
+            }
+            if(index==2){
+                borderDots.at(3)->setPos(x+0, y+dy);
+                borderDots.at(1)->setPos(x+dx, oppY+0);
+
+                // 内部控制点的相应缩放
+                borderDots.at(6)->setPos(x+dx * 0.9, y+dy);   // 内部右下角
+                borderDots.at(7)->setPos(x+dx * 0.1, y+dy);       // 内部左下角
+                borderDots.at(4)->setPos(x+dx * 0.1, oppY+0);        // 内部左上角
+                borderDots.at(5)->setPos(x+dx * 0.9, oppY+0);    // 内部右上角
+            }
+            if(index==3){
+                borderDots.at(2)->setPos(x+0, y+dy);
+                borderDots.at(0)->setPos(x+dx, oppY+0);
+
+                // 内部控制点的相应缩放
+                borderDots.at(7)->setPos(x+dx * 0.9, y+dy);   // 内部左下角
+                borderDots.at(6)->setPos(x+dx * 0.1, y+dy);       // 内部右下角
+                borderDots.at(5)->setPos(x+dx * 0.1, oppY+0);        // 内部右上角
+                borderDots.at(4)->setPos(x+dx * 0.9, oppY+0);    // 内部左上角
+            }
+        }
+        else if(inBorder(index)[0] && !inBorder(index)[1]){//仅y越界
+            qDebug()<<"y越界";
+            dy = deltay[index];
+            double x=controlDots.at(index)->scenePos().x();
+            double oppX=controlDots.at(oppIdx)->scenePos().x();
+            double y=controlDots.at(oppIdx)->scenePos().y();
+            controlDots.at(index)->setPos(x+dx,y+dy);
+            if(index==0){
+                borderDots.at(1)->setPos(oppX+0, y+dy);
+                borderDots.at(3)->setPos(x+dx, y+0);
+
+                // 内部控制点的相应缩放
+                borderDots.at(4)->setPos(0.1*oppX+0.9*x+dx * 0.9, y+dy);   // 内部左上角
+                borderDots.at(5)->setPos(0.9*oppX+0.1*x+dx * 0.1, y+dy);       // 内部右上角
+                borderDots.at(6)->setPos(0.9*oppX+0.1*x+dx * 0.1, y+0);        // 内部右下角
+                borderDots.at(7)->setPos(0.1*oppX+0.9*x+dx * 0.9, y+0);    // 内部左下角
+            }
+            if(index==1){
+                borderDots.at(0)->setPos(oppX+0, y+dy);
+                borderDots.at(2)->setPos(x+dx, y+0);
+
+                // 内部控制点的相应缩放
+                borderDots.at(5)->setPos(0.1*oppX+0.9*x+dx * 0.9, y+dy);   // 内部右上角
+                borderDots.at(4)->setPos(0.1*x+0.9*oppX+dx * 0.1, y+dy);       // 内部左上角
+                borderDots.at(7)->setPos(0.1*x+0.9*oppX+dx * 0.1, y+0);        // 内部左下角
+                borderDots.at(6)->setPos(0.1*oppX+0.9*x+dx * 0.9, y+0);    // 内部右下角
+            }
+            if(index==2){
+                borderDots.at(3)->setPos(oppX+0, y+dy);
+                borderDots.at(1)->setPos(x+dx, y+0);
+
+                // 内部控制点的相应缩放
+                borderDots.at(6)->setPos(0.1*oppX+0.9*x+dx * 0.9, y+dy);   // 内部右下角
+                borderDots.at(7)->setPos(0.1*x+0.9*oppX+dx * 0.1, y+dy);       // 内部左下角
+                borderDots.at(4)->setPos(0.1*x+0.9*oppX+dx * 0.1, y+0);        // 内部左上角
+                borderDots.at(5)->setPos(0.1*oppX+0.9*x+dx * 0.9, y+0);    // 内部右上角
+            }
+            if(index==3){
+                borderDots.at(2)->setPos(oppX+0, y+dy);
+                borderDots.at(0)->setPos(x+dx, y+0);
+
+                // 内部控制点的相应缩放
+                borderDots.at(7)->setPos(0.1*oppX+0.9*x+dx * 0.9, y+dy);   // 内部左下角
+                borderDots.at(6)->setPos(0.9*oppX+0.1*x+dx * 0.1, y+dy);       // 内部右下角
+                borderDots.at(5)->setPos(0.9*oppX+0.1*x+dx * 0.1, y+0);        // 内部右上角
+                borderDots.at(4)->setPos(0.1*oppX+0.9*x+dx * 0.9, y+0);    // 内部左上角
+            }
+        }
+        draw();
+        return;
     }
     // 移动被选中的控制点
     controlDots.at(index)->moveBy(dx, dy);

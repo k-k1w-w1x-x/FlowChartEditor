@@ -23,6 +23,7 @@ public:
     bool clickmove = false;
     bool clickscale = false;
     bool mouseclick = false;
+    bool elementClicked = false;
 
 protected:
     void drawBackground(QPainter *painter, const QRectF &rect) override;
@@ -49,7 +50,7 @@ private:
     void onRedo();
     void onFind();
     FlowElement* clickedSelectedElement = nullptr;
-    int clickedControlDot;
+    int clickedControlDot ;
 public slots:
     void onColorButtonClicked();
 };
