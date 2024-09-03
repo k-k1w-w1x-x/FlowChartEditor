@@ -18,7 +18,7 @@ FlowParaElement::FlowParaElement(): FlowElement()
     // 绘制路径
     draw();
 }
-void FlowParaElement::scale(int index,double dx,double dy)//默认4个控制点，如果不是需要重写，规定从左上角开始顺时针
+void FlowParaElement::mySetScale(int index,double dx,double dy)//默认4个控制点，如果不是需要重写，规定从左上角开始顺时针
 {
     qDebug()<<"开始缩放";
     controlDots.at(index)->moveBy(dx, dy);

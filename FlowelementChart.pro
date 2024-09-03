@@ -21,8 +21,7 @@ SOURCES += \
     flowrectelement.cpp \
     flowsubelement.cpp \
     main.cpp \
-    mainwidget.cpp \
-    rectangleelement.cpp
+    mainwidget.cpp
 
 HEADERS += \
     canvas.h \
@@ -36,8 +35,7 @@ HEADERS += \
     flowradiuselement.h \
     flowrectelement.h \
     flowsubelement.h \
-    mainwidget.h \
-    rectangleelement.h
+    mainwidget.h
 
 FORMS += \
     mainwidget.ui

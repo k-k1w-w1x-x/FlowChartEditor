@@ -5,7 +5,7 @@ class FlowDiamondElement: public FlowElement
 {
 public:
     FlowDiamondElement();
-    void scale(int index, double dx, double dy);
+    void mySetScale(int index, double dx, double dy);
     void calArrowDots();
     void resetArrowDots();
     void draw();

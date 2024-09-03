@@ -5,7 +5,7 @@ class FlowParaElement:public FlowElement
 {
 public:
     FlowParaElement();
-    void scale(int index,double dx,double dy);
+    void mySetScale(int index,double dx,double dy);
 };
 
 #endif // FLOWPARAELEMENT_H

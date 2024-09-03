@@ -81,7 +81,7 @@ void FlowSubElement::draw(){
 }
 
 
-void FlowSubElement::scale(int index, double dx, double dy) {
+void FlowSubElement::mySetScale(int index, double dx, double dy) {
     if(!inBorder(index)[0]||!inBorder(index)[1])//若越界
     {
         qDebug()<<"越界了";

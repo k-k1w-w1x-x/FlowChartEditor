@@ -187,7 +187,7 @@ void Canvas::mouseMoveEvent(QMouseEvent *event)
             QPointF currentPosition = mapToScene(event->pos());
             QPointF offset = currentPosition - lastMousePosition;
             qDebug()<<"clickedSelectedElement"<<clickedControlDot;
-            clickedSelectedElement->scale(clickedControlDot,offset.x(), offset.y());
+            clickedSelectedElement->mySetScale(clickedControlDot,offset.x(), offset.y());
             lastMousePosition = currentPosition;
 
             scene->update();

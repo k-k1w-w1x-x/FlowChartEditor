@@ -57,7 +57,7 @@ void FlowDiamondElement::draw() {
     mainItem->setPen(pen);
 }
 
-void FlowDiamondElement::scale(int index, double dx, double dy)
+void FlowDiamondElement::mySetScale(int index, double dx, double dy)
 {
     qDebug() << "开始缩放";
     if (index == 0) {  // 左
