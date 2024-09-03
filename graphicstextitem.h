@@ -12,6 +12,7 @@ public:
     ~GraphicsTextItem();
     QRectF boundingRect() const override;
     void move(QPointF delta);
+    GraphicsTextItem* deepClone();
 
 protected:
     void focusOutEvent(QFocusEvent *event) override;
@@ -28,7 +29,7 @@ private:
     QPointF initialScenePos;
     QTransform initialTransform;
     qreal initialWidth, initialHeight;
-    QRectF topLeft, topRight, bottomLeft, bottomRight, top, bottom, left, right;
+
 };
 
 #endif // GRAPHICSTEXTITEM_H

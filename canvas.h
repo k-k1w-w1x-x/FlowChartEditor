@@ -17,6 +17,7 @@ public:
     void onDelete();
 
     QList<FlowElement*> clipboard;
+    QList<GraphicsTextItem*> textClipboard;
     QGraphicsScene *scene;
     explicit Canvas(QWidget *parent = nullptr);
     void addShape(FlowElement *element);
@@ -45,7 +46,7 @@ private:
     KeyEventFilter *keyEventFilter;
     QPointF lastMousePosition;
 
-    std::vector<GraphicsTextItem*> graphicTextItems;
+    QList<GraphicsTextItem*> graphicTextItems;
     bool isDragging=false;
     bool isScaling=false;
     void onUndo();
