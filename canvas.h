@@ -39,6 +39,7 @@ protected:
     void mouseMoveEvent(QMouseEvent *event) override;
     void mouseDoubleClickEvent(QMouseEvent *event) override;
     void keyPressEvent(QKeyEvent *event);
+    void drawArrows();
     QList<FlowElement*> dragSelectedElements ;
 
 private:
@@ -61,6 +62,7 @@ private:
     int clickedControlDot ;
 public slots:
     void onColorButtonClicked();
+    void setCross();
 };
 
 #endif // CANVAS_H

@@ -214,6 +214,7 @@ void Canvas::mouseMoveEvent(QMouseEvent *event)
             QPointF currentPosition = mapToScene(event->pos());
             QPointF offset = currentPosition - lastMousePosition;
             clickedSelectedElement->mySetScale(clickedControlDot,offset.x(), offset.y());
+            drawArrows();
             lastMousePosition = currentPosition;
 
             scene->update();
@@ -234,6 +235,7 @@ void Canvas::mouseMoveEvent(QMouseEvent *event)
         if(clickedSelectedElement->contains(lastMousePosition)){
             // qDebug()<<"1个！选中才能动！"<<isDragging;
             clickedSelectedElement->move(offset.x(), offset.y());
+            drawArrows();
             clickmove = true;
             lastMousePosition = currentPosition;
             scene->update();
@@ -245,6 +247,7 @@ void Canvas::mouseMoveEvent(QMouseEvent *event)
         for(FlowElement *dragSelectedElement:dragSelectedElements){
             clickedSelectedElement = dragSelectedElement;
             clickedSelectedElement->move(offset.x(), offset.y());
+            drawArrows();
             clickmove = true;
         }
         lastMousePosition = currentPosition;
@@ -543,4 +546,14 @@ void Canvas::keyPressEvent(QKeyEvent *event)
 
 double Canvas::Manhattandis(QGraphicsRectItem *p1,QGraphicsRectItem *p2){
     return(abs(p1->scenePos().x()-p2->scenePos().x()) + abs(p1->scenePos().y()-p2->scenePos().y()));
+}
+
+void Canvas::drawArrows(){
+    for(FlowArrowElement *arrow:arrows){
+        arrow->draw();
+    }
+}
+
+void Canvas::setCross(){
+
 }
