@@ -180,6 +180,7 @@ void Canvas::mousePressEvent(QMouseEvent *event)
 void Canvas::mouseMoveEvent(QMouseEvent *event)
 {
     if(!mouseclick){
+        QGraphicsView::mouseMoveEvent(event);
         return;
     }
     if( isScaling && dragSelectedElements.size() == 1 ){
@@ -209,6 +210,14 @@ void Canvas::mouseMoveEvent(QMouseEvent *event)
 
             scene->update();
         }
+    }
+    if(isDragging)
+    {
+        QPointF currentPosition = mapToScene(event->pos());
+        QPointF offset = currentPosition - lastMousePosition;
+        for (auto i : graphicTextItems)
+            if (i->isSelected())
+                i->move(offset);
     }
     if(isDragging && dragSelectedElements.size() == 1){
         QPointF currentPosition = mapToScene(event->pos());

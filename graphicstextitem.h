@@ -11,6 +11,7 @@ public:
     GraphicsTextItem(const QString &text, QGraphicsItem *parent = nullptr);
     ~GraphicsTextItem();
     QRectF boundingRect() const override;
+    void move(QPointF delta);
 
 protected:
     void focusOutEvent(QFocusEvent *event) override;

@@ -224,4 +224,15 @@ void GraphicsTextItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
     QGraphicsTextItem::mouseReleaseEvent(event);
 }
 
+void GraphicsTextItem::move(QPointF delta)
+{
+    qreal deltax = transform().m31() + delta.x(),
+        deltay = transform().m32() + delta.y();
+    QTransform t;
+    t.translate(deltax, deltay);
+    t.scale(transform().m11(), transform().m22());
+    setTransform(t);
+    update();
+}
+
 #endif // GRAPHICSTEXTITEM_CPP
