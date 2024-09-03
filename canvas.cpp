@@ -360,13 +360,14 @@ void Canvas::onCopy()
 
     // 获取选中的元素
     QList<FlowElement *> SelectedElementTemp = this->dragSelectedElements;
-    if (SelectedElementTemp.empty()) {
-        return; // 如果没有选中任何元素，则直接返回
-    }
+    // if (SelectedElementTemp.empty()) {
+    //     return; // 如果没有选中任何元素，则直接返回
+    // }
     for(const auto&item:clipboard){
         delete(item);
     }
     clipboard.clear();
+    textClipboard.clear();
 
     // // 清空之前的选择元素列表
     // selectedElements.clear();
@@ -377,6 +378,12 @@ void Canvas::onCopy()
         clipboard.append(clonedElement);
     }
 
+    for (auto i : graphicTextItems)
+        if (i->isSelected())
+        {
+            textClipboard.push_back(i->deepClone());
+            qDebug() << 11111;
+        }
 
 /*
     // 此时，selectedElements 列表中包含了深拷贝的元素
@@ -401,7 +408,6 @@ void Canvas::onPaste() {
 
     if (clipboard.isEmpty()) {
         qDebug() << "剪切板为空，无法粘贴";
-        return;
     }
 
     // 遍历剪切板中的元素
@@ -417,6 +423,14 @@ void Canvas::onPaste() {
         } else {
             qDebug() << "deepClone 失败，无法粘贴该元素";
         }
+    }
+
+    qDebug() << textClipboard.size();
+    for (auto i : textClipboard)
+    {
+        i->setSelected(false);
+        scene->addItem(i);
+        graphicTextItems.push_back(i);
     }
 }
 
@@ -471,4 +485,11 @@ void Canvas::onDelete() {
         dragSelectedElements.removeOne(element);
         delete element;
     }
+    for (auto i : graphicTextItems)
+        if (i->isSelected())
+        {
+            scene->removeItem(i);
+            graphicTextItems.removeOne(i);
+            delete i;
+        }
 }
