@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE QtCreatorProject>
-<!-- Written by QtCreator 14.0.1, 2024-09-03T11:23:14. -->
+<!-- Written by QtCreator 14.0.1, 2024-09-03T11:24:39. -->
 <qtcreator>
  <data>
   <variable>EnvironmentId</variable>
@@ -244,8 +244,8 @@
     <value type="bool" key="PE.EnvironmentAspect.PrintOnRun">false</value>
     <value type="QString" key="PerfRecordArgsId">-e cpu-cycles --call-graph &quot;dwarf,4096&quot; -F 250</value>
     <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName"></value>
-    <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">Qt4ProjectManager.Qt4RunConfiguration:E:/BIT_SoftwareEngineering/CS_FlowChart/FlowChart-master/FlowelementChart.pro</value>
-    <value type="QString" key="ProjectExplorer.RunConfiguration.BuildKey">E:/BIT_SoftwareEngineering/CS_FlowChart/FlowChart-master/FlowelementChart.pro</value>
+    <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">Qt4ProjectManager.Qt4RunConfiguration:E:/BIT_SoftwareEngineering/CS_FlowChart/FlowChart-master/FlowElementChart.pro</value>
+    <value type="QString" key="ProjectExplorer.RunConfiguration.BuildKey">E:/BIT_SoftwareEngineering/CS_FlowChart/FlowChart-master/FlowElementChart.pro</value>
     <value type="bool" key="ProjectExplorer.RunConfiguration.Customized">false</value>
     <value type="bool" key="RunConfiguration.UseCppDebuggerAuto">true</value>
     <value type="bool" key="RunConfiguration.UseLibrarySearchPath">true</value>
