@@ -57,6 +57,10 @@ void MainWidget::init_menu_layout() {
     ui->searchBox->setFixedSize(400, 35);
     ui->searchButton->setFixedSize(40, 40);
     ui->searchButton->setIcon(QIcon(":/menu/search.png"));
+    //箭头没地方绑了先绑这儿
+    connect(ui->searchButton, &QPushButton::clicked, [=](){
+        canvas->isArrowing=!canvas->isArrowing;
+    });
 
     menuBar = new QMenuBar(this);
     ui->menuWidget->setLayout(ui->menu_layout);

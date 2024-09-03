@@ -7,6 +7,8 @@
 #include "flowsubelement.h"
 #include "graphicstextitem.h"
 #include"keyeventFilter.h"
+#include "flowarrowelement.h"
+
 class Canvas : public QGraphicsView
 {
     Q_OBJECT
@@ -17,6 +19,7 @@ public:
     void onDelete();
 
     QList<FlowElement*> clipboard;
+    QList<FlowArrowElement*> arrows;
     QGraphicsScene *scene;
     explicit Canvas(QWidget *parent = nullptr);
     void addShape(FlowElement *element);
@@ -26,6 +29,8 @@ public:
     bool clickscale = false;
     bool mouseclick = false;
     bool elementClicked = false;
+    bool isArrowing = false;
+    double Manhattandis(QGraphicsRectItem *p1,QGraphicsRectItem *p2);
 
 protected:
     void drawBackground(QPainter *painter, const QRectF &rect) override;
@@ -33,6 +38,7 @@ protected:
     void mouseReleaseEvent(QMouseEvent *event) override;
     void mouseMoveEvent(QMouseEvent *event) override;
     void mouseDoubleClickEvent(QMouseEvent *event) override;
+    void keyPressEvent(QKeyEvent *event);
     QList<FlowElement*> dragSelectedElements ;
 
 private:

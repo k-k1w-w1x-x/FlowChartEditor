@@ -8,6 +8,7 @@
 #include <QDebug>
 #include<keyeventFilter.h>
 #include <qgraphicsitem.h>
+#include <float.h>
 
 Canvas::Canvas(QWidget *parent)
     : QGraphicsView(parent),  gridSpacing(20),
@@ -103,6 +104,9 @@ void Canvas::addShape(FlowElement *element)
 void Canvas::mousePressEvent(QMouseEvent *event)
 {
     qDebug()<<"mousePress!";
+    if(isArrowing){
+        return;
+    }
     clickmove = false;
     clickscale = false;
     mouseclick = true;
@@ -179,6 +183,10 @@ void Canvas::mousePressEvent(QMouseEvent *event)
 
 void Canvas::mouseMoveEvent(QMouseEvent *event)
 {
+
+    if(isArrowing){
+        return;
+    }
     if(!mouseclick){
         QGraphicsView::mouseMoveEvent(event);
         return;
@@ -248,6 +256,21 @@ void Canvas::mouseMoveEvent(QMouseEvent *event)
 
 void Canvas::mouseReleaseEvent(QMouseEvent *event)
 {
+    if(isArrowing){
+        if( arrows.empty() || (!arrows.last()->endDot->scenePos().x() == 0 && !arrows.last()->endDot->scenePos().y() == 0) ){
+            qDebug()<<"开始画箭头";
+            arrows.append(new FlowArrowElement);
+            arrows.last()->startDot->setPos( mapToScene(event->pos()));
+        }
+        else{
+            arrows.last()->endDot->setPos( mapToScene(event->pos()));
+            arrows.last()->draw();
+            scene->addItem(arrows.last()->mainItem);
+            arrows.last()->mainItem->setFlag(QGraphicsItem::ItemIsSelectable, true);
+        }
+        return;
+    }
+
     mouseclick = false;
     qDebug()<<"mouseRelease!";
     QPointF releasedPoint = mapToScene(event->pos());
@@ -471,4 +494,53 @@ void Canvas::onDelete() {
         dragSelectedElements.removeOne(element);
         delete element;
     }
+}
+
+void Canvas::keyPressEvent(QKeyEvent *event)
+{
+    if (event->key() == Qt::Key_Shift) {
+
+        qDebug() << "Shift key pressed!";
+        for(FlowArrowElement *arrow : arrows){
+            if(arrow->mainItem->isSelected()){
+                qDebug()<<"看看锁谁的";
+                //排序锁头
+                double stman = DBL_MAX;
+                double endman = DBL_MAX;
+                FlowElement *stelement = nullptr;
+                for(FlowElement *element:elements){
+                    for(QGraphicsRectItem *arrowDot:element->arrowDots){
+                        double tempstman = Manhattandis(arrowDot,arrow->startDot);
+                        if( tempstman < stman){
+                            stman = tempstman;
+                            arrow->startElementDot = arrowDot;
+                            stelement = element;
+                        }
+                    }
+                }
+
+                for(FlowElement *element:elements){
+                    if(stelement == element){
+                        continue;
+                    }
+                    for(QGraphicsRectItem *arrowDot:element->arrowDots){
+                        double tempendman = Manhattandis(arrowDot,arrow->endDot);
+                        if( tempendman < endman){
+                            endman = tempendman;
+                            arrow->endElementDot = arrowDot;
+                        }
+                    }
+                }
+                //没找到合适的，不画
+                if(arrow->startElementDot && arrow->endElementDot){
+                    qDebug()<<"小开不算开";
+                    arrow->draw();
+                }
+            }
+        }
+    }
+}
+
+double Canvas::Manhattandis(QGraphicsRectItem *p1,QGraphicsRectItem *p2){
+    return(abs(p1->scenePos().x()-p2->scenePos().x()) + abs(p1->scenePos().y()-p2->scenePos().y()));
 }
