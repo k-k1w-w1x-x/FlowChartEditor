@@ -10,6 +10,7 @@ CONFIG += c++17
 
 SOURCES += \
     canvas.cpp \
+    flowarrow.cpp \
     flowcircleelement.cpp \
     flowdiamondelement.cpp \
     flowdocuelement.cpp \
@@ -25,6 +26,7 @@ SOURCES += \
 
 HEADERS += \
     canvas.h \
+    flowarrow.h \
     flowcircleelement.h \
     flowdiamondelement.h \
     flowdocuelement.h \

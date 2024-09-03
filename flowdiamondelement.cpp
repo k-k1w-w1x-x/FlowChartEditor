@@ -19,13 +19,47 @@ FlowDiamondElement::FlowDiamondElement(): FlowElement()
     // 绘制路径
     draw();
 }
+
+void FlowDiamondElement::draw() {
+    // qDebug() << "draw";
+
+    QPainterPath path;
+
+    // 依次取出两个小矩形的中心点，并绘制线条
+    path.moveTo(borderDots[0]->scenePos() + borderDots[0]->rect().center());
+
+    // 依次取出两个小矩形的中心点，并绘制线条
+    for (int i = 1; i < borderDots.size(); ++i) {
+        path.lineTo(borderDots[i]->scenePos() + borderDots[i]->rect().center());
+    }
+    for(QGraphicsRectItem* borderDot : borderDots){
+        borderDot->setBrush(Qt::red);
+        QPen pen(Qt::red);
+        borderDot->setPen(pen);
+    }
+
+    // 设置箭头点的外观
+    resetArrowDots();
+    for(QGraphicsRectItem* arrowDot : arrowDots){
+        arrowDot->setBrush(Qt::black);
+        QPen pen(Qt::black);
+        arrowDot->setPen(pen);
+    }
+
+    path.closeSubpath();
+
+    // 设置主图形项路径
+    mainItem->setPath(path);
+    mainItem->setBrush(QBrush(contentColor));
+    // 设置默认线条宽度
+    QPen pen(Qt::black);
+    pen.setWidth(2);
+    mainItem->setPen(pen);
+}
+
 void FlowDiamondElement::scale(int index, double dx, double dy)
 {
     qDebug() << "开始缩放";
-    if(!inBorder(index)){
-        dx = deltax[index];
-        dy = deltay[index];
-    }
     if (index == 0) {  // 左
         controlDots.at(0)->moveBy(dx, 0);
         controlDots.at(3)->moveBy(dx*0.5, 0);
@@ -61,3 +95,4 @@ void FlowDiamondElement::resetArrowDots(){
     }
     arrowDots = controlDots;
 }
+

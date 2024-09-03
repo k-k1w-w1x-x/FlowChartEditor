@@ -8,6 +8,7 @@ public:
     void scale(int index, double dx, double dy);
     void calArrowDots();
     void resetArrowDots();
+    void draw();
 };
 
 #endif // FLOWDIAMONDELEMENT_H

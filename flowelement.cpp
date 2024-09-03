@@ -52,9 +52,9 @@ void FlowElement::move(int dx, int dy) {
     for(QGraphicsRectItem *borderDot : borderDots) {
         borderDot->moveBy(dx, dy);
     }
-    for(QGraphicsRectItem *arrowDot : arrowDots) {
-        arrowDot->moveBy(dx, dy);
-    }
+    // for(QGraphicsRectItem *arrowDot : arrowDots) {
+    //     arrowDot->moveBy(dx, dy);
+    // }
     // 重新绘制路径
     draw();
 }
