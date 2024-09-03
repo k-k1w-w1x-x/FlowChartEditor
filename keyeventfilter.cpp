@@ -27,6 +27,8 @@ bool KeyEventFilter::eventFilter(QObject *obj, QEvent *event)
             case Qt::Key_F:
                 emit findTriggered();
                 return true;
+            case Qt::Key_Backspace:
+                emit deleteTriggered();
             default:
                 break;
             }

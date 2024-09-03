@@ -32,6 +32,7 @@ public:
     void init_left_button();
     void init_top_button();
     void init_menu_layout();
+    void outputSvg();
 
 private slots:
     // void update();
@@ -40,6 +41,7 @@ private slots:
     // void createLine();
     // void createArrow();
     void onColorButtonClicked();
+
 
 private:
     Ui::MainWidget *ui;

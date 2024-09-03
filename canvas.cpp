@@ -41,6 +41,7 @@ Canvas::Canvas(QWidget *parent)
     connect(keyEventFilter, &KeyEventFilter::undoTriggered, this, &Canvas::onUndo);
     connect(keyEventFilter, &KeyEventFilter::redoTriggered, this, &Canvas::onRedo);
     connect(keyEventFilter, &KeyEventFilter::findTriggered, this, &Canvas::onFind);
+    connect(keyEventFilter, &KeyEventFilter::deleteTriggered, this, &Canvas::onDelete);
 
 }
 
@@ -375,20 +376,6 @@ void Canvas::onPaste() {
     }
 }
 
-void Canvas::onUndo() {
-    qDebug() << "Undo action triggered";
-    // 具体的撤销操作
-}
-
-void Canvas::onRedo() {
-    qDebug() << "Redo action triggered";
-    // 具体的重做操作
-}
-
-void Canvas::onFind() {
-    qDebug() << "Find action triggered";
-    // 具体的查找操作
-}
 void Canvas::mouseDoubleClickEvent(QMouseEvent *event)
 {
     qDebug()<<"doubleclick";
@@ -403,4 +390,37 @@ void Canvas::mouseDoubleClickEvent(QMouseEvent *event)
         graphicTextItems.push_back(textItem);
     }
     QGraphicsView::mouseDoubleClickEvent(event);
+}
+
+void Canvas::onUndo() {
+    qDebug() << "Undo action triggered";
+    // 具体的撤销操作
+}
+
+void Canvas::onRedo() {
+    qDebug() << "Redo action triggered";
+    // 具体的重做操作
+}
+
+void Canvas::onFind() {
+    qDebug() << "Find action triggered";
+    // 具体的查找操作
+}
+
+void Canvas::onDelete() {
+    qDebug() << "Delete action triggered";
+    for (auto element : dragSelectedElements) {
+        scene->removeItem(element->mainItem);
+        delete element->mainItem;
+        if(FlowSubElement* subElement = dynamic_cast<FlowSubElement*>(element)){
+            scene->removeItem(subElement->innerItem);
+        }
+        for (auto dot : element->borderDots) {
+            scene->removeItem(dot);
+            delete dot;
+        }
+        elements.removeOne(element);
+        dragSelectedElements.removeOne(element);
+        delete element;
+    }
 }

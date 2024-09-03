@@ -9,7 +9,7 @@ public:
     void draw();
     void mySetScale(int index,double dx,double dy);
     FlowSubElement* deepClone();
-    QGraphicsPathItem *innerItem=new QGraphicsPathItem;
+    QGraphicsPathItem *innerItem=new QGraphicsPathItem(this);
 };
 
 #endif // FLOWSUBELEMENT_H
