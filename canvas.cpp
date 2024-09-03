@@ -455,17 +455,19 @@ void Canvas::onDelete() {
     qDebug() << "Delete action triggered";
     for (auto element : dragSelectedElements) {
         scene->removeItem(element->mainItem);
-        delete element->mainItem;
+        // delete element->mainItem;
         if(FlowSubElement* subElement = dynamic_cast<FlowSubElement*>(element)){
             scene->removeItem(subElement->innerItem);
+            // delete subElement->innerItem;
         }
         for (auto dot : element->borderDots) {
             scene->removeItem(dot);
-            delete dot;
+            // delete dot;
+            // element->arrowDots.removeOne(dot);
         }
         for (auto dot : element->arrowDots) {
             scene->removeItem(dot);
-            delete dot;
+            // delete dot;
         }
         elements.removeOne(element);
         dragSelectedElements.removeOne(element);

@@ -9,7 +9,16 @@
 class FlowElement : public QGraphicsItem {
 public:
     FlowElement();
-    virtual ~FlowElement() {}
+    virtual ~FlowElement() {
+        qDebug()<<"delete FlowElement";
+            for (auto dot : this->borderDots) {
+                delete dot;
+                this->arrowDots.removeOne(dot);
+            }
+            for (auto dot : this->arrowDots) {
+                delete dot;
+            }
+    }
 
     virtual void draw();
     virtual bool contains(const QPointF &point) const;
