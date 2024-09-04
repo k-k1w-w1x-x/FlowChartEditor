@@ -23,7 +23,8 @@ SOURCES += \
     graphicstextitem.cpp \
     keyeventfilter.cpp \
     main.cpp \
-    mainwidget.cpp
+    mainwidget.cpp \
+    zindexmanager.cpp
 
 HEADERS += \
     canvas.h \
@@ -40,7 +41,8 @@ HEADERS += \
     flowradiuselement.h \
     flowrectelement.h \
     flowsubelement.h \
-    graphicstextitem.h
+    graphicstextitem.h \
+    zindexmanager.h
 FORMS += \
     mainwidget.ui
 
