@@ -150,10 +150,10 @@ void MainWidget::init_menu_layout() {
             "Image Files (*.png *.jpg *.bmp *.jpeg)");
         if (!filePath.isEmpty()) {
             qDebug() << filePath;
+            canvas->background_path = filePath;
+            canvas->background_set = true;
+            canvas->update();
         }
-        canvas->background_path = filePath;
-        canvas->background_set = true;
-        canvas->update();
     });
     connect(back_returnAction, &QAction::triggered, [=](){
         canvas->setBackgroundBrush(QBrush());
