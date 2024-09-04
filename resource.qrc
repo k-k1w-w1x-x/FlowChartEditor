@@ -14,5 +14,6 @@
         <file>export.png</file>
         <file>background.png</file>
         <file>background_return.png</file>
+        <file>exit.png</file>
     </qresource>
 </RCC>

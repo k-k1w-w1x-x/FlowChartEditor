@@ -84,7 +84,7 @@ void MainWidget::init_menu_layout() {
     exportAction = new QAction(QIcon(":/menu/export.png"),"Export", this);
     openAction = new QAction(QIcon(":/menu/open.png"),"Open", this);
     saveAction = new QAction(QIcon(":/menu/save.png"),"Save", this);
-    exitAction = new QAction("Exit", this);
+    exitAction = new QAction(QIcon(":/menu/exit.png"),"Exit", this);
     fileMenu->addAction(saveAction);
     fileMenu->addAction(openAction);
     fileMenu->addAction(exportAction);
@@ -152,7 +152,7 @@ void MainWidget::init_menu_layout() {
             qDebug() << filePath;
             canvas->background_path = filePath;
             canvas->background_set = true;
-            canvas->update();
+            canvas->update();//update会调用drawbackground方法
         }
     });
     connect(back_returnAction, &QAction::triggered, [=](){
