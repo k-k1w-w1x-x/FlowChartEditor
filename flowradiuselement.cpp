@@ -51,7 +51,7 @@ void FlowRadiusElement::draw() {
     mainItem->setBrush(QBrush(contentColor));
 
     // 设置默认线条宽度
-    QPen pen(Qt::black);
+    QPen pen(borderColor);
     pen.setWidth(2);
     mainItem->setPen(pen);
 }
@@ -61,6 +61,7 @@ FlowRadiusElement *FlowRadiusElement::deepClone()
     clonedElement->borderDots.clear();
     clonedElement->controlDots.clear();
 
+    clonedElement->borderColor=this->borderColor;
     clonedElement->contentColor = this->contentColor;
     clonedElement->selected = this->selected;
 

@@ -47,6 +47,7 @@ private slots:
     // void createLine();
     // void createArrow();
     void onColorButtonClicked();
+    void onBorderColorButtonClicked();
     // void onArrowButtonClicked();
 
 signals:

@@ -13,10 +13,11 @@ public:
     QGraphicsRectItem *endDot ;
     QGraphicsRectItem *startElementDot = nullptr;
     QGraphicsRectItem *endElementDot =nullptr;
-    void move(double dx,double dy);
+    void move(double dx,double dy) ;
     void mySetScale(int index,double dx,double dy);
     QPointF passingPoint;
     FlowArrowElement* deepClone();
+    ~FlowArrowElement();
 };
 
 #endif // FLOWARROWELEMENT_H

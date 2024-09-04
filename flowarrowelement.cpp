@@ -6,6 +6,12 @@ FlowArrowElement::FlowArrowElement(): FlowElement(){
     startDot = new QGraphicsRectItem(QRectF(0, 0, DOT_SIZE, DOT_SIZE), this);
     endDot = new QGraphicsRectItem(QRectF(0, 0, DOT_SIZE, DOT_SIZE), this);
 }
+FlowArrowElement::~FlowArrowElement(){
+    delete(this->startDot);
+    delete(this->startElementDot);
+    delete(this->endDot);
+    delete(this->endElementDot);
+}
 void FlowArrowElement::draw()  {
     // 创建一个 QPainterPath 来绘制箭头
     QPainterPath path;
@@ -14,9 +20,14 @@ void FlowArrowElement::draw()  {
     //锁头优先
     if(startElementDot){
         startPoint = startElementDot->scenePos() + startElementDot->rect().center();
+        startDot->setX(startElementDot->scenePos().x() + startElementDot->rect().center().x());
+        startDot->setY(startElementDot->scenePos().y() + startElementDot->rect().center().y());
+        qDebug()<<"startDot:"<<startDot->scenePos().x()<<","<<startDot->scenePos().y();
     }
     if(endElementDot){
         endPoint = endElementDot->scenePos() + endElementDot->rect().center();
+        endDot->setX(endElementDot->scenePos().x() + endElementDot->rect().center().x());
+        endDot->setY(endElementDot->scenePos().y() + endElementDot->rect().center().y());
     }
     if(passingPoint.x()==0&&passingPoint.y()==0){
         path.moveTo(startPoint);
@@ -58,7 +69,8 @@ void FlowArrowElement::draw()  {
 
     // 创建一个 QGraphicsPathItem 来显示箭头
     mainItem->setPath(path);
-    mainItem->setPen(QPen(Qt::black, 2));  // 设置箭头的颜色和宽度
+    mainItem->setPen(QPen(borderColor, 2));    // 设置箭头的颜色和宽度
+
 
     QPen pen(Qt::red,1);
     startDot->setBrush(Qt::red);
@@ -77,6 +89,7 @@ void FlowArrowElement::draw()  {
 void FlowArrowElement::move(double dx,double dy)
 {
     //解绑全部锁头
+    qDebug()<<"move";
     if(startElementDot){
         //把锁头时的值赋给位置点
         startDot->scenePos() = startElementDot->scenePos();
@@ -129,5 +142,38 @@ void FlowArrowElement::mySetScale(int index,double dx,double dy){
 
 FlowArrowElement *FlowArrowElement::deepClone()
 {
-    return new FlowArrowElement();
+    FlowArrowElement* clonedElement = new FlowArrowElement();
+    clonedElement->borderColor=this->borderColor;
+    clonedElement->contentColor = this->contentColor;
+    clonedElement->selected = this->selected;
+
+    clonedElement->mainItem->setPath(this->mainItem->path());
+    // clonedElement->mainItem->setBrush(this->mainItem->brush());
+    clonedElement->mainItem->setPen(this->mainItem->pen());
+
+    clonedElement->startElementDot = nullptr;
+    clonedElement->endElementDot = nullptr;
+
+    QGraphicsRectItem* newStartDot = new QGraphicsRectItem(startDot->rect());
+    QGraphicsRectItem* newEndDot = new QGraphicsRectItem(endDot->rect());
+    newStartDot->setBrush(startDot->brush());
+    newStartDot->setPen(startDot->pen());
+    newStartDot->setPos(startDot->pos());
+
+    newEndDot->setBrush(endDot->brush());
+    newEndDot->setPen(endDot->pen());
+    newEndDot->setPos(endDot->pos());
+
+    clonedElement->startDot = newStartDot;
+    clonedElement->endDot = newEndDot;
+
+    QPointF newPassingPoint(0,0);
+    clonedElement->passingPoint = newPassingPoint;
+    qDebug()<<"brush:"<<clonedElement->startDot->brush();
+
+    clonedElement->setPos(this->pos());
+    clonedElement->setRotation(this->rotation());
+    clonedElement->setScale(this->scale());
+
+    return clonedElement;
 }

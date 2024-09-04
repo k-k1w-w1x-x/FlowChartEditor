@@ -81,6 +81,7 @@ private:
     int arrowClickedContronDot = 0;
 public slots:
     void onColorButtonClicked();
+    void onBorderColorButtonClicked();
     void setCross();
 };
 

@@ -63,7 +63,7 @@ void FlowPlaygroundElement::draw() {
     // 设置主图形项路径
     mainItem->setPath(path);
     mainItem->setBrush(QBrush(contentColor));
-    QPen pen(Qt::black);
+    QPen pen(borderColor);
     pen.setWidth(2);
     mainItem->setPen(pen);
 }
@@ -91,6 +91,7 @@ FlowPlaygroundElement *FlowPlaygroundElement::deepClone()
     clonedElement->borderDots.clear();
     clonedElement->controlDots.clear();
 
+    clonedElement->borderColor=this->borderColor;
     clonedElement->contentColor = this->contentColor;
     clonedElement->selected = this->selected;
 

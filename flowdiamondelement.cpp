@@ -52,7 +52,7 @@ void FlowDiamondElement::draw() {
     mainItem->setPath(path);
     mainItem->setBrush(QBrush(contentColor));
     // 设置默认线条宽度
-    QPen pen(Qt::black);
+    QPen pen(borderColor);
     pen.setWidth(2);
     mainItem->setPen(pen);
 }
@@ -84,6 +84,7 @@ void FlowDiamondElement::mySetScale(int index, double dx, double dy)
 FlowDiamondElement *FlowDiamondElement::deepClone()
 {
     FlowDiamondElement* clonedElement = new FlowDiamondElement();
+    clonedElement->borderColor=this->borderColor;
     clonedElement->borderDots.clear();
     clonedElement->controlDots.clear();
 

@@ -24,6 +24,7 @@ FlowParaElement *FlowParaElement::deepClone()
     clonedElement->borderDots.clear();
     clonedElement->controlDots.clear();
 
+    clonedElement->borderColor=this->borderColor;
     clonedElement->contentColor = this->contentColor;
     clonedElement->selected = this->selected;
 

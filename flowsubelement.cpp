@@ -62,7 +62,7 @@ void FlowSubElement::draw(){
     path1.lineTo(borderDots[6]->scenePos() + borderDots[6]->rect().center());
     path1.lineTo(borderDots[5]->scenePos() + borderDots[5]->rect().center());
     path1.closeSubpath();
-    QPen pen(Qt::black);
+    QPen pen(borderColor);
     pen.setWidth(2);
     innerItem->setPath(path1);
     innerItem->setBrush(QBrush(contentColor));
@@ -287,6 +287,7 @@ FlowSubElement *FlowSubElement::deepClone()
         clonedElement->borderDots.clear();
         clonedElement->controlDots.clear();
 
+        clonedElement->borderColor=this->borderColor;
         clonedElement->contentColor = this->contentColor;
         clonedElement->selected = this->selected;
 

@@ -62,7 +62,7 @@ void FlowDocuElement::draw() {
     mainItem->setBrush(QBrush(contentColor));
 
     // 设置路径的线条样式
-    QPen pen(Qt::black);
+    QPen pen(borderColor);
     pen.setWidth(2);
     mainItem->setPen(pen);
 }
@@ -259,6 +259,7 @@ FlowDocuElement *FlowDocuElement::deepClone()
     clonedElement->borderDots.clear();
     clonedElement->controlDots.clear();
 
+    clonedElement->borderColor=this->borderColor;
     clonedElement->contentColor = this->contentColor;
     clonedElement->selected = this->selected;
 

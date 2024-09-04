@@ -38,7 +38,7 @@ void FlowElement::draw() {
     mainItem->setPath(path);
     mainItem->setBrush(QBrush(contentColor));
     // 设置默认线条宽度
-    QPen pen(Qt::black);
+    QPen pen(borderColor);
     pen.setWidth(2);
     mainItem->setPen(pen);
 }
@@ -47,7 +47,7 @@ bool FlowElement::contains(const QPointF &point) const {
     return mainItem->contains(point);
 }
 
-void FlowElement::move(int dx, int dy) {
+void FlowElement::move(double dx,double dy) {
     // 先移动各个控制点（边界点）
     for(QGraphicsRectItem * borderDot : borderDots) {
         borderDot->moveBy(dx, dy);

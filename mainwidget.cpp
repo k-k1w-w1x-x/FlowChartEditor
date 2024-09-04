@@ -60,6 +60,7 @@ void MainWidget::init_menu_layout() {
 
     //边框color按钮
     ui->border_color_button->setFixedSize(40,40);
+    connect(ui->border_color_button,&QPushButton::clicked,this,&MainWidget::onBorderColorButtonClicked);
     // 连接边框颜色改变
     // connect(ui->border_color_button,&QPushButton::clicked,this,&MainWidget::onColorButtonClicked);
     QIcon icon2(":/menu/color_change.png");
@@ -69,30 +70,8 @@ void MainWidget::init_menu_layout() {
     ui->searchBox->setFixedSize(400, 35);
     ui->searchButton->setFixedSize(40, 40);
     ui->searchButton->setIcon(QIcon(":/menu/search.png"));
-    //箭头没地方绑了先绑这儿
     connect(ui->searchButton, &QPushButton::clicked, [=](){
-        canvas->isArrowing=!canvas->isArrowing;
-        if(!canvas->isArrowing && !canvas->arrows.empty() && canvas->arrows.last()->endDot->scenePos().x() == 0 && canvas->arrows.last()->endDot->scenePos().y() == 0){
-            //需要删除操作
-            qDebug()<<"删除";
-            FlowArrowElement *temp = canvas->arrows.last();
-            canvas->arrows.removeLast();
-            delete(temp->startDot);
-            delete(temp->startElementDot);
-            delete(temp->endDot);
-            delete(temp->endElementDot);
-            delete(temp);
-        }
-        if(canvas->isArrowing){
-            for(FlowElement *element : canvas->dragSelectedElements){
-                for(QGraphicsRectItem *controlDot:element->controlDots){
-                    controlDot->setVisible(false);
-                }
-                for(QGraphicsRectItem *arrowDot:element->arrowDots){
-                    arrowDot->setVisible(false);
-                }
-            }
-        }
+
     });
 
     menuBar = new QMenuBar(this);
@@ -285,12 +264,44 @@ void MainWidget::init_left_button() {
     QIcon icon9(":/type/arrow.png");
     ui->arrow_button->setIcon(icon9);
     ui->arrow_button->setIconSize(QSize(32, 32));
-
+    connect(ui->arrow_button, &QPushButton::clicked, [=](){
+        canvas->isArrowing=!canvas->isArrowing;
+        if(!canvas->isArrowing && !canvas->arrows.empty() && canvas->arrows.last()->endDot->scenePos().x() == 0 && canvas->arrows.last()->endDot->scenePos().y() == 0){
+            //需要删除操作
+            qDebug()<<"删除";
+            FlowArrowElement *temp = canvas->arrows.last();
+            canvas->arrows.removeLast();
+            delete(temp);
+        }
+        if(canvas->isArrowing){
+            for(FlowElement *element : canvas->dragSelectedElements){
+                for(QGraphicsRectItem *controlDot:element->controlDots){
+                    controlDot->setVisible(false);
+                }
+                for(QGraphicsRectItem *arrowDot:element->arrowDots){
+                    arrowDot->setVisible(false);
+                }
+            }
+            for(FlowArrowElement *dragSelectedArrow : canvas->dragSelectedArrows){
+                if(dragSelectedArrow->startElementDot){
+                    dragSelectedArrow->startElementDot->setVisible(false);
+                }
+                dragSelectedArrow->startDot->setVisible(false);
+                if(dragSelectedArrow->endElementDot){
+                    dragSelectedArrow->endElementDot->setVisible(false);
+                }
+                dragSelectedArrow->endDot->setVisible(false);
+            }
+        }
+    });
 }
 
 void MainWidget::onColorButtonClicked() {
     // 调用Canvas的draw方法
     canvas->onColorButtonClicked();
+}
+void MainWidget::onBorderColorButtonClicked(){
+    canvas->onBorderColorButtonClicked();
 }
 
 // void MainWidget::onArrowButtonClicked() {

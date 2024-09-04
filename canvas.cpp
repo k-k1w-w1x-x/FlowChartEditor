@@ -99,6 +99,15 @@ void Canvas::addShape(FlowElement *element)
             qDebug()<<"转型成功";
             scene->addItem(subElement->innerItem);
         }
+        if (FlowArrowElement* arrowElement = dynamic_cast<FlowArrowElement*>(element)){
+            scene->addItem(arrowElement->mainItem);
+            arrowElement->mainItem->setFlag(QGraphicsItem::ItemIsSelectable, true);
+            scene->addItem(arrowElement->startDot);
+            scene->addItem(arrowElement->endDot);
+            arrows.append(arrowElement);
+            setCross();
+            return;
+        }
         elements.append(element);
         for (auto controlDot : element->controlDots) {
             scene->addItem(controlDot);
@@ -401,7 +410,7 @@ void Canvas::mouseMoveEvent(QMouseEvent *event)
 void Canvas::mouseReleaseEvent(QMouseEvent *event)
 {
     //储存被选中的箭头
-    if(!clickmove && !clickscale){
+    if(!clickmove && !clickscale &&!isArrowing){
         dragSelectedArrows.clear();
         arrowClickedContronDot = 0;
         for(FlowArrowElement *arrow : arrows){
@@ -409,12 +418,14 @@ void Canvas::mouseReleaseEvent(QMouseEvent *event)
                 qDebug()<<"add arrow";
                 dragSelectedArrows.append(arrow);
                 if(!arrow->startElementDot && !arrow->endElementDot){
+                    qDebug()<<"可见";
                     arrow->startDot->setVisible(true);
                     arrow->endDot->setVisible(true);
                 }
 
             }
         }
+        qDebug()<<"arrowsize:"<<arrows.size();
     }
 
 
@@ -582,6 +593,42 @@ void Canvas::onColorButtonClicked()
     //     qDebug() << "No element selected. Color change ignored.";
     // }
 }
+
+
+void Canvas::onBorderColorButtonClicked()
+{
+    if(dragSelectedElements.empty() && dragSelectedArrows.empty()){
+        qDebug() << "No element selected. Color change ignored.";
+        return;
+    }
+    QColor color = QColorDialog::getColor(Qt::black, this, "Select Color");
+    for(const auto&dragselectedElement:dragSelectedElements){
+        // QColor color = QColorDialog::getColor(dragselectedElement->contentColor, this, "Select Color");
+        if (color.isValid()) {
+            dragselectedElement->borderColor = color;  // 设置选中元素的颜色
+            dragselectedElement->draw();
+            scene->update();  // 触发重绘，将元素颜色更新
+        }
+    }
+    for(const auto&dragselectedArrow:dragSelectedArrows){
+        // QColor color = QColorDialog::getColor(dragselectedElement->contentColor, this, "Select Color");
+        if (color.isValid()) {
+            dragselectedArrow->borderColor = color;  // 设置选中元素的颜色
+            dragselectedArrow->draw();
+            scene->update();  // 触发重绘，将元素颜色更新
+        }
+    }
+    // if (clickedSelectedElement) {
+    //     QColor color = QColorDialog::getColor(clickedSelectedElement->contentColor, this, "Select Color");
+    //     if (color.isValid()) {
+    //         clickedSelectedElement->contentColor = color;  // 设置选中元素的颜色
+    //         clickedSelectedElement->draw();
+    //         scene->update();  // 触发重绘，将元素颜色更新
+    //     }
+    // } else {
+    //     qDebug() << "No element selected. Color change ignored.";
+    // }
+}
 //键盘操作
 
 // 添加一个剪切板列表
@@ -595,6 +642,10 @@ void Canvas::onCopy()
 
     // 获取选中的元素
     QList<FlowElement *> SelectedElementTemp = this->dragSelectedElements;
+    for(FlowElement *dragSelectedArrow : dragSelectedArrows){
+        SelectedElementTemp.append(dragSelectedArrow);
+    }
+
     // if (SelectedElementTemp.empty()) {
     //     return; // 如果没有选中任何元素，则直接返回
     // }
@@ -871,6 +922,7 @@ void Canvas::keyPressEvent(QKeyEvent *event)
                 }
             }
         }
+        setCross();
     }
 }
 
@@ -941,8 +993,10 @@ void Canvas::setCross(){
             arrows[j]->draw();
         }
         if(flag==0){//没人和我相交
+            qDebug()<<"没人和我相交";
             arrows[i]->passingPoint.setX(0);
             arrows[i]->passingPoint.setY(0);
+            arrows[i]->draw();
         }
     }
 

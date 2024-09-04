@@ -4,8 +4,6 @@
 #include <QGraphicsPathItem>
 #include "elementserializer.h"
 
-
-
 void ElementSerializer::serializePainterPath(const QPainterPath& path, QDataStream& out) {
     int elementCount = path.elementCount();
     qDebug() << "serializePainterPath" << elementCount;
