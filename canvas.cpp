@@ -759,8 +759,10 @@ void Canvas::drawArrows(){
 void Canvas::setCross(){
     qDebug()<<"调用setCross";
     for(int i = 0; i <= arrows.size() - 1; i++){
-        for(int j = i + 1; j <= arrows.size() - 1; j++){
-            if(isCross(arrows[i],arrows[j])){
+        int flag = 0;
+        for(int j = 0; j <= arrows.size() - 1; j++){
+            if(i!=j && isCross(arrows[i],arrows[j])){
+                flag++;
                 qDebug()<<"计算交点";
                 double x1 = arrows[i]->startDot->x();
                 double y1 = arrows[i]->startDot->y();
@@ -806,16 +808,13 @@ void Canvas::setCross(){
                 arrows[i]->passingPoint.setY(y);
                 arrows[j]->passingPoint.setX(x);
                 arrows[j]->passingPoint.setY(y);
-
-            }
-            else{
-                arrows[i]->passingPoint.setX(0);
-                arrows[i]->passingPoint.setY(0);
-                arrows[j]->passingPoint.setX(0);
-                arrows[j]->passingPoint.setY(0);
             }
             arrows[i]->draw();
             arrows[j]->draw();
+        }
+        if(flag==0){//没人和我相交
+            arrows[i]->passingPoint.setX(0);
+            arrows[i]->passingPoint.setY(0);
         }
     }
 

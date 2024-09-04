@@ -59,6 +59,7 @@ void FlowArrowElement::draw()  {
     // 创建一个 QGraphicsPathItem 来显示箭头
     mainItem->setPath(path);
     mainItem->setPen(QPen(Qt::black, 2));  // 设置箭头的颜色和宽度
+
     QPen pen(Qt::red,1);
     startDot->setBrush(Qt::red);
     startDot->setPen(pen);
