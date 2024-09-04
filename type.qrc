@@ -8,5 +8,6 @@
         <file>circle.png</file>
         <file>rect3.png</file>
         <file>rect4.png</file>
+        <file>arrow.png</file>
     </qresource>
 </RCC>

@@ -10,6 +10,7 @@
 #include <QVector>
 #include <QFileDialog>
 #include <QLineEdit>
+#include <QSvgGenerator>
 
 MainWidget::MainWidget(QWidget *parent)
     : QWidget(parent)
@@ -53,6 +54,20 @@ void MainWidget::outputSvg() {
 }
 
 void MainWidget::init_menu_layout() {
+    //填充color按钮
+    ui->color_button->setFixedSize(40,40);
+    connect(ui->color_button,&QPushButton::clicked,this,&MainWidget::onColorButtonClicked);
+    QIcon icon1(":/menu/border_color.png");
+    ui->color_button->setIcon(icon1);
+    ui->color_button->setIconSize(QSize(25, 25));
+
+    //边框color按钮
+    ui->border_color_button->setFixedSize(40,40);
+    // 连接边框颜色改变
+    // connect(ui->border_color_button,&QPushButton::clicked,this,&MainWidget::onColorButtonClicked);
+    QIcon icon2(":/menu/color_change.png");
+    ui->border_color_button->setIcon(icon2);
+    ui->border_color_button->setIconSize(QSize(25, 25));
 
     ui->searchBox->setFixedSize(400, 35);
     ui->searchButton->setFixedSize(40, 40);
@@ -89,9 +104,25 @@ void MainWidget::init_menu_layout() {
         }
     });
     connect(saveAction, &QAction::triggered, [=](){
-        QString filePath = QFileDialog::getOpenFileName(this, "选择保存位置", "", "All Files (*)");
+        QString filePath = QFileDialog::getSaveFileName(nullptr, "选择保存位置", "", "SVG Files (*.svg);;All Files (*)");
         if (!filePath.isEmpty()) {
-            qDebug() << filePath;
+            if (!filePath.endsWith(".svg", Qt::CaseInsensitive)) {
+                filePath += ".svg";  // 确保文件路径有扩展名
+            }
+
+            // 创建 QSvgGenerator 对象
+            QSvgGenerator svgGen;
+            svgGen.setFileName(filePath);
+            svgGen.setSize(canvas->size());  // 设置 SVG 的大小
+            svgGen.setViewBox(canvas->viewport()->rect());  // 设置视图框
+            svgGen.setTitle("GraphicsScene SVG Export");
+            svgGen.setDescription("An SVG drawing created by exporting a QGraphicsScene.");
+
+            // 使用 QPainter 将 QGraphicsScene 的内容绘制到 SVG 文件中
+            QPainter painter;
+            painter.begin(&svgGen);
+            canvas->render(&painter);  // 将视图渲染到 QPainter
+            painter.end();  // 完成绘制
         }
     });
 
@@ -104,6 +135,9 @@ void MainWidget::init_menu_layout() {
     pasteAction = new QAction(QIcon(":/menu/paste.png"),"Paste", this);
     editMenu->addAction(copyAction);
     editMenu->addAction(pasteAction);
+
+    connect(copyAction, &QAction::triggered, canvas, &Canvas::onCopy);
+    connect(pasteAction, &QAction::triggered, canvas, &Canvas::onPaste);
 
     //redo按钮信号!!!!
     //connect(redoMenu, &QMenu::aboutToShow, this, &QWidget::close);
@@ -186,12 +220,12 @@ void MainWidget::init_left_button() {
         canvas->addShape(playgroundElement);
     });
 
-    //color按钮
-    ui->color_button->setFixedSize(60,50);
-    connect(ui->color_button,&QPushButton::clicked,this,&MainWidget::onColorButtonClicked);
-    QIcon icon8(":/menu/color_change.png");
-    ui->color_button->setIcon(icon8);
-    ui->color_button->setIconSize(QSize(32, 32));
+    //arrow按钮
+    ui->arrow_button->setFixedSize(60,50);
+    connect(ui->arrow_button, &QPushButton::clicked,this,&MainWidget::onArrowButtonClicked);
+    QIcon icon9(":/type/arrow.png");
+    ui->arrow_button->setIcon(icon9);
+    ui->arrow_button->setIconSize(QSize(32, 32));
 
     // 创建一个 FlowRectElement 并将其添加到 Canvas (QGraphicsScene) 中
     FlowRectElement* rectElement = new FlowRectElement();
@@ -215,6 +249,17 @@ void MainWidget::onColorButtonClicked() {
     // canvas->addShape(circleElement);
     // FlowSubElement* subElement = new FlowSubElement();
     // canvas->addShape(subElement);
+}
+
+void MainWidget::onArrowButtonClicked() {
+    if (arrow_flag) {
+        emit arrow_first_click();
+        arrow_flag = !arrow_flag;
+    }
+    else {
+        emit arrow_second_click();
+        arrow_flag = !arrow_flag;
+    }
 }
 
 MainWidget::~MainWidget()

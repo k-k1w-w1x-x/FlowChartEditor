@@ -461,12 +461,14 @@ void Canvas::onDelete() {
         }
         for (auto dot : element->borderDots) {
             scene->removeItem(dot);
+            element->arrowDots.removeOne(dot);
             delete dot;
         }
         for (auto dot : element->arrowDots) {
             scene->removeItem(dot);
             delete dot;
         }
+
         elements.removeOne(element);
         dragSelectedElements.removeOne(element);
         delete element;

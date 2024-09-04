@@ -10,5 +10,6 @@
         <file>download.png</file>
         <file>color_change.png</file>
         <file>search.png</file>
+        <file>border_color.png</file>
     </qresource>
 </RCC>
