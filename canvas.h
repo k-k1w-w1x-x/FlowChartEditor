@@ -10,6 +10,8 @@
 #include<zindexmanager.h>
 #include<QFile>
 #include<flowrectelement.h>
+#include "flowarrowelement.h"
+
 class Canvas : public QGraphicsView
 {
     Q_OBJECT
@@ -24,6 +26,7 @@ public:
 
     QList<FlowElement*> clipboard;
     QList<GraphicsTextItem*> textClipboard;
+    QList<FlowArrowElement*> arrows;
     QGraphicsScene *scene;
     explicit Canvas(QWidget *parent = nullptr);
     void addShape(FlowElement *element);
@@ -33,8 +36,19 @@ public:
     void importElements(const QString& filename);
     bool clickmove = false;
     bool clickscale = false;
+    bool arrowclickmove = false;
+    bool arrowclickscale = false;
     bool mouseclick = false;
     bool elementClicked = false;
+    bool isArrowing = false;
+    QList<FlowElement*> dragSelectedElements ;
+    QList<FlowArrowElement*> dragSelectedArrows;
+    double Manhattandis(QGraphicsRectItem *p1,QGraphicsRectItem *p2);
+    bool isCross(FlowArrowElement *arrow1,FlowArrowElement*arrow2);
+    double crossProduct(QPointF a,QPointF b);
+
+
+protected:
     void drawBackground(QPainter *painter, const QRectF &rect) override;
 
     void removeFromCanvas(FlowElement *element);
@@ -44,6 +58,8 @@ protected:
     void mouseReleaseEvent(QMouseEvent *event) override;
     void mouseMoveEvent(QMouseEvent *event) override;
     void mouseDoubleClickEvent(QMouseEvent *event) override;
+    void keyPressEvent(QKeyEvent *event);
+    void drawArrows();
 
 private:
     void drawGrid(QPainter &painter, const QRectF &rect);  // 绘制网格线
@@ -53,7 +69,6 @@ private:
     QList<FlowElement*> elements ;
     KeyEventFilter *keyEventFilter;
     QPointF lastMousePosition;
-    QList<FlowElement*> dragSelectedElements ;
     QList<GraphicsTextItem*> graphicTextItems;
     bool isDragging=false;
     bool isScaling=false;
@@ -63,9 +78,10 @@ private:
     FlowElement* clickedSelectedElement = nullptr;
     int clickedControlDot ;
     ZIndexManager* zindexManager;
-
+    int arrowClickedContronDot = 0;
 public slots:
     void onColorButtonClicked();
+    void setCross();
 };
 
 #endif // CANVAS_H

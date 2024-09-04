@@ -11,7 +11,7 @@ CONFIG += c++17
 SOURCES += \
     ElementSerializer.cpp \
     canvas.cpp \
-    flowarrow.cpp \
+    flowarrowelement.cpp \
     flowcircleelement.cpp \
     flowelement.cpp \
     flowdiamondelement.cpp \
@@ -30,7 +30,7 @@ SOURCES += \
 HEADERS += \
     ElementSerializer.h \
     canvas.h \
-    flowarrow.h \
+    flowarrowelement.h \
     flowcircleelement.h \
     flowdiamondelement.h \
     flowdocuelement.h \
