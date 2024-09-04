@@ -16,7 +16,6 @@ public:
     QPointF passingPoint;
     void move(double dx,double dy);
     void mySetScale(int index,double dx,double dy);
-    void drawHalfCircle(QPainterPath &path,const QPointF &center, const QPointF &point1, const QPointF &point2);
 };
 
 #endif // FLOWARROWELEMENT_H

@@ -23,17 +23,21 @@ void FlowArrowElement::draw()  {
         path.lineTo(endPoint);
     }
     else{
+
         qDebug()<<"在draw里面passingPoint:"<<passingPoint.x()<<","<<passingPoint.y();
-        double passSize = 5;
-        if(endPoint.x()<startPoint.x()){
-            passSize=-5;
-        }
-        double k = (endPoint.y()-startPoint.y())/(endPoint.x()-startPoint.x());
-        QPointF passingPoint1(passingPoint.x() - passSize,passingPoint.y() - passSize * k);
-        QPointF passingPoint2(passingPoint.x() + passSize,passingPoint.y() + passSize * k);
+        double passSize = 10.0;
+        double x1 = startPoint.x();
+        double y1 = startPoint.y();
+        double x2 = endPoint.x();
+        double y2 = endPoint.y();
+        double passX = passSize * (x1-x2)/sqrt(pow(x1-x2,2)+pow(y1-y2,2));
+        double passY = passSize * (y1-y2)/sqrt(pow(x1-x2,2)+pow(y1-y2,2));
+        QPointF passingPoint1(passingPoint.x() + passX, passingPoint.y() + passY);
+        QPointF passingPoint2(passingPoint.x() - passX, passingPoint.y() - passY);
+        QPointF passingPoint0(passingPoint.x() - passY, passingPoint.y() + passX);
         path.moveTo(startPoint);
         path.lineTo(passingPoint1);
-        drawHalfCircle(path,passingPoint,passingPoint1,passingPoint2);
+        path.quadTo(passingPoint0,passingPoint2);
         path.lineTo(endPoint);
     }
     // 箭头的头部宽度和长度
@@ -99,17 +103,5 @@ void FlowArrowElement::mySetScale(int index,double dx,double dy){
     draw();
 }
 
-void FlowArrowElement::drawHalfCircle(QPainterPath &path,const QPointF &center, const QPointF &point1, const QPointF &point2) {
-    // 计算半径
-    qreal radius = QLineF(point1, point2).length() / 2.0;
 
-    // 计算起始角度
-    qreal angle = std::atan2(point2.y() - point1.y(), point2.x() - point1.x()) * 180.0 / M_PI;
 
-    // 创建外接矩形
-    QRectF boundingRect(center.x() - radius, center.y() - radius, 2 * radius, 2 * radius);
-
-    // 绘制半圆（180度的弧线）
-    path.arcMoveTo(boundingRect, angle + 180);
-    path.arcTo(boundingRect, angle + 180, -180);
-}

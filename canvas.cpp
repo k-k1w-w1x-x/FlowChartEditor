@@ -567,6 +567,15 @@ void Canvas::setCross(){
                 double y1 = arrows[i]->startDot->y();
                 double x2 = arrows[i]->endDot->x();
                 double y2 = arrows[i]->endDot->y();
+                if(arrows[i]->startElementDot){
+                    x1=arrows[i]->startElementDot->x();
+                    y1=arrows[i]->startElementDot->y();
+                }
+                if(arrows[i]->endElementDot){
+                    x2=arrows[i]->endElementDot->x();
+                    y2=arrows[i]->endElementDot->y();
+                }
+
                 double k1 = (y1 - y2)/(x1 - x2);
                 double b1 = y1 - k1 * x1;
 
@@ -574,6 +583,14 @@ void Canvas::setCross(){
                 double y3 = arrows[j]->startDot->y();
                 double x4 = arrows[j]->endDot->x();
                 double y4 = arrows[j]->endDot->y();
+                if(arrows[j]->startElementDot){
+                    x3=arrows[j]->startElementDot->x();
+                    y3=arrows[j]->startElementDot->y();
+                }
+                if(arrows[j]->endElementDot){
+                    x4=arrows[j]->endElementDot->x();
+                    y4=arrows[j]->endElementDot->y();
+                }
                 double k2 = (y3 - y4)/(x3 - x4);
                 double b2 = y3 - k2 * x3;
                 double x = (b2 - b1)/(k1 - k2);
@@ -590,6 +607,13 @@ void Canvas::setCross(){
                 arrows[i]->passingPoint.setY(y);
                 arrows[j]->passingPoint.setX(x);
                 arrows[j]->passingPoint.setY(y);
+
+            }
+            else{
+                arrows[i]->passingPoint.setX(0);
+                arrows[i]->passingPoint.setY(0);
+                arrows[j]->passingPoint.setX(0);
+                arrows[j]->passingPoint.setY(0);
             }
         }
     }
@@ -602,6 +626,19 @@ bool Canvas::isCross(FlowArrowElement *arrow1,FlowArrowElement*arrow2){//判断�
     QPointF b = arrow1->endDot->scenePos().toPoint();
     QPointF c = arrow2->startDot->scenePos().toPoint();
     QPointF d = arrow2->endDot->scenePos().toPoint();
+
+    if(arrow1->startElementDot){
+        a=arrow1->startElementDot->scenePos();
+    }
+    if(arrow1->endElementDot){
+        b=arrow1->endElementDot->scenePos();
+    }
+    if(arrow2->startElementDot){
+        c=arrow2->startElementDot->scenePos();
+    }
+    if(arrow2->endElementDot){
+        d=arrow2->endElementDot->scenePos();
+    }
 
     if(fmax(c.x(),d.x())<fmin(a.x(),b.x())||fmax(a.x(),b.x())<fmin(c.x(),d.x())||fmax(c.y(),d.y())<fmin(a.y(),b.y())||fmax(a.y(),b.y())<fmin(c.y(),d.y()))
     {
