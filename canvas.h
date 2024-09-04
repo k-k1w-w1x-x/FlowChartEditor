@@ -7,6 +7,7 @@
 #include "flowsubelement.h"
 #include "graphicstextitem.h"
 #include"keyeventFilter.h"
+#include<zindexmanager.h>
 class Canvas : public QGraphicsView
 {
     Q_OBJECT
@@ -34,7 +35,6 @@ protected:
     void mouseReleaseEvent(QMouseEvent *event) override;
     void mouseMoveEvent(QMouseEvent *event) override;
     void mouseDoubleClickEvent(QMouseEvent *event) override;
-    QList<FlowElement*> dragSelectedElements ;
 
 private:
     void drawGrid(QPainter &painter, const QRectF &rect);  // 绘制网格线
@@ -42,10 +42,9 @@ private:
     int gridSpacing;  // 网格线的间隔
     QColor gridColor; // 网格线的颜色
     QList<FlowElement*> elements ;
-    // QList<FlowElement*> dragSelectedElements ;
     KeyEventFilter *keyEventFilter;
     QPointF lastMousePosition;
-
+    QList<FlowElement*> dragSelectedElements ;
     QList<GraphicsTextItem*> graphicTextItems;
     bool isDragging=false;
     bool isScaling=false;
@@ -54,6 +53,8 @@ private:
     void onFind();
     FlowElement* clickedSelectedElement = nullptr;
     int clickedControlDot ;
+    ZIndexManager* zindexManager;
+
 public slots:
     void onColorButtonClicked();
 };

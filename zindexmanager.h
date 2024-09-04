@@ -6,6 +6,7 @@
 #include <QMap>
 #include<vector>
 #include <flowelement.h>
+#include <flowsubelement.h>
 #include<graphicstextitem.h>
 class ZIndexManager : public QObject {
     Q_OBJECT
@@ -16,12 +17,12 @@ public:
 
     // // 添加一个 QGraphicsItem，并设置它的 z-index
     void setHighestZindexForItem(FlowElement* flowelement);
-    void setHighestZindexForItem(GraphicsTextItem* flowelement);
+    void setHighestZindexForItem(GraphicsTextItem* textelement);
     // void adjustZIndexForAllElementOnCanvas(QList<FlowElement*>x,std::vector<GraphicsTextItem*>y);
 
 
 private:
-    int maxZIndex=0;
+    qreal maxZIndex=0;
 };
 
 #endif // ZINDEXMANAGER_H

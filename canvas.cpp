@@ -35,6 +35,9 @@ Canvas::Canvas(QWidget *parent)
     keyEventFilter = new KeyEventFilter(this);
     this->installEventFilter(keyEventFilter);
 
+    // 初始化ZIndexManager
+    zindexManager = new ZIndexManager();
+
     // 连接 KeyEventFilter 的信号到相应的槽函数
     connect(keyEventFilter, &KeyEventFilter::copyTriggered, this, &Canvas::onCopy);
     connect(keyEventFilter, &KeyEventFilter::pasteTriggered, this, &Canvas::onPaste);
@@ -318,6 +321,13 @@ void Canvas::mouseReleaseEvent(QMouseEvent *event)
             element->selected = true;
         }
     }
+    for(const auto element:dragSelectedElements){
+        zindexManager->setHighestZindexForItem(element);
+    }
+    for(const auto element:graphicTextItems){
+        if(element->isSelected())
+        zindexManager->setHighestZindexForItem(element);
+    }
     scene->update();
 }
 
@@ -369,8 +379,7 @@ void Canvas::onCopy()
     clipboard.clear();
     textClipboard.clear();
 
-    // // 清空之前的选择元素列表
-    // selectedElements.clear();
+
 
     // 遍历选中的图形项，并将它们深拷贝
     for (const auto &item : SelectedElementTemp) {
