@@ -19,17 +19,6 @@ GraphicsTextItem::GraphicsTextItem(const QString &text, QGraphicsItem *parent)
     setAcceptHoverEvents(true);
     setTextInteractionFlags(Qt::TextEditorInteraction);
 
-    QRectF rect = boundingRect();
-    topLeft = QRectF(rect.topLeft().x(), rect.topLeft().y(), 5, 5);
-    topRight = QRectF(rect.topRight().x() - 5, rect.topRight().y(), 5, 5);
-    bottomLeft = QRectF(rect.bottomLeft().x(), rect.bottomLeft().y() - 5, 5, 5);
-    bottomRight = QRectF(rect.bottomRight().x() - 5, rect.bottomRight().y() - 5, 5, 5);
-
-    top = QRectF(rect.topLeft().x() + 5, rect.topLeft().y(), rect.width() - 10, 5);
-    bottom = QRectF(rect.bottomLeft().x() + 5, rect.bottomLeft().y() - 5, rect.width() - 10, 5);
-    left = QRectF(rect.topLeft().x(), rect.topLeft().y() + 5, 5, rect.height() - 10);
-    right = QRectF(rect.topRight().x() - 5, rect.topRight().y() + 5, 5, rect.height() - 10);
-
     scaling = resizing = 0;
 }
 
@@ -76,6 +65,18 @@ void GraphicsTextItem::hoverMoveEvent(QGraphicsSceneHoverEvent *event)
 {
     QPointF pos = event->pos();
 
+    QRectF rect = boundingRect();
+    QRectF topLeft, topRight, bottomLeft, bottomRight, top, bottom, left, right;
+    topLeft = QRectF(rect.topLeft().x(), rect.topLeft().y(), 5, 5);
+    topRight = QRectF(rect.topRight().x() - 5, rect.topRight().y(), 5, 5);
+    bottomLeft = QRectF(rect.bottomLeft().x(), rect.bottomLeft().y() - 5, 5, 5);
+    bottomRight = QRectF(rect.bottomRight().x() - 5, rect.bottomRight().y() - 5, 5, 5);
+
+    top = QRectF(rect.topLeft().x() + 5, rect.topLeft().y(), rect.width() - 10, 5);
+    bottom = QRectF(rect.bottomLeft().x() + 5, rect.bottomLeft().y() - 5, rect.width() - 10, 5);
+    left = QRectF(rect.topLeft().x(), rect.topLeft().y() + 5, 5, rect.height() - 10);
+    right = QRectF(rect.topRight().x() - 5, rect.topRight().y() + 5, 5, rect.height() - 10);
+
     if (isSelected())
     {
         if (topLeft.contains(pos) || bottomRight.contains(pos))
@@ -105,6 +106,18 @@ void GraphicsTextItem::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
 
 void GraphicsTextItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
+    QRectF rect = boundingRect();
+    QRectF topLeft, topRight, bottomLeft, bottomRight, top, bottom, left, right;
+    topLeft = QRectF(rect.topLeft().x(), rect.topLeft().y(), 5, 5);
+    topRight = QRectF(rect.topRight().x() - 5, rect.topRight().y(), 5, 5);
+    bottomLeft = QRectF(rect.bottomLeft().x(), rect.bottomLeft().y() - 5, 5, 5);
+    bottomRight = QRectF(rect.bottomRight().x() - 5, rect.bottomRight().y() - 5, 5, 5);
+
+    top = QRectF(rect.topLeft().x() + 5, rect.topLeft().y(), rect.width() - 10, 5);
+    bottom = QRectF(rect.bottomLeft().x() + 5, rect.bottomLeft().y() - 5, rect.width() - 10, 5);
+    left = QRectF(rect.topLeft().x(), rect.topLeft().y() + 5, 5, rect.height() - 10);
+    right = QRectF(rect.topRight().x() - 5, rect.topRight().y() + 5, 5, rect.height() - 10);
+
     if (event->button() == Qt::LeftButton)
     {
         QPointF pos = event->pos();
@@ -233,6 +246,15 @@ void GraphicsTextItem::move(QPointF delta)
     t.scale(transform().m11(), transform().m22());
     setTransform(t);
     update();
+}
+
+GraphicsTextItem* GraphicsTextItem::deepClone()
+{
+    GraphicsTextItem *ret = new GraphicsTextItem(toPlainText());
+    ret->setTransform(transform());
+    ret->setPos(this->pos());
+    ret->move(QPointF(10, 10));
+    return ret;
 }
 
 #endif // GRAPHICSTEXTITEM_CPP
