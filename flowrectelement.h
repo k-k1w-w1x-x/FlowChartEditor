@@ -6,7 +6,9 @@
 class FlowRectElement : public FlowElement {
 public:
     FlowRectElement();
-    FlowRectElement* deepClone();
+    FlowRectElement* deepClone() override;
+    void serialize(QDataStream& out, const FlowElement& element) override;
+    static FlowElement* deSerialize(QDataStream& in) ;
 };
 
 #endif // FLOWRECTELEMENT_H

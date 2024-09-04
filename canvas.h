@@ -8,6 +8,8 @@
 #include "graphicstextitem.h"
 #include"keyeventFilter.h"
 #include<zindexmanager.h>
+#include<QFile>
+#include<flowrectelement.h>
 class Canvas : public QGraphicsView
 {
     Q_OBJECT
@@ -24,6 +26,8 @@ public:
     void addShape(FlowElement *element);
     void setGridSpacing(int spacing);  // 设置网格间隔
     void setGridColor(const QColor &color);  // 设置网格颜色
+    void exportElements(const QString& filename);
+    void importElements(const QString& filename);
     bool clickmove = false;
     bool clickscale = false;
     bool mouseclick = false;

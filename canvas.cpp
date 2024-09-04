@@ -478,19 +478,14 @@ void Canvas::onDelete() {
     qDebug() << "Delete action triggered";
     for (auto element : dragSelectedElements) {
         scene->removeItem(element->mainItem);
-        // delete element->mainItem;
         if(FlowSubElement* subElement = dynamic_cast<FlowSubElement*>(element)){
             scene->removeItem(subElement->innerItem);
-            // delete subElement->innerItem;
         }
         for (auto dot : element->borderDots) {
             scene->removeItem(dot);
-            // delete dot;
-            // element->arrowDots.removeOne(dot);
         }
         for (auto dot : element->arrowDots) {
             scene->removeItem(dot);
-            // delete dot;
         }
 
         elements.removeOne(element);
@@ -504,4 +499,74 @@ void Canvas::onDelete() {
             graphicTextItems.removeOne(i);
             delete i;
         }
+}
+void Canvas::exportElements(const QString& filename) {
+    QFile file(filename);
+    if (file.open(QIODevice::WriteOnly)) {
+        QDataStream out(&file);
+
+        // 写入元素数量
+        out << elements.size();
+        // qDebug()<<"elementsize"<<elements.size();
+        // // 遍历并序列化每个元素
+        for (FlowElement* element : elements) {
+            element->serialize(out,*element);
+        }
+
+        file.close();
+    } else {
+        qWarning("Could not open file for writing.");
+    }
+}
+
+
+
+void Canvas::importElements(const QString& filename) { // 实现 importElements 方法
+    QFile file(filename);
+
+    qDebug()<<"start import1";
+    if (file.open(QIODevice::ReadOnly)) {
+        QDataStream in(&file);
+        for (auto element : elements) {
+            scene->removeItem(element->mainItem);
+            if(FlowSubElement* subElement = dynamic_cast<FlowSubElement*>(element)){
+                scene->removeItem(subElement->innerItem);
+            }
+            for (auto dot : element->borderDots) {
+                scene->removeItem(dot);
+            }
+            for (auto dot : element->arrowDots) {
+                scene->removeItem(dot);
+            }
+
+            elements.removeOne(element);
+            dragSelectedElements.removeOne(element);
+            delete element;
+        }
+        for (auto i : graphicTextItems){
+                scene->removeItem(i);
+                graphicTextItems.removeOne(i);
+                delete i;
+        }
+        qsizetype elementCount;
+        in >> elementCount;
+        // qDebug()<<elementCount;
+        for (int i = 0; i < elementCount; ++i) {
+            int type;
+            in>>type;
+            FlowElement* element;
+            if(type==0){
+                element = FlowRectElement::deSerialize(in);
+            }
+            // FlowElement* element = new FlowElement();  // 需要根据实际类型创建适当的子类对象
+            // in >> *element;  // 使用重载的 >> 操作符进行反序列化
+
+            addShape(element);
+            // scene->addItem(element->mainItem);
+        }
+
+        file.close();
+    } else {
+        qWarning("Could not open file for reading.");
+    }
 }

@@ -237,18 +237,6 @@ void MainWidget::init_left_button() {
 void MainWidget::onColorButtonClicked() {
     // 调用Canvas的draw方法
     canvas->onColorButtonClicked();
-    // // 创建一个 FlowRectElement 并将其添加到 Canvas (QGraphicsScene) 中
-    // FlowRectElement* rectElement = new FlowRectElement();
-    // canvas->addShape(rectElement);
-    //菱形
-    // FlowDiamondElement* diamondElement = new FlowDiamondElement();
-    // canvas->addShape(diamondElement);
-    // FlowParaElement* paraElement = new FlowParaElement();
-    // canvas->addShape(paraElement);
-    // FlowCircleElement* circleElement = new FlowCircleElement();
-    // canvas->addShape(circleElement);
-    // FlowSubElement* subElement = new FlowSubElement();
-    // canvas->addShape(subElement);
 }
 
 void MainWidget::onArrowButtonClicked() {
@@ -261,7 +249,19 @@ void MainWidget::onArrowButtonClicked() {
         arrow_flag = !arrow_flag;
     }
 }
+void MainWidget::onExportButtonClicked() {
+    QString filename = QFileDialog::getSaveFileName(this, "Export Elements", "", "Data Files (*.dat)");
+    if (!filename.isEmpty()) {
+        canvas->exportElements(filename); // 调用 Canvas 的导出方法
+    }
+}
 
+void MainWidget::onImportButtonClicked() {
+    QString filename = QFileDialog::getOpenFileName(this, "Import Elements", "", "Data Files (*.dat)");
+    if (!filename.isEmpty()) {
+        canvas->importElements(filename); // 调用 Canvas 的 importElements 方法
+    }
+}
 MainWidget::~MainWidget()
 {
     delete ui;

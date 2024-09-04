@@ -13,7 +13,7 @@
 #include "flowradiuselement.h"
 #include "flowdocuelement.h"
 #include "flowplaygroundelement.h"
-
+#include <QFileDialog>
 class Canvas;
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -34,6 +34,8 @@ public:
     void init_menu_layout();
     void outputSvg();
 
+    void onExportButtonClicked();
+    void onImportButtonClicked();
 private slots:
     // void update();
     // void createRectangle();
