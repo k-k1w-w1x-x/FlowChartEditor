@@ -68,6 +68,13 @@
         </widget>
        </item>
        <item>
+        <widget class="QPushButton" name="roundrect_button">
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+       </item>
+       <item>
         <widget class="QPushButton" name="arrow_button">
          <property name="text">
           <string/>

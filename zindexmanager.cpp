@@ -6,6 +6,9 @@ void ZIndexManager::setHighestZindexForItem(FlowElement *flowelement)
 {
     ++maxZIndex;
     flowelement->mainItem->setZValue(maxZIndex);
+    if(FlowSubElement* subElement = dynamic_cast<FlowSubElement*>(flowelement)){
+        subElement->innerItem->setZValue(maxZIndex);
+    }
     for(const auto&dot:flowelement->borderDots){
         dot->setZValue(maxZIndex);
     }

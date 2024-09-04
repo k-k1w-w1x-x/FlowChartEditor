@@ -62,7 +62,14 @@ void Canvas::setGridColor(const QColor &color)
 
 void Canvas::drawBackground(QPainter *painter, const QRectF &rect)
 {
-    drawGrid(*painter, rect);
+    if (!background_set) this->drawGrid(*painter, rect);
+    else {
+        // 加载背景图片
+        QPixmap background(background_path);
+
+        // 缩放背景图片以适应视图大小
+        painter->drawPixmap(this->rect(), background.scaled(this->size(), Qt::KeepAspectRatioByExpanding));
+    }
 }
 
 void Canvas::drawGrid(QPainter &painter, const QRectF &rect)
@@ -384,6 +391,7 @@ void Canvas::onCopy()
     // 遍历选中的图形项，并将它们深拷贝
     for (const auto &item : SelectedElementTemp) {
         FlowElement *clonedElement = item->deepClone(); // 深拷贝元素
+        clonedElement->move(10,10);
         clipboard.append(clonedElement);
     }
 
@@ -420,18 +428,27 @@ void Canvas::onPaste() {
     }
 
     // 遍历剪切板中的元素
+    QList<FlowElement*>deleteElements,appendElements;
     for (FlowElement* element : clipboard) {
         FlowElement* clonedElement = element->deepClone(); // 深拷贝元素
-        // clipboard.clear();
+        deleteElements.append(element);
+        appendElements.append(clonedElement);
+        // clipboard.removeOne(element);
         // clipboard.append(clonedElement);
         if (clonedElement) {
             // 将粘贴的元素稍微偏移位置
             clonedElement->move(10, 10); // 向右下偏移 10 像素
-            addShape(clonedElement); // 将深拷贝的元素添加到场景中
+            addShape(element); // 将深拷贝的元素添加到场景中
             qDebug() << "粘贴了一个元素";
         } else {
             qDebug() << "deepClone 失败，无法粘贴该元素";
         }
+    }
+    for(const auto&u:deleteElements){
+        clipboard.removeOne(u);
+    }
+    for(const auto&u:appendElements){
+        clipboard.append(u);
     }
 
     qDebug() << textClipboard.size();
@@ -473,23 +490,36 @@ void Canvas::onFind() {
     qDebug() << "Find action triggered";
     // 具体的查找操作
 }
-
+void Canvas::removeFromCanvas(FlowElement* element){
+    scene->removeItem(element->mainItem);
+    if(FlowSubElement* subElement = dynamic_cast<FlowSubElement*>(element)){
+        scene->removeItem(subElement->innerItem);
+    }
+    for (auto dot : element->borderDots) {
+        scene->removeItem(dot);
+    }
+    for (auto dot : element->arrowDots) {
+        scene->removeItem(dot);
+    }
+    elements.removeOne(element);
+    dragSelectedElements.removeOne(element);
+}
 void Canvas::onDelete() {
     qDebug() << "Delete action triggered";
     for (auto element : dragSelectedElements) {
-        scene->removeItem(element->mainItem);
-        if(FlowSubElement* subElement = dynamic_cast<FlowSubElement*>(element)){
-            scene->removeItem(subElement->innerItem);
-        }
-        for (auto dot : element->borderDots) {
-            scene->removeItem(dot);
-        }
-        for (auto dot : element->arrowDots) {
-            scene->removeItem(dot);
-        }
-
-        elements.removeOne(element);
-        dragSelectedElements.removeOne(element);
+        // scene->removeItem(element->mainItem);
+        // if(FlowSubElement* subElement = dynamic_cast<FlowSubElement*>(element)){
+        //     scene->removeItem(subElement->innerItem);
+        // }
+        // for (auto dot : element->borderDots) {
+        //     scene->removeItem(dot);
+        // }
+        // for (auto dot : element->arrowDots) {
+        //     scene->removeItem(dot);
+        // }
+        // elements.removeOne(element);
+        // dragSelectedElements.removeOne(element);
+        removeFromCanvas(element);
         delete element;
     }
     for (auto i : graphicTextItems)

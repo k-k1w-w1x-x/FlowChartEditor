@@ -14,6 +14,10 @@
 #include "flowdocuelement.h"
 #include "flowplaygroundelement.h"
 #include <QFileDialog>
+#include <QKeyEvent>
+#include <QScrollBar>
+#include <QScrollArea>
+
 class Canvas;
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -43,7 +47,7 @@ private slots:
     // void createLine();
     // void createArrow();
     void onColorButtonClicked();
-    void onArrowButtonClicked();
+    // void onArrowButtonClicked();
 
 signals:
     //arrow_flag为true
@@ -53,9 +57,10 @@ signals:
     void arrow_second_click();
 
 private:
+
     Ui::MainWidget *ui;
 
-    bool arrow_flag = true;
+    // bool arrow_flag = true;
 
     QVBoxLayout *sidebarLayout;
     QPushButton *rectangleButton;
@@ -69,12 +74,14 @@ private:
     QMenu *redoMenu;
     QMenu *undoMenu;
 
-    QAction *newAction;
+    QAction *exportAction;
     QAction *openAction;
     QAction *saveAction;
     QAction *exitAction;
     QAction *copyAction;
     QAction *pasteAction;
+    QAction *backgroundAction;
+    QAction *back_returnAction;
 
     QGridLayout *mainLayout;
     QVBoxLayout *topLayout;

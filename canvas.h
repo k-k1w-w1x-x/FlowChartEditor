@@ -15,6 +15,9 @@ class Canvas : public QGraphicsView
     Q_OBJECT
 
 public:
+    bool background_set = false;
+    QString background_path;
+
     void onCopy();
     void onPaste();
     void onDelete();
@@ -32,9 +35,11 @@ public:
     bool clickscale = false;
     bool mouseclick = false;
     bool elementClicked = false;
-
-protected:
     void drawBackground(QPainter *painter, const QRectF &rect) override;
+
+    void removeFromCanvas(FlowElement *element);
+protected:
+
     void mousePressEvent(QMouseEvent *event) override;
     void mouseReleaseEvent(QMouseEvent *event) override;
     void mouseMoveEvent(QMouseEvent *event) override;
@@ -42,7 +47,7 @@ protected:
 
 private:
     void drawGrid(QPainter &painter, const QRectF &rect);  // 绘制网格线
-
+    void drawBack(QString filepath);
     int gridSpacing;  // 网格线的间隔
     QColor gridColor; // 网格线的颜色
     QList<FlowElement*> elements ;

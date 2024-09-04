@@ -19,8 +19,10 @@ MainWidget::MainWidget(QWidget *parent)
     canvas->setSceneRect(0, 0, 1600, 1600);
     ui->setupUi(this);
 
+    // 设置最小大小
+    this->setMinimumSize(600, 500);
     // 设置窗口大小
-    this->resize(800, 600);
+    this->resize(1000, 800);
 
     // 设置 Canvas 的网格属性
     canvas->setGridSpacing(20);  // 设置网格间隔为 20 像素
@@ -46,11 +48,6 @@ MainWidget::MainWidget(QWidget *parent)
 
     //初始化顶部布局
     init_menu_layout();
-
-}
-
-void MainWidget::outputSvg() {
-
 }
 
 void MainWidget::init_menu_layout() {
@@ -84,26 +81,30 @@ void MainWidget::init_menu_layout() {
     redoMenu = menuBar->addMenu(QIcon(":/menu/redo.png"),"");
 
     // filemenu创建菜单项
-    newAction = new QAction(QIcon(":/menu/new.png"),"New", this);
+    exportAction = new QAction(QIcon(":/menu/export.png"),"Export", this);
     openAction = new QAction(QIcon(":/menu/open.png"),"Open", this);
     saveAction = new QAction(QIcon(":/menu/save.png"),"Save", this);
-    exitAction = new QAction("Exit", this);
+    exitAction = new QAction(QIcon(":/menu/exit.png"),"Exit", this);
     fileMenu->addAction(saveAction);
-    fileMenu->addAction(newAction);
     fileMenu->addAction(openAction);
-    connect(openAction, &QAction::triggered, [=](){
-        QString filePath = QFileDialog::getOpenFileName(this, "选择打开文件", "", "All Files (*)");
-        if (!filePath.isEmpty()) {
-            qDebug() << filePath;
-        }
-    });
-    connect(newAction, &QAction::triggered, [=](){
-        QString filePath = QFileDialog::getOpenFileName(this, "选择新建文件夹", "", "All Files (*)");
-        if (!filePath.isEmpty()) {
-            qDebug() << filePath;
-        }
-    });
+    fileMenu->addAction(exportAction);
     connect(saveAction, &QAction::triggered, [=](){
+        // QString filePath = QFileDialog::getSaveFileName(this, "保存", "", "All Files (*)");
+        // if (!filePath.isEmpty()) {
+        //     qDebug() << filePath;
+        //     onExportButtonClicked();
+        // }
+        onExportButtonClicked();
+    });
+    connect(openAction, &QAction::triggered, [=](){
+        // QString filePath = QFileDialog::getOpenFileName(this, "选择打开文件", "", "All Files (*)");
+        // if (!filePath.isEmpty()) {
+        //     qDebug() << filePath;
+        //     onImportButtonClicked();
+        // }
+        onImportButtonClicked();
+    });
+    connect(exportAction, &QAction::triggered, [=](){
         QString filePath = QFileDialog::getSaveFileName(nullptr, "选择保存位置", "", "SVG Files (*.svg);;All Files (*)");
         if (!filePath.isEmpty()) {
             if (!filePath.endsWith(".svg", Qt::CaseInsensitive)) {
@@ -129,16 +130,40 @@ void MainWidget::init_menu_layout() {
     //横线分隔
     fileMenu->addSeparator();
     fileMenu->addAction(exitAction);
+    //退出增加保存操作
+    connect(exitAction, &QAction::triggered, [=](){
+        //保存操作
+    });
 
     // editmenu创建菜单项
     copyAction = new QAction(QIcon(":/menu/copy.png"),"Copy", this);
     pasteAction = new QAction(QIcon(":/menu/paste.png"),"Paste", this);
+    backgroundAction = new QAction(QIcon(":/menu/background.png"),"Background",this);
+    back_returnAction = new QAction(QIcon(":/menu/background_return.png"),"Grid Background",this);
     editMenu->addAction(copyAction);
     editMenu->addAction(pasteAction);
+    editMenu->addAction(backgroundAction);
+    editMenu->addAction(back_returnAction);
 
     connect(copyAction, &QAction::triggered, canvas, &Canvas::onCopy);
     connect(pasteAction, &QAction::triggered, canvas, &Canvas::onPaste);
-
+    connect(backgroundAction, &QAction::triggered, [=](){
+        QString filePath = QFileDialog::getOpenFileName(this,
+            "选择背景图片",
+            "",
+            "Image Files (*.png *.jpg *.bmp *.jpeg)");
+        if (!filePath.isEmpty()) {
+            qDebug() << filePath;
+            canvas->background_path = filePath;
+            canvas->background_set = true;
+            canvas->update();//update会调用drawbackground方法
+        }
+    });
+    connect(back_returnAction, &QAction::triggered, [=](){
+        canvas->setBackgroundBrush(QBrush());
+        canvas->background_set = false;
+        canvas->update();
+    });
     //redo按钮信号!!!!
     //connect(redoMenu, &QMenu::aboutToShow, this, &QWidget::close);
 
@@ -220,17 +245,21 @@ void MainWidget::init_left_button() {
         canvas->addShape(playgroundElement);
     });
 
+    //圆角矩形
+    ui->roundrect_button->setFixedSize(60,50);
+    QIcon icon8(":/type/round_rect.png");
+    ui->roundrect_button->setIcon(icon8);
+    ui->roundrect_button->setIconSize(QSize(32, 32));
+    connect(ui->roundrect_button, &QPushButton::clicked, [=](){
+        FlowRadiusElement* radiusElement = new FlowRadiusElement();
+        canvas->addShape(radiusElement);
+    });
+
     //arrow按钮
     ui->arrow_button->setFixedSize(60,50);
-    connect(ui->arrow_button, &QPushButton::clicked,this,&MainWidget::onArrowButtonClicked);
     QIcon icon9(":/type/arrow.png");
     ui->arrow_button->setIcon(icon9);
     ui->arrow_button->setIconSize(QSize(32, 32));
-
-    // 创建一个 FlowRectElement 并将其添加到 Canvas (QGraphicsScene) 中
-    FlowRectElement* rectElement = new FlowRectElement();
-    rectElement->move(-1000,-1000);
-    canvas->addShape(rectElement);
 
 }
 
@@ -239,16 +268,16 @@ void MainWidget::onColorButtonClicked() {
     canvas->onColorButtonClicked();
 }
 
-void MainWidget::onArrowButtonClicked() {
-    if (arrow_flag) {
-        emit arrow_first_click();
-        arrow_flag = !arrow_flag;
-    }
-    else {
-        emit arrow_second_click();
-        arrow_flag = !arrow_flag;
-    }
-}
+// void MainWidget::onArrowButtonClicked() {
+//     if (arrow_flag) {
+//         emit arrow_first_click();
+//         arrow_flag = !arrow_flag;
+//     }
+//     else {
+//         emit arrow_second_click();
+//         arrow_flag = !arrow_flag;
+//     }
+// }
 void MainWidget::onExportButtonClicked() {
     QString filename = QFileDialog::getSaveFileName(this, "Export Elements", "", "Data Files (*.dat)");
     if (!filename.isEmpty()) {

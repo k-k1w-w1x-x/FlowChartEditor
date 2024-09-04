@@ -91,7 +91,9 @@ FlowElement* FlowRectElement::deSerialize(QDataStream& in) {
 
         QBrush brush = ElementSerializer::deserializeBrush(in);
         cur->mainItem->setBrush(brush);
+        cur->contentColor = brush.color();
     }
+
     qsizetype borderDotsSize;
     in>>borderDotsSize;
     cur->borderDots.clear();
@@ -100,7 +102,7 @@ FlowElement* FlowRectElement::deSerialize(QDataStream& in) {
         cur->borderDots.append(ElementSerializer::deserializeGraphicsRectItem(in));
     }
     cur->controlDots = cur->borderDots;//只对正方形成立
-
+    cur->resetArrowDots();
     // element.setPos(pos);
     // element.setRotation(rotation);
     // element.setScale(scale);
