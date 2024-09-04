@@ -118,13 +118,18 @@ void FlowDiamondElement::calArrowDots(){
     if(controlDots.size() < 4){
         return;
     }
-    arrowDots = controlDots;
+    for(QGraphicsRectItem *controlDot : controlDots){
+        arrowDots.append(new QGraphicsRectItem(QRectF(0, 0, DOT_SIZE, DOT_SIZE), this));
+        arrowDots.last()->setPos(controlDot->pos());
+    }
 }
 
 void FlowDiamondElement::resetArrowDots(){
     if(controlDots.size() < 4){
         return;
     }
-    arrowDots = controlDots;
+    for(int i=0 ; i<arrowDots.size() ; i++){
+        arrowDots[i]->setPos(controlDots[i]->pos());
+    }
 }
 

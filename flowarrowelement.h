@@ -15,6 +15,7 @@ public:
     QGraphicsRectItem *endElementDot =nullptr;
     void move(double dx,double dy);
     void mySetScale(int index,double dx,double dy);
+    QPointF passingPoint;
 };
 
 #endif // FLOWARROWELEMENT_H

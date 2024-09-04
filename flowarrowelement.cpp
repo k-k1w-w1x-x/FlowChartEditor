@@ -18,9 +18,27 @@ void FlowArrowElement::draw()  {
     if(endElementDot){
         endPoint = endElementDot->scenePos() + endElementDot->rect().center();
     }
-
-    path.moveTo(startPoint);
-    path.lineTo(endPoint);
+    if(passingPoint.x()==0&&passingPoint.y()==0){
+        path.moveTo(startPoint);
+        path.lineTo(endPoint);
+    }
+    else{
+        qDebug()<<"在draw里面passingPoint:"<<passingPoint.x()<<","<<passingPoint.y();
+        double passSize = 10.0;
+        double x1 = startPoint.x();
+        double y1 = startPoint.y();
+        double x2 = endPoint.x();
+        double y2 = endPoint.y();
+        double passX = passSize * (x1-x2)/sqrt(pow(x1-x2,2)+pow(y1-y2,2));
+        double passY = passSize * (y1-y2)/sqrt(pow(x1-x2,2)+pow(y1-y2,2));
+        QPointF passingPoint1(passingPoint.x() + passX, passingPoint.y() + passY);
+        QPointF passingPoint2(passingPoint.x() - passX, passingPoint.y() - passY);
+        QPointF passingPoint0(passingPoint.x() - passY, passingPoint.y() + passX);
+        path.moveTo(startPoint);
+        path.lineTo(passingPoint1);
+        path.quadTo(passingPoint0,passingPoint2);
+        path.lineTo(endPoint);
+    }
     // 箭头的头部宽度和长度
     const double arrowHeadSize = 10.0;
 
@@ -41,7 +59,6 @@ void FlowArrowElement::draw()  {
     // 创建一个 QGraphicsPathItem 来显示箭头
     mainItem->setPath(path);
     mainItem->setPen(QPen(Qt::black, 2));  // 设置箭头的颜色和宽度
-
     QPen pen(Qt::red,1);
     startDot->setBrush(Qt::red);
     startDot->setPen(pen);
@@ -82,6 +99,9 @@ void FlowArrowElement::mySetScale(int index,double dx,double dy){
             //把锁头时的值赋给位置点
             startDot->setPos(startElementDot->scenePos());
             startDot->setVisible(true);
+            QPen pen(Qt::black,1);
+            startElementDot->setBrush(Qt::black);
+            startElementDot->setPen(pen);
             startElementDot->setVisible(false);
             //解除锁头
             startElementDot = nullptr;
@@ -94,6 +114,9 @@ void FlowArrowElement::mySetScale(int index,double dx,double dy){
             //把锁头时的值赋给位置点
             endDot->setPos(endElementDot->scenePos());
             endDot->setVisible(true);
+            QPen pen(Qt::black,1);
+            endElementDot->setBrush(Qt::black);
+            endElementDot->setPen(pen);
             endElementDot->setVisible(false);
             //解除锁头
             endElementDot = nullptr;

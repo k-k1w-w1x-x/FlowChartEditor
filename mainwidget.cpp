@@ -218,10 +218,10 @@ void MainWidget::init_left_button() {
     ui->color_button->setIcon(icon8);
     ui->color_button->setIconSize(QSize(32, 32));
 
-    // 创建一个 FlowRectElement 并将其添加到 Canvas (QGraphicsScene) 中
-    FlowRectElement* rectElement = new FlowRectElement();
-    rectElement->move(-1000,-1000);
-    canvas->addShape(rectElement);
+    // // 创建一个 FlowRectElement 并将其添加到 Canvas (QGraphicsScene) 中
+    // FlowRectElement* rectElement = new FlowRectElement();
+    // rectElement->move(-1000,-1000);
+    // canvas->addShape(rectElement);
 
 }
 
