@@ -27,6 +27,8 @@ public:
     void setGridColor(const QColor &color);  // 设置网格颜色
     bool clickmove = false;
     bool clickscale = false;
+    bool arrowclickmove = false;
+    bool arrowclickscale = false;
     bool mouseclick = false;
     bool elementClicked = false;
     bool isArrowing = false;
