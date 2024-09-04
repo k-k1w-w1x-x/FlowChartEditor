@@ -41,10 +41,19 @@ private slots:
     // void createLine();
     // void createArrow();
     void onColorButtonClicked();
+    void onArrowButtonClicked();
 
+signals:
+    //arrow_flag为true
+    void arrow_first_click();
+
+    //arrow_flag为flase
+    void arrow_second_click();
 
 private:
     Ui::MainWidget *ui;
+
+    bool arrow_flag = true;
 
     QVBoxLayout *sidebarLayout;
     QPushButton *rectangleButton;

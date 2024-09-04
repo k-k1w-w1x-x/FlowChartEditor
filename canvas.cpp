@@ -321,8 +321,8 @@ void Canvas::mouseReleaseEvent(QMouseEvent *event)
             element->selected = true;
         }
     }
-    for(const auto element:dragSelectedElements){
-        zindexManager->setHighestZindexForItem(element);
+    for (auto it = dragSelectedElements.rbegin(); it != dragSelectedElements.rend(); ++it) {
+        zindexManager->setHighestZindexForItem(*it);
     }
     for(const auto element:graphicTextItems){
         if(element->isSelected())
@@ -492,6 +492,7 @@ void Canvas::onDelete() {
             scene->removeItem(dot);
             // delete dot;
         }
+
         elements.removeOne(element);
         dragSelectedElements.removeOne(element);
         delete element;
