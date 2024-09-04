@@ -209,6 +209,11 @@ void Canvas::mousePressEvent(QMouseEvent *event)
         FlowArrowElement *clickedArrow = dragSelectedArrows.at(0);
         QPointF localstPoint;
         QPointF localendPoint;
+        if(clickedArrow->mainItem->contains(clickedPoint)){
+            qDebug()<<"至少能平移";
+            lastMousePosition = clickedPoint;
+            arrowClickedContronDot = 3;
+        }
         if(clickedArrow->startElementDot){
             localstPoint = clickedArrow->startElementDot->mapFromScene(clickedPoint);
         }
@@ -336,16 +341,30 @@ void Canvas::mouseMoveEvent(QMouseEvent *event)
         return;
     }
     if(dragSelectedElements.empty() && dragSelectedArrows.size() == 1 && arrowClickedContronDot){
-        setDragMode(QGraphicsView::NoDrag);//禁用拖拽框
-        qDebug()<<"托拽箭头";
-        QPointF currentPosition = mapToScene(event->pos());
-        QPointF offset = currentPosition - lastMousePosition;
-        qDebug()<<offset;
-        dragSelectedArrows.at(0)->mySetScale(arrowClickedContronDot,offset.x(),offset.y());
-        lastMousePosition = currentPosition;
-        setDragMode(QGraphicsView::RubberBandDrag);//启用拖拽框
-        QGraphicsView::mouseMoveEvent(event);
-        arrowclickscale = true;
+        qDebug()<<"单箭头操作";
+        if(arrowClickedContronDot != 3){
+            setDragMode(QGraphicsView::NoDrag);//禁用拖拽框
+            qDebug()<<"托拽箭头";
+            QPointF currentPosition = mapToScene(event->pos());
+            QPointF offset = currentPosition - lastMousePosition;
+            qDebug()<<offset;
+            dragSelectedArrows.at(0)->mySetScale(arrowClickedContronDot,offset.x(),offset.y());
+            lastMousePosition = currentPosition;
+            setDragMode(QGraphicsView::RubberBandDrag);//启用拖拽框
+            QGraphicsView::mouseMoveEvent(event);
+            arrowclickscale = true;
+        }
+        else{
+            qDebug()<<"只能平移了";
+            setDragMode(QGraphicsView::NoDrag);//禁用拖拽框
+            QPointF currentPosition = mapToScene(event->pos());
+            QPointF offset = currentPosition - lastMousePosition;
+            dragSelectedArrows.at(0)->move(offset.x(),offset.y());
+            lastMousePosition = currentPosition;
+            setDragMode(QGraphicsView::RubberBandDrag);//启用拖拽框
+            QGraphicsView::mouseMoveEvent(event);
+            arrowclickmove = true;
+        }
         return;
     }
     QGraphicsView::mouseMoveEvent(event);
