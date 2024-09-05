@@ -18,7 +18,12 @@ FlowRectElement::FlowRectElement() : FlowElement() {
     // 绘制路径
     draw();
 }
-
+// clonedElement->mainItem->setPath(this->mainItem->path());
+// clonedElement->mainItem->setBrush(this->mainItem->brush());
+// clonedElement->mainItem->setPen(this->mainItem->pen());
+// clonedElement->setPos(this->pos());
+// clonedElement->setRotation(this->rotation());
+// clonedElement->setScale(this->scale());
 FlowRectElement *FlowRectElement::deepClone()
 {
     FlowRectElement* clonedElement = new FlowRectElement();
@@ -28,10 +33,6 @@ FlowRectElement *FlowRectElement::deepClone()
     clonedElement->borderColor=this->borderColor;
     clonedElement->contentColor = this->contentColor;
     clonedElement->selected = this->selected;
-
-    clonedElement->mainItem->setPath(this->mainItem->path());
-    clonedElement->mainItem->setBrush(this->mainItem->brush());
-    clonedElement->mainItem->setPen(this->mainItem->pen());
 
     int cont=0;
     for (QGraphicsRectItem* borderDot : this->borderDots) {
@@ -45,20 +46,11 @@ FlowRectElement *FlowRectElement::deepClone()
             cont++;
         }
     }
-
-    clonedElement->setPos(this->pos());
-    clonedElement->setRotation(this->rotation());
-    clonedElement->setScale(this->scale());
-
     return clonedElement;
 }
 
 void FlowRectElement::serialize(QDataStream &out, const FlowElement &element)
 {
-    // out << element.pos() << element.rotation() << element.scale();
-    // qDebug()<<element.pos() << element.rotation() << element.scale();
-
-    // 获取 QGraphicsPathItem 以序列化 QPainterPath、QPen 和 QBrush
     int type=0;
     out<<type;
     qDebug()<<type;
@@ -68,15 +60,6 @@ void FlowRectElement::serialize(QDataStream &out, const FlowElement &element)
     for(auto dot:element.borderDots){
         ElementSerializer::serializeGraphicsRectItem(dot,out);
     }
-    // if (element.mainItem) { // 假设 mainItem 是指向 QGraphicsPathItem 的指针
-    //     ElementSerializer::serializePainterPath(element.mainItem->path(), out); // 序列化路径
-    //     ElementSerializer::serializePen(element.mainItem->pen(), out); // 序列化画笔
-    //     ElementSerializer::serializeBrush(element.mainItem->brush(), out); // 序列化画刷
-    // }
-    // out<<element.borderDots.size();
-    // for(auto dot:element.borderDots){
-    //     ElementSerializer::serializeGraphicsRectItem(dot,out);
-    // }
 }
 FlowElement* FlowRectElement::deSerialize(QDataStream& in) {
     //此方法应在子类中被重载

@@ -13,6 +13,8 @@ public:
     QRectF boundingRect() const override;
     void move(QPointF delta);
     GraphicsTextItem* deepClone();
+    void serialize(QDataStream& out, const GraphicsTextItem& element);
+    static GraphicsTextItem* deSerialize(QDataStream& in) ;
 
 protected:
     void focusOutEvent(QFocusEvent *event) override;
