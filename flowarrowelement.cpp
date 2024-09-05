@@ -100,11 +100,13 @@ void FlowArrowElement::move(double dx,double dy)
     if(startElementDot){
         //把锁头时的值赋给位置点
         startDot->scenePos() = startElementDot->scenePos();
+        startElementDot->setVisible(0);
         //解除锁头
         startElementDot = nullptr;
     }
     if(endElementDot){
         endDot->scenePos() = endElementDot->scenePos();
+        endElementDot->setVisible(0);
         endElementDot = nullptr;
     }
     startDot->moveBy(dx,dy);
