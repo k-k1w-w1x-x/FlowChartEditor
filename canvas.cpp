@@ -537,10 +537,11 @@ void Canvas::mouseReleaseEvent(QMouseEvent *event)
 
 void Canvas::onColorButtonClicked()
 {
-    if(!clickedSelectedElement){
-        qDebug() << "No element selected. Color change ignored.";
-        return;
-    }
+    // if(!clickedSelectedElement){
+    //     qDebug() << "No element selected. Color change ignored.";
+    //     return;
+    // }
+    bool changed = 0;
     QColor color = QColorDialog::getColor(Qt::white, this, "Select Color");
     for(const auto&dragselectedElement:dragSelectedElements){
         // QColor color = QColorDialog::getColor(dragselectedElement->contentColor, this, "Select Color");
@@ -548,8 +549,17 @@ void Canvas::onColorButtonClicked()
             dragselectedElement->contentColor = color;  // 设置选中元素的颜色
             dragselectedElement->draw();
             scene->update();  // 触发重绘，将元素颜色更新
+            changed = 1;
         }
     }
+    for (auto i : graphicTextItems)
+        if (i->isSelected() && color.isValid())
+        {
+            i->setDefaultTextColor(color);
+            scene->update();  // 触发重绘，将元素颜色更新
+            changed = 1;
+        }
+    if (changed) pushAll();
 }
 void Canvas::onBorderColorButtonClicked()
 {
@@ -558,6 +568,7 @@ void Canvas::onBorderColorButtonClicked()
         return;
     }
 
+    bool changed = 0;
     QColor color = QColorDialog::getColor(Qt::white, this, "Select Border Color");
 
     for(const auto&dragselectedElement:dragSelectedElements){
@@ -566,6 +577,7 @@ void Canvas::onBorderColorButtonClicked()
             dragselectedElement->borderColor = color;  // 设置选中元素的颜色
             dragselectedElement->draw();
             scene->update();  // 触发重绘，将元素颜色更新
+            changed = 1;
         }
     }
     for(const auto&dragselectedArrow:dragSelectedArrows){
@@ -574,8 +586,10 @@ void Canvas::onBorderColorButtonClicked()
             dragselectedArrow->borderColor = color;  // 设置选中元素的颜色
             dragselectedArrow->draw();
             scene->update();  // 触发重绘，将元素颜色更新
+            changed = 1;
         }
     }
+    if (changed) pushAll();
 }
 //键盘操作
 

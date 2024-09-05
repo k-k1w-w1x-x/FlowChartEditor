@@ -258,21 +258,21 @@ GraphicsTextItem* GraphicsTextItem::deepClone()
     GraphicsTextItem *ret = new GraphicsTextItem(toPlainText());
     ret->setTransform(transform());
     ret->setPos(this->pos());
-
+    ret->setDefaultTextColor(this->defaultTextColor());
     return ret;
 }
 
 void GraphicsTextItem::serialize(QDataStream &out, const GraphicsTextItem &element)
 {
-    // int type=9;
-    // out<<type;
     out << this->toPlainText();
     out << this->transform();
     out << this->pos();
+    out << this->defaultTextColor();
     qDebug() << "serializeGraphicsTextItem:"
              << "Text:" << this->toPlainText()
              << "Transform:" << this->transform()
-             << "Position:" << this->pos();
+             << "Position:" << this->pos()
+             << "Color:" << this->defaultTextColor();
 }
 GraphicsTextItem* GraphicsTextItem::deSerialize(QDataStream &in) {
     // 创建一个新的 GraphicsTextItem 对象
@@ -293,10 +293,16 @@ GraphicsTextItem* GraphicsTextItem::deSerialize(QDataStream &in) {
     in >> position;
     cur->setPos(position);
 
+    // 反序列化颜色
+    QColor color;
+    in >> color;
+    cur->setDefaultTextColor(color);
+
     qDebug() << "deSerializeGraphicsTextItem:"
              << "Text:" << text
              << "Transform:" << transform
-             << "Position:" << position;
+             << "Position:" << position
+             << "Color:" << color;
 
     return cur;
 }
