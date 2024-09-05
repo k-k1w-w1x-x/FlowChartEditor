@@ -1,4 +1,4 @@
-QT       += core gui svg
+QT       += core gui
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -10,39 +10,15 @@ CONFIG += c++17
 
 SOURCES += \
     canvas.cpp \
-    flowarrow.cpp \
-    flowcircleelement.cpp \
     flowelement.cpp \
-    flowdiamondelement.cpp \
-    flowdocuelement.cpp \
-    flowparaelement.cpp \
-    flowplaygroundelement.cpp \
-    flowradiuselement.cpp \
-    flowrectelement.cpp \
-    flowsubelement.cpp \
-    graphicstextitem.cpp \
-    keyeventfilter.cpp \
     main.cpp \
-    mainwidget.cpp \
-    zindexmanager.cpp
+    mainwidget.cpp
 
 HEADERS += \
     canvas.h \
-    flowarrow.h \
-    flowcircleelement.h \
-    flowdiamondelement.h \
-    flowdocuelement.h \
     flowelement.h \
-    graphicstextitem.h \
-    keyeventFilter.h \
-    mainwidget.h \
-    flowparaelement.h \
-    flowplaygroundelement.h \
-    flowradiuselement.h \
-    flowrectelement.h \
-    flowsubelement.h \
-    graphicstextitem.h \
-    zindexmanager.h
+    mainwidget.h
+
 FORMS += \
     mainwidget.ui
 
