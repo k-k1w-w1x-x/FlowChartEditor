@@ -16,7 +16,7 @@ MainWidget::MainWidget(QWidget *parent)
     : QWidget(parent)
     , canvas(new Canvas(this)), ui(new Ui::MainWidget)
 {
-    canvas->setSceneRect(0, 0, 1600, 1600);
+    canvas->setSceneRect(0, 0, 2000, 1600);
     ui->setupUi(this);
 
     // 设置最小大小
