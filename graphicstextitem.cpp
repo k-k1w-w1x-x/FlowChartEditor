@@ -27,22 +27,27 @@ GraphicsTextItem::~GraphicsTextItem() {}
 QRectF GraphicsTextItem::boundingRect() const
 {
     QRectF rect = QGraphicsTextItem::boundingRect();
-    rect = rect.marginsAdded(QMarginsF(1, 1, 1, 1));
+    // rect = rect.marginsAdded(QMarginsF(1, 1, 1, 1));
     return rect;
 }
 
 void GraphicsTextItem::focusOutEvent(QFocusEvent *event)
 {
-    qDebug() << "!!!!";
-    setPlainText(toPlainText());
-    setTextInteractionFlags(Qt::NoTextInteraction);
-    QGraphicsTextItem::focusOutEvent(event);
+    if (event->reason() != Qt::PopupFocusReason)
+    {
+        qDebug() << "!!!!";
+        setPlainText(toPlainText());
+        setTextInteractionFlags(Qt::NoTextInteraction);
+        emit leaveTextEditor();
+        QGraphicsTextItem::focusOutEvent(event);
+    } else setSelected(true);
 }
 
 void GraphicsTextItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
 {
     if (textInteractionFlags() == Qt::NoTextInteraction && event->button() == Qt::LeftButton)
     {
+        emit enterTextEditor();
         qDebug() << "????";
         setTextInteractionFlags(Qt::TextEditorInteraction);
     }
@@ -82,16 +87,16 @@ void GraphicsTextItem::hoverMoveEvent(QGraphicsSceneHoverEvent *event)
         if (topLeft.contains(pos) || bottomRight.contains(pos))
             setCursor(Qt::SizeFDiagCursor);
         else
-        if (bottomLeft.contains(pos) || topRight.contains(pos))
-            setCursor(Qt::SizeBDiagCursor);
-        else
-        if (top.contains(pos) || bottom.contains(pos))
-            setCursor(Qt::SizeVerCursor);
-        else
-        if (left.contains(pos) || right.contains(pos))
-            setCursor(Qt::SizeHorCursor);
-        else
-            setCursor(Qt::ArrowCursor);
+            if (bottomLeft.contains(pos) || topRight.contains(pos))
+                setCursor(Qt::SizeBDiagCursor);
+            else
+                if (top.contains(pos) || bottom.contains(pos))
+                    setCursor(Qt::SizeVerCursor);
+                else
+                    if (left.contains(pos) || right.contains(pos))
+                        setCursor(Qt::SizeHorCursor);
+                    else
+                        setCursor(Qt::ArrowCursor);
     } else
         setCursor(Qt::ArrowCursor);
 
@@ -217,17 +222,17 @@ void GraphicsTextItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
             update();
         }
     } else
-    if (textInteractionFlags() == Qt::NoTextInteraction)
-    {
-        setCursor(Qt::SizeAllCursor);
-        qreal deltax = initialTransform.m31() + pos.x() - initialScenePos.x(),
-              deltay = initialTransform.m32() + pos.y() - initialScenePos.y();
-        QTransform transform;
-        transform.translate(deltax, deltay);
-        transform.scale(initialTransform.m11(), initialTransform.m22());
-        setTransform(transform);
-        update();
-    }
+        if (textInteractionFlags() == Qt::NoTextInteraction)
+        {
+            setCursor(Qt::SizeAllCursor);
+            qreal deltax = initialTransform.m31() + pos.x() - initialScenePos.x(),
+                deltay = initialTransform.m32() + pos.y() - initialScenePos.y();
+            QTransform transform;
+            transform.translate(deltax, deltay);
+            transform.scale(initialTransform.m11(), initialTransform.m22());
+            setTransform(transform);
+            update();
+        }
     QGraphicsTextItem::mouseMoveEvent(event);
 }
 
@@ -253,7 +258,7 @@ GraphicsTextItem* GraphicsTextItem::deepClone()
     GraphicsTextItem *ret = new GraphicsTextItem(toPlainText());
     ret->setTransform(transform());
     ret->setPos(this->pos());
-    ret->move(QPointF(10, 10));
+    // ret->move(QPointF(10, 10));
     return ret;
 }
 

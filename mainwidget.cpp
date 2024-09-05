@@ -187,6 +187,7 @@ void MainWidget::init_left_button() {
     connect(ui->rect_button, &QPushButton::clicked, [=](){
         FlowRectElement* rectElement = new FlowRectElement();
         canvas->addShape(rectElement);
+        canvas->pushAll();
     });
     connect(ui->rect_button, &QPushButton::pressed, [=]() {
         ui->rect_button->setStyleSheet("background-color: lightgrey;");
@@ -203,6 +204,7 @@ void MainWidget::init_left_button() {
     connect(ui->rect3_button, &QPushButton::clicked, [=](){
         FlowDocuElement* documentElement = new FlowDocuElement();
         canvas->addShape(documentElement);
+        canvas->pushAll();
     });
 
     //菱形
@@ -213,6 +215,7 @@ void MainWidget::init_left_button() {
     connect(ui->rhombus_button, &QPushButton::clicked, [=](){
         FlowDiamondElement* diamondElement = new FlowDiamondElement();
         canvas->addShape(diamondElement);
+        canvas->pushAll();
     });
 
     //平行四边形
@@ -223,6 +226,7 @@ void MainWidget::init_left_button() {
     connect(ui->parallelogram_button, &QPushButton::clicked, [=](){
         FlowParaElement* paraElement = new FlowParaElement();
         canvas->addShape(paraElement);
+        canvas->pushAll();
     });
 
     //圆形
@@ -233,6 +237,7 @@ void MainWidget::init_left_button() {
     connect(ui->circle_button, &QPushButton::clicked, [=](){
         FlowCircleElement* circleElement = new FlowCircleElement();
         canvas->addShape(circleElement);
+        canvas->pushAll();
     });
 
     //子流程矩形
@@ -243,6 +248,7 @@ void MainWidget::init_left_button() {
     connect(ui->rect2_button, &QPushButton::clicked, [=](){
         FlowSubElement* subElement = new FlowSubElement();
         canvas->addShape(subElement);
+        canvas->pushAll();
     });
 
 
@@ -254,6 +260,7 @@ void MainWidget::init_left_button() {
     connect(ui->rect4_button, &QPushButton::clicked, [=](){
         FlowPlaygroundElement* playgroundElement = new FlowPlaygroundElement();
         canvas->addShape(playgroundElement);
+        canvas->pushAll();
     });
 
     //圆角矩形
@@ -264,6 +271,7 @@ void MainWidget::init_left_button() {
     connect(ui->roundrect_button, &QPushButton::clicked, [=](){
         FlowRadiusElement* radiusElement = new FlowRadiusElement();
         canvas->addShape(radiusElement);
+        canvas->pushAll();
     });
 
     //arrow按钮
