@@ -11,8 +11,9 @@
 GraphicsTextItem::GraphicsTextItem(QGraphicsItem *parent)
     : QGraphicsTextItem(parent) {}
 
-GraphicsTextItem::GraphicsTextItem(const QString &text, QGraphicsItem *parent)
+GraphicsTextItem::GraphicsTextItem(const QString &text, QGraphicsItem *parent, FlowElement *follow)
     : QGraphicsTextItem(text, parent)
+    , followElement(follow)
 {
     this->setFlags(QGraphicsItem::ItemIsSelectable);
     setSelected(true);
@@ -35,6 +36,7 @@ void GraphicsTextItem::focusOutEvent(QFocusEvent *event)
 {
     if (event->reason() != Qt::PopupFocusReason)
     {
+        follow();
         qDebug() << "!!!!";
         setPlainText(toPlainText());
         setTextInteractionFlags(Qt::NoTextInteraction);
@@ -64,6 +66,7 @@ void GraphicsTextItem::keyPressEvent(QKeyEvent *event)
         clearFocus();
     }
     QGraphicsTextItem::keyPressEvent(event);
+    follow();
 }
 
 void GraphicsTextItem::hoverMoveEvent(QGraphicsSceneHoverEvent *event)
@@ -233,13 +236,29 @@ void GraphicsTextItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
             setTransform(transform);
             update();
         }
+    follow();
     QGraphicsTextItem::mouseMoveEvent(event);
 }
 
 void GraphicsTextItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
     scaling = resizing = 0;
+    follow();
     QGraphicsTextItem::mouseReleaseEvent(event);
+}
+
+void GraphicsTextItem::follow()
+{
+    if (followElement != nullptr)
+    {
+        QPointF eps(boundingRect().width() * transform().m11() / 2,
+                    boundingRect().height() * transform().m22() / 2);
+        QTransform t;
+        t.scale(transform().m11(), transform().m22());
+        setTransform(t);
+        setPos((followElement->controlDots.at(0)->pos() + followElement->controlDots.at(2)->pos()) / 2 - eps);
+        setZValue(followElement->mainItem->zValue() + 1);
+    }
 }
 
 void GraphicsTextItem::move(QPointF delta)
