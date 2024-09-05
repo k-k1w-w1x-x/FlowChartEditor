@@ -93,6 +93,10 @@ void Canvas::addShape(FlowElement *element)
         if (FlowArrowElement* arrowElement = dynamic_cast<FlowArrowElement*>(element)){
             scene->addItem(arrowElement->mainItem);
             arrowElement->mainItem->setFlag(QGraphicsItem::ItemIsSelectable, true);
+            //创建时默认不显示红点
+            arrowElement->startDot->setVisible(0);
+            arrowElement->endDot->setVisible(0);
+
             scene->addItem(arrowElement->startDot);
             scene->addItem(arrowElement->endDot);
             arrows.append(arrowElement);

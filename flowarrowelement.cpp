@@ -19,6 +19,7 @@ void FlowArrowElement::draw()  {
     QPainterPath path;
     QPointF startPoint = startDot->scenePos() + startDot->rect().center();
     QPointF endPoint = endDot->scenePos() + endDot->rect().center();
+
     //锁头优先
     if(startElementDot){
         qDebug()<<"startElementDot is no null";
@@ -165,11 +166,11 @@ FlowArrowElement *FlowArrowElement::deepClone()
     newStartDot->setBrush(startDot->brush());
     newStartDot->setPen(startDot->pen());
     newStartDot->setPos(startDot->pos());
-
+    newStartDot->setVisible(newStartDot->isVisible());
     newEndDot->setBrush(endDot->brush());
     newEndDot->setPen(endDot->pen());
     newEndDot->setPos(endDot->pos());
-
+    newEndDot->setVisible(newEndDot->isVisible());
     clonedElement->startDot = newStartDot;
     clonedElement->endDot = newEndDot;
 
