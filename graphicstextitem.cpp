@@ -58,13 +58,13 @@ void GraphicsTextItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
 
 void GraphicsTextItem::keyPressEvent(QKeyEvent *event)
 {
-    if (event->key() == Qt::Key_Return || event->key() == Qt::Key_Enter)
-    {
-        setPlainText(toPlainText());
-        setTextInteractionFlags(Qt::NoTextInteraction);
-        setSelected(false);
-        clearFocus();
-    }
+    // if (event->key() == Qt::Key_Return || event->key() == Qt::Key_Enter)
+    // {
+    //     setPlainText(toPlainText());
+    //     setTextInteractionFlags(Qt::NoTextInteraction);
+    //     setSelected(false);
+    //     clearFocus();
+    // }
     QGraphicsTextItem::keyPressEvent(event);
     follow();
 }

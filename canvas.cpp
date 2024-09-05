@@ -465,10 +465,10 @@ void Canvas::mouseReleaseEvent(QMouseEvent *event)
         if( arrows.empty() || (!arrows.last()->endDot->scenePos().x() == 0 && !arrows.last()->endDot->scenePos().y() == 0) ){
             qDebug()<<"开始画箭头";
             arrows.append(new FlowArrowElement);
-            arrows.last()->startDot->setPos( mapToScene(event->pos()));
+            arrows.last()->startDot->setPos(mapToScene(event->pos()));
         }
         else{
-            arrows.last()->endDot->setPos( mapToScene(event->pos()));
+            arrows.last()->endDot->setPos(mapToScene(event->pos()));
             arrows.last()->draw();
             scene->addItem(arrows.last()->mainItem);
             arrows.last()->mainItem->setFlag(QGraphicsItem::ItemIsSelectable, true);
@@ -478,6 +478,7 @@ void Canvas::mouseReleaseEvent(QMouseEvent *event)
             arrows.last()->endDot->setVisible(false);
             setCross();
             pushAll();
+            autoAdsorption();
         }
         return;
     }
@@ -555,11 +556,9 @@ void Canvas::mouseReleaseEvent(QMouseEvent *event)
     for (auto it = dragSelectedElements.rbegin(); it != dragSelectedElements.rend(); ++it) {
         zindexManager->setHighestZindexForItem(*it);
     }
-    for (auto it = dragSelectedArrows.rbegin(); it != dragSelectedArrows.rend(); ++it) {
-        zindexManager->setHighestZindexForItem(*it);
-    }
     for (auto i : graphicTextItems)
-        zindexManager->setHighestZindexForItem(i);
+        if (i->isSelected())
+            zindexManager->setHighestZindexForItem(i);
     if(dragSelectedElements.empty() && dragSelectedArrows.size() == 1){
         FlowArrowElement *clickedArrow = dragSelectedArrows.at(0);
         qDebug()<<"only one arrow";
@@ -1152,6 +1151,9 @@ void Canvas::updateTextItems()
 }
 
 void Canvas::setCross(){
+    for (auto i : arrows)
+        i->mainItem->setZValue(998244353);
+
     qDebug()<<"调用setCross";
     for(int i = 0; i <= arrows.size() - 1; i++){
         int flag = 0;

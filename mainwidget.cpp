@@ -324,20 +324,11 @@ void MainWidget::onColorButtonClicked() {
     // 调用Canvas的draw方法
     canvas->onColorButtonClicked();
 }
+
 void MainWidget::onBorderColorButtonClicked(){
     canvas->onBorderColorButtonClicked();
 }
 
-// void MainWidget::onArrowButtonClicked() {
-//     if (arrow_flag) {
-//         emit arrow_first_click();
-//         arrow_flag = !arrow_flag;
-//     }
-//     else {
-//         emit arrow_second_click();
-//         arrow_flag = !arrow_flag;
-//     }
-// }
 void MainWidget::onExportButtonClicked() {
     QString filename = QFileDialog::getSaveFileName(this, "Export Elements", "", "Data Files (*.dat)");
     if (!filename.isEmpty()) {
@@ -351,6 +342,7 @@ void MainWidget::onImportButtonClicked() {
         canvas->importElements(filename); // 调用 Canvas 的 importElements 方法
     }
 }
+
 MainWidget::~MainWidget()
 {
     delete ui;
