@@ -28,6 +28,7 @@ public:
     void onCopy();
     void onPaste();
     void onDelete();
+    void onCut();
 
     QList<FlowElement*> clipboard;
     QList<GraphicsTextItem*> textClipboard;

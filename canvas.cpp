@@ -36,7 +36,7 @@ Canvas::Canvas(QWidget *parent)
     connect(keyEventFilter, &KeyEventFilter::redoTriggered, this, &Canvas::onRedo);
     connect(keyEventFilter, &KeyEventFilter::findTriggered, this, &Canvas::onFind);
     connect(keyEventFilter, &KeyEventFilter::deleteTriggered, this, &Canvas::onDelete);
-
+    connect(keyEventFilter, &KeyEventFilter::cutTriggered,this,&Canvas::onCut);
     pushAll();
 }
 
@@ -838,6 +838,12 @@ void Canvas::onDelete() {
         }
     if (changed) pushAll();
 
+}
+
+void Canvas::onCut()
+{
+    onCopy();
+    onDelete();
 }
 void Canvas::exportElements(const QString& filename) {
     QFile file(filename);
