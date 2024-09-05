@@ -112,6 +112,7 @@ void Canvas::addShape(FlowElement *element)
             scene->addItem(arrowDot);
             arrowDot->setVisible(false);
         }
+        zindexManager->setHighestZindexForItem(element);
         element->draw();
     }
 }
@@ -135,6 +136,7 @@ void Canvas::autoAdsorption()
     qDebug() << "Auto adsoring";
     for (auto i : graphicTextItems)
     {
+        i->follow();
         if (i->followElement != nullptr)
             continue;
         QPointF pos = i->pos();
@@ -151,6 +153,7 @@ void Canvas::autoAdsorption()
                 break;
             }
         }
+        i->follow();
     }
     updateTextItems();
     for (auto arrow : arrows)
