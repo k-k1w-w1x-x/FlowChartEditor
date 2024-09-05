@@ -43,6 +43,7 @@ public:
     bool* inBorder(int idx);
     void calArrowDots();
     void resetArrowDots();
+    void myRotate(QPointF mousePos,QPointF *centerPos,double dx,double dy);
 
 protected:
 

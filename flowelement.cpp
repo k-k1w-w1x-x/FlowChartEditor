@@ -251,3 +251,40 @@ bool* FlowElement::inBorder(int idx){
         return(isInBorder);
     }
 }
+
+void FlowElement::myRotate(QPointF mousePos,QPointF *centerPos,double dx,double dy){
+    bool fail = false;
+    double sqr1 = pow((mousePos.x()- centerPos->x()),2) + pow((mousePos.y()- centerPos->y()),2);
+    double sqr2 = pow((mousePos.x()+ dx - centerPos->x()),2) + pow((mousePos.y() + dy - centerPos->y()),2);
+    double sqr3 = pow(dx,2) + pow(dy,2);
+    if(sqr1*sqr2 == 0){
+        return;
+    }
+    double costheta = (sqr1 + sqr2 - sqr3) / (2 * sqrt(sqr1 * sqr2));
+    double sintheta = sqrt(1 - costheta*costheta);
+    qDebug()<<"dx:"<<dx<<"dy:"<<dy;
+    qDebug()<<"centerx:"<<centerPos->x()<<"centery:"<<centerPos->y();
+    for(QGraphicsRectItem *borderDot : borderDots){
+        double x1=centerPos->x()-borderDot->x();
+        double y1=borderDot->y()-centerPos->y();
+        double r = sqrt(pow(x1,2)+pow(y1,2));
+        if(r == 0){
+            fail =true;
+        }
+        qDebug()<<"x1:"<<borderDot->x()<<"y1:"<<borderDot->y();
+        double cosalpha = x1 / r;
+        double sinalpha = y1 / r;
+        qDebug()<<"cosalpha:"<<cosalpha<<"sinalpha:"<<sinalpha;
+        double costhetaplusalpha = costheta*cosalpha - sintheta*sinalpha;
+        double sinthetaplusalpha = sintheta*cosalpha + costheta*sinalpha;
+        qDebug()<<"costhetaplusalpha:"<<costhetaplusalpha<<"sinthetaplusalpha:"<<sinthetaplusalpha;
+        double newdx = x1 - r*costhetaplusalpha;
+        double newdy = r*sinthetaplusalpha - y1;
+        qDebug()<<"newdx:"<<newdx<<"newdy:"<<newdy;
+        borderDot->moveBy(newdx,newdy);
+    }
+    if(!fail){
+        draw();
+    }
+
+}
