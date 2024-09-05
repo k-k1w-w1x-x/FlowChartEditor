@@ -23,16 +23,6 @@ Canvas::Canvas(QWidget *parent)
     setViewportUpdateMode(BoundingRectViewportUpdate);
     setDragMode(QGraphicsView::RubberBandDrag);
 
-    // // 创建一个垂直布局，用于在画布左侧放置按钮
-    // QVBoxLayout *layout = new QVBoxLayout(this);
-
-    // // 创建按钮并添加到布局中
-    // QPushButton *colorButton = new QPushButton("Change Color", this);
-    // layout->addWidget(colorButton);
-
-    // 连接按钮点击事件到槽函数
-    // connect(colorButton, &QPushButton::clicked, this, &Canvas::onColorButtonClicked);
-    // 初始化并安装 KeyEventFilter
     keyEventFilter = new KeyEventFilter(this);
     this->installEventFilter(keyEventFilter);
 
@@ -47,6 +37,7 @@ Canvas::Canvas(QWidget *parent)
     connect(keyEventFilter, &KeyEventFilter::findTriggered, this, &Canvas::onFind);
     connect(keyEventFilter, &KeyEventFilter::deleteTriggered, this, &Canvas::onDelete);
 
+    pushAll();
 }
 
 void Canvas::setGridSpacing(int spacing)
@@ -117,7 +108,22 @@ void Canvas::addShape(FlowElement *element)
             scene->addItem(arrowDot);
             arrowDot->setVisible(false);
         }
+        element->draw();
     }
+}
+
+void Canvas::addGraphicsTextItem(GraphicsTextItem *element)
+{
+    element->setSelected(false);
+    scene->addItem(element);
+    graphicTextItems.push_back(element);
+    connect(element, &GraphicsTextItem::enterTextEditor, this, [=](){
+        textEditing = true;
+    });
+    connect(element, &GraphicsTextItem::leaveTextEditor, this, [=](){
+        textEditing = false;
+        pushAll();
+    });
 }
 
 void Canvas::mousePressEvent(QMouseEvent *event)
@@ -150,29 +156,6 @@ void Canvas::mousePressEvent(QMouseEvent *event)
         qDebug()<<"clickedSelectedElement = dragSelectedElements.at(0);"<<clickedControlDot;
     }
 
-    // // clickedSelectedElement = nullptr;
-    // bool elementClicked = false;
-
-    // if(clickedSelectedElement){
-        // int index = 0;//标记哪个dot被选中了
-        // for(QGraphicsRectItem* controlDot : clickedSelectedElement->controlDots){
-        //     QPointF localPoint = controlDot->mapFromScene(clickedPoint);
-        //     if(controlDot->contains(localPoint)){//若在选中状态下有控制点被点击
-        //         qDebug()<<"进入缩放模式";
-        //         isScaling = true;
-        //         clickedControlDot = index;//标记哪个dot被选中了
-        //         lastMousePosition = clickedPoint;
-        //         setDragMode(QGraphicsView::NoDrag);//禁用拖拽框
-        //         elementClicked = true;
-        //         break;
-        //     }
-        //     index++;
-        // }
-    // }
-
-    // else{
-    //     qDebug()<<"not change";
-    //     // 遍历所有元素，检查是否点击了某个元素
     bool clean = true;
     for(FlowElement *dragSelectedElement:dragSelectedElements){
         if(dragSelectedElement->mainItem->contains(clickedPoint)){
@@ -180,10 +163,6 @@ void Canvas::mousePressEvent(QMouseEvent *event)
         }
     }
 
-
-    // if (!elementClicked) {
-    //     clickedSelectedElement = nullptr;
-    // }
     if(isScaling){
         lastMousePosition = clickedPoint;
         qDebug()<<"进入缩放模式";
@@ -276,7 +255,6 @@ void Canvas::mousePressEvent(QMouseEvent *event)
 
 void Canvas::mouseMoveEvent(QMouseEvent *event)
 {
-
     if(isArrowing){
         return;
     }
@@ -287,20 +265,6 @@ void Canvas::mouseMoveEvent(QMouseEvent *event)
     if( isScaling && dragSelectedElements.size() == 1 ){
         // qDebug()<<"点点点点";
         clickedSelectedElement = dragSelectedElements.at(0);
-
-        // int index = 0;//标记哪个dot被选中了
-        // for(QGraphicsRectItem* controlDot : clickedSelectedElement->controlDots){
-        //     QPointF localPoint = controlDot->mapFromScene(lastMousePosition);
-        //     if(controlDot->contains(localPoint)){//若在选中状态下有控制点被点击
-        //         qDebug()<<"进入缩放模式";
-        //         // clickedControlDot = index;//标记哪个dot被选中了
-        //         // qDebug()<<"index:"<<index;
-        //         setDragMode(QGraphicsView::NoDrag);//禁用拖拽框
-        //         elementClicked = true;
-        //         break;
-        //     }
-        //     // index++;
-        // }
         if(elementClicked){
             qDebug()<<"缩放且鼠标移动";
             clickscale = true;
@@ -428,7 +392,6 @@ void Canvas::mouseReleaseEvent(QMouseEvent *event)
         qDebug()<<"arrowsize:"<<arrows.size();
     }
 
-
     if(isArrowing){
         if( arrows.empty() || (!arrows.last()->endDot->scenePos().x() == 0 && !arrows.last()->endDot->scenePos().y() == 0) ){
             qDebug()<<"开始画箭头";
@@ -445,6 +408,7 @@ void Canvas::mouseReleaseEvent(QMouseEvent *event)
             arrows.last()->startDot->setVisible(false);
             arrows.last()->endDot->setVisible(false);
             setCross();
+            pushAll();
         }
         return;
     }
@@ -564,6 +528,10 @@ void Canvas::mouseReleaseEvent(QMouseEvent *event)
             }
         }
     }
+
+    if (clickmove || clickscale || arrowclickscale)
+        pushAll();
+
     scene->update();
 }
 
@@ -582,16 +550,6 @@ void Canvas::onColorButtonClicked()
             scene->update();  // 触发重绘，将元素颜色更新
         }
     }
-    // if (clickedSelectedElement) {
-    //     QColor color = QColorDialog::getColor(clickedSelectedElement->contentColor, this, "Select Color");
-    //     if (color.isValid()) {
-    //         clickedSelectedElement->contentColor = color;  // 设置选中元素的颜色
-    //         clickedSelectedElement->draw();
-    //         scene->update();  // 触发重绘，将元素颜色更新
-    //     }
-    // } else {
-    //     qDebug() << "No element selected. Color change ignored.";
-    // }
 }
 void Canvas::onBorderColorButtonClicked()
 {
@@ -618,27 +576,45 @@ void Canvas::onBorderColorButtonClicked()
             scene->update();  // 触发重绘，将元素颜色更新
         }
     }
-    // if (clickedSelectedElement) {
-    //     QColor color = QColorDialog::getColor(clickedSelectedElement->contentColor, this, "Select Color");
-    //     if (color.isValid()) {
-    //         clickedSelectedElement->contentColor = color;  // 设置选中元素的颜色
-    //         clickedSelectedElement->draw();
-    //         scene->update();  // 触发重绘，将元素颜色更新
-    //     }
-    // } else {
-    //     qDebug() << "No element selected. Color change ignored.";
-    // }
 }
 //键盘操作
 
+void Canvas::pushAll()
+{
+    qDebug() << "所有元素压栈";
+
+    while (elementsHistory.size() > currentHistoryIndex + 1)
+    {
+        elementsHistory.pop_back();
+        arrowsHistory.pop_back();
+        graphicTextItemsHistory.pop_back();
+    }
+
+    QList<FlowElement*> elementsCopy;
+    QList<FlowArrowElement*> arrowsCopy;
+    QList<GraphicsTextItem*> graphicTextItemsCopy;
+
+    for (auto i : elements)
+        elementsCopy.push_back(i->deepClone());
+    for (auto i : arrows)
+        arrowsCopy.push_back(i->deepClone());
+    for (auto i : graphicTextItems)
+        graphicTextItemsCopy.push_back(i->deepClone());
+
+    elementsHistory.push_back(elementsCopy);
+    arrowsHistory.push_back(arrowsCopy);
+    graphicTextItemsHistory.push_back(graphicTextItemsCopy);
+
+    currentHistoryIndex++;
+}
+
 // 添加一个剪切板列表
-
-
 void Canvas::onCopy()
 {
+    if (textEditing)
+        return;
+
     qDebug() << "onCopy() called";
-
-
 
     // 获取选中的元素
     QList<FlowElement *> SelectedElementTemp = this->dragSelectedElements;
@@ -646,9 +622,6 @@ void Canvas::onCopy()
         SelectedElementTemp.append(dragSelectedArrow);
     }
 
-    // if (SelectedElementTemp.empty()) {
-    //     return; // 如果没有选中任何元素，则直接返回
-    // }
     for(const auto&item:clipboard){
         delete(item);
     }
@@ -666,92 +639,111 @@ void Canvas::onCopy()
 
     for (auto i : graphicTextItems)
         if (i->isSelected())
-        {
             textClipboard.push_back(i->deepClone());
-        }
-
-/*
-    // 此时，selectedElements 列表中包含了深拷贝的元素
-    // qDebug() << "复制了" << selectedItems.size() << "个元素";
-    if (clickedSelectedElement) {
-        FlowElement* SelectedElement = clickedSelectedElement->deepClone(); // 深拷贝元素
-        if (SelectedElement) {
-            clipboard.clear(); // 清空剪切板
-            clipboard.append(SelectedElement); // 将深拷贝的元素加入剪切板
-            qDebug() << "复制了一个元素到剪切板";
-        }
-    } else {
-        qDebug() << "没有选中任何元素，无法复制";
-    }
-*/
-
 }
 
-
 void Canvas::onPaste() {
+    if (textEditing)
+        return;
+
     qDebug() << "Paste action triggered";
 
-    if (clipboard.isEmpty()) {
-        qDebug() << "剪切板为空，无法粘贴";
-    }
+    bool changed = false;
 
     // 遍历剪切板中的元素
-    QList<FlowElement*>deleteElements,appendElements;
     for (FlowElement* element : clipboard) {
+        element->move(10, 10);
         FlowElement* clonedElement = element->deepClone(); // 深拷贝元素
-        deleteElements.append(element);
-        appendElements.append(clonedElement);
-        // clipboard.removeOne(element);
-        // clipboard.append(clonedElement);
-        if (clonedElement) {
-            // 将粘贴的元素稍微偏移位置
-            clonedElement->move(10, 10); // 向右下偏移 10 像素
-            addShape(element); // 将深拷贝的元素添加到场景中
-            qDebug() << "粘贴了一个元素";
-        } else {
-            qDebug() << "deepClone 失败，无法粘贴该元素";
-        }
-    }
-    for(const auto&u:deleteElements){
-        clipboard.removeOne(u);
-    }
-    for(const auto&u:appendElements){
-        clipboard.append(u);
+        addShape(clonedElement); // 将深拷贝的元素添加到场景中
+        changed = true;
     }
 
-    qDebug() << textClipboard.size();
     for (auto i : textClipboard)
     {
-        i->setSelected(false);
-        scene->addItem(i);
-        graphicTextItems.push_back(i);
+        i->move(QPointF(10, 10));
+        GraphicsTextItem *clone = i->deepClone();
+        addGraphicsTextItem(clone);
+        changed = true;
     }
+
+    if (changed) pushAll();
 }
 
 void Canvas::mouseDoubleClickEvent(QMouseEvent *event)
 {
     qDebug()<<"doubleclick";
     mouseclick = false;
-    QPointF pos = mapToScene(event->pos());
-    QGraphicsTextItem *item = qgraphicsitem_cast<QGraphicsTextItem*>(scene->itemAt(pos, QTransform()));
-    if (item == nullptr)
+    if (event->button() == Qt::LeftButton)
     {
-        GraphicsTextItem *textItem = new GraphicsTextItem("Text here.");
-        textItem->setPos(pos);
-        scene->addItem(textItem);
-        graphicTextItems.push_back(textItem);
+        QPointF pos = mapToScene(event->pos());
+        QGraphicsTextItem *item = qgraphicsitem_cast<QGraphicsTextItem*>(scene->itemAt(pos, QTransform()));
+        if (item == nullptr)
+        {
+            GraphicsTextItem *textItem = new GraphicsTextItem("Text here.");
+            textItem->setPos(pos);
+            addGraphicsTextItem(textItem);
+        }
     }
     QGraphicsView::mouseDoubleClickEvent(event);
 }
 
+void Canvas::recoverFromHistory()
+{
+    for(auto element : arrows)
+    {
+        removeFromCanvas(element);
+        delete element;
+    }
+    for (auto element : elements)
+    {
+        removeFromCanvas(element);
+        delete element;
+    }
+    for (auto i : graphicTextItems)
+    {
+        scene->removeItem(i);
+        graphicTextItems.removeOne(i);
+        delete i;
+    }
+
+    dragSelectedElements.clear();
+    dragSelectedArrows.clear();
+
+    for (auto i : elementsHistory.at(currentHistoryIndex))
+        addShape(i->deepClone());
+
+    for (auto i : arrowsHistory.at(currentHistoryIndex))
+        addShape(i->deepClone());
+
+    for (auto i : graphicTextItemsHistory.at(currentHistoryIndex))
+        addGraphicsTextItem(i->deepClone());
+
+    setCross();
+    scene->update();
+}
+
 void Canvas::onUndo() {
+    if (textEditing)
+        return;
+
     qDebug() << "Undo action triggered";
-    // 具体的撤销操作
+
+    if (currentHistoryIndex != 0)
+        currentHistoryIndex --;
+
+    recoverFromHistory();
 }
 
 void Canvas::onRedo() {
+    if (textEditing)
+        return;
+
     qDebug() << "Redo action triggered";
-    // 具体的重做操作
+
+    if (currentHistoryIndex < elementsHistory.size() - 1)
+        currentHistoryIndex ++;
+
+    recoverFromHistory();
 }
 
 void Canvas::onFind() {
@@ -759,36 +751,65 @@ void Canvas::onFind() {
     // 具体的查找操作
 }
 void Canvas::removeFromCanvas(FlowElement* element){
-    scene->removeItem(element->mainItem);
-    if(FlowSubElement* subElement = dynamic_cast<FlowSubElement*>(element)){
-        scene->removeItem(subElement->innerItem);
+    if(!dynamic_cast<FlowArrowElement*>(element)){
+        scene->removeItem(element->mainItem);
+        if(FlowSubElement* subElement = dynamic_cast<FlowSubElement*>(element)){
+            scene->removeItem(subElement->innerItem);
+        }
+        for (auto dot : element->borderDots) {
+            scene->removeItem(dot);
+        }
+        for (auto dot : element->arrowDots) {
+            scene->removeItem(dot);
+        }
+        elements.removeOne(element);
+        dragSelectedElements.removeOne(element);
     }
-    for (auto dot : element->borderDots) {
-        scene->removeItem(dot);
+    else{
+        FlowArrowElement* arrowElement = dynamic_cast<FlowArrowElement*>(element);
+        scene->removeItem(arrowElement->startDot);
+        scene->removeItem(arrowElement->endDot);
+        if(arrowElement->mainItem)
+            scene->removeItem(arrowElement->mainItem);
+        arrows.removeOne(arrowElement);
+        dragSelectedArrows.removeOne(arrowElement);
+        if(arrowElement->startElementDot){
+            QPen pen(Qt::black,1);
+            arrowElement->startElementDot->setBrush(Qt::black);
+            arrowElement->startElementDot->setPen(pen);
+            arrowElement->startElementDot->setVisible(false);
+        }
+        if(arrowElement->endElementDot){
+            QPen pen(Qt::black,1);
+            arrowElement->endElementDot->setBrush(Qt::black);
+            arrowElement->endElementDot->setPen(pen);
+            arrowElement->endElementDot->setVisible(false);
+        }
     }
-    for (auto dot : element->arrowDots) {
-        scene->removeItem(dot);
-    }
-    elements.removeOne(element);
-    dragSelectedElements.removeOne(element);
 }
 void Canvas::onDelete() {
+    if (textEditing)
+        return;
     qDebug() << "Delete action triggered";
-    for (auto element : dragSelectedElements) {
-        // scene->removeItem(element->mainItem);
-        // if(FlowSubElement* subElement = dynamic_cast<FlowSubElement*>(element)){
-        //     scene->removeItem(subElement->innerItem);
-        // }
-        // for (auto dot : element->borderDots) {
-        //     scene->removeItem(dot);
-        // }
-        // for (auto dot : element->arrowDots) {
-        //     scene->removeItem(dot);
-        // }
-        // elements.removeOne(element);
-        // dragSelectedElements.removeOne(element);
+    bool changed = 0;
+    for(auto element: dragSelectedArrows){
         removeFromCanvas(element);
         delete element;
+    }
+    for (auto element : dragSelectedElements) {
+        for(auto arrow:arrows){
+            for(auto arrowDot:element->arrowDots){
+                if(arrow->startElementDot==arrowDot){
+                    arrow->startElementDot = nullptr;
+                }
+                if(arrow->endElementDot==arrowDot){
+                    arrow->endElementDot = nullptr;
+                }
+            }
+        }
+        removeFromCanvas(element);
+        delete element;
+        changed = 1;
     }
     for (auto i : graphicTextItems)
         if (i->isSelected())
@@ -796,7 +817,10 @@ void Canvas::onDelete() {
             scene->removeItem(i);
             graphicTextItems.removeOne(i);
             delete i;
+            changed = 1;
         }
+    if (changed) pushAll();
+
 }
 void Canvas::exportElements(const QString& filename) {
     QFile file(filename);
@@ -820,8 +844,6 @@ void Canvas::exportElements(const QString& filename) {
     }
 }
 
-
-
 void Canvas::importElements(const QString& filename) { // 实现 importElements 方法
     QFile file(filename);
 
@@ -835,6 +857,10 @@ void Canvas::importElements(const QString& filename) { // 实现 importElements 
                 scene->removeItem(element->mainItem);
             arrows.removeOne(element);
             dragSelectedArrows.removeOne(element);
+            if(element->startElementDot)
+            element->startElementDot->setVisible(false);
+            if(element->endElementDot)
+            element->endElementDot->setVisible(false);
             delete element;
         }
         for (auto element : elements) {
@@ -848,7 +874,6 @@ void Canvas::importElements(const QString& filename) { // 实现 importElements 
             for (auto dot : element->arrowDots) {
                 scene->removeItem(dot);
             }
-
             elements.removeOne(element);
             dragSelectedElements.removeOne(element);
             delete element;
@@ -897,7 +922,6 @@ void Canvas::importElements(const QString& filename) { // 实现 importElements 
             }
 
             addShape(element);
-            // scene->addItem(element->mainItem);
         }
 
         file.close();
@@ -908,6 +932,11 @@ void Canvas::importElements(const QString& filename) { // 实现 importElements 
 
 void Canvas::keyPressEvent(QKeyEvent *event)
 {
+    if (textEditing)
+    {
+        QGraphicsView::keyPressEvent(event);
+        return;
+    }
     if (event->key() == Qt::Key_Shift) {
 
         qDebug() << "Shift key pressed!";
@@ -917,6 +946,8 @@ void Canvas::keyPressEvent(QKeyEvent *event)
                 //排序锁头
                 double stman = DBL_MAX;
                 double endman = DBL_MAX;
+                if (arrow->startElementDot && arrow->endElementDot)
+                    continue;
                 FlowElement *stelement = nullptr;
                 for(FlowElement *element:elements){
                     for(QGraphicsRectItem *arrowDot:element->arrowDots){
@@ -950,6 +981,7 @@ void Canvas::keyPressEvent(QKeyEvent *event)
                     arrow->startElementDot->setVisible(true);
                     arrow->endDot->setVisible(false);
                     arrow->endElementDot->setVisible(true);
+                    pushAll();
                 }
                 else{
                     qDebug()<<"没找到合适的";
@@ -960,6 +992,7 @@ void Canvas::keyPressEvent(QKeyEvent *event)
         }
         setCross();
     }
+    QGraphicsView::keyPressEvent(event);
 }
 
 double Canvas::Manhattandis(QGraphicsRectItem *p1,QGraphicsRectItem *p2){

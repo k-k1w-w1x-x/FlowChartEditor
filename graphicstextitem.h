@@ -24,6 +24,10 @@ protected:
     void mouseMoveEvent(QGraphicsSceneMouseEvent *event) override;
     void mouseReleaseEvent(QGraphicsSceneMouseEvent *event) override;
 
+signals:
+    void enterTextEditor();
+    void leaveTextEditor();
+
 private:
     int scaling, resizing;
     QPointF initialScenePos;

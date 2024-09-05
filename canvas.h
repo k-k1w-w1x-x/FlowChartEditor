@@ -35,6 +35,7 @@ public:
     QGraphicsScene *scene;
     explicit Canvas(QWidget *parent = nullptr);
     void addShape(FlowElement *element);
+    void addGraphicsTextItem(GraphicsTextItem *element);
     void setGridSpacing(int spacing);  // 设置网格间隔
     void setGridColor(const QColor &color);  // 设置网格颜色
     void exportElements(const QString& filename);
@@ -52,6 +53,8 @@ public:
     bool isCross(FlowArrowElement *arrow1,FlowArrowElement*arrow2);
     double crossProduct(QPointF a,QPointF b);
 
+    void pushAll();
+
 
 protected:
     void drawBackground(QPainter *painter, const QRectF &rect) override;
@@ -65,6 +68,7 @@ protected:
     void mouseDoubleClickEvent(QMouseEvent *event) override;
     void keyPressEvent(QKeyEvent *event);
     void drawArrows();
+    void recoverFromHistory();
 
 private:
     void drawGrid(QPainter &painter, const QRectF &rect);  // 绘制网格线
@@ -84,10 +88,20 @@ private:
     int clickedControlDot ;
     ZIndexManager* zindexManager;
     int arrowClickedContronDot = 0;
+
+    QList<QList<FlowElement*>> elementsHistory;
+    QList<QList<FlowArrowElement*>> arrowsHistory;
+    QList<QList<GraphicsTextItem*>> graphicTextItemsHistory;
+
+    int currentHistoryIndex = 0;
+
+    bool textEditing = false;
+
 public slots:
     void onColorButtonClicked();
     void onBorderColorButtonClicked();
     void setCross();
+
 };
 
 #endif // CANVAS_H
