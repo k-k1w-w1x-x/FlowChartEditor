@@ -62,7 +62,7 @@ void FlowSubElement::draw(){
     path1.lineTo(borderDots[6]->scenePos() + borderDots[6]->rect().center());
     path1.lineTo(borderDots[5]->scenePos() + borderDots[5]->rect().center());
     path1.closeSubpath();
-    QPen pen(Qt::black);
+    QPen pen(borderColor);
     pen.setWidth(2);
     innerItem->setPath(path1);
     innerItem->setBrush(QBrush(contentColor));
@@ -287,6 +287,7 @@ FlowSubElement *FlowSubElement::deepClone()
         clonedElement->borderDots.clear();
         clonedElement->controlDots.clear();
 
+        clonedElement->borderColor=this->borderColor;
         clonedElement->contentColor = this->contentColor;
         clonedElement->selected = this->selected;
 
@@ -313,4 +314,41 @@ FlowSubElement *FlowSubElement::deepClone()
 
         return clonedElement;
     }
+void FlowSubElement::serialize(QDataStream &out, const FlowElement &element)
+    {
+        // out << element.pos() << element.rotation() << element.scale();
+        // qDebug()<<element.pos() << element.rotation() << element.scale();
+
+        int type=2;
+        out<<type;
+        qDebug()<<type;
+        ElementSerializer::serializeColor(element.contentColor,out);
+        ElementSerializer::serializeColor(element.borderColor,out);
+        out<<element.borderDots.size();
+        for(auto dot:element.borderDots){
+            ElementSerializer::serializeGraphicsRectItem(dot,out);
+        }
+    }
+FlowElement* FlowSubElement::deSerialize(QDataStream& in) {
+        //此方法应在子类中被重载
+        FlowSubElement *cur = new FlowSubElement();
+        cur->contentColor = ElementSerializer::deserializeColor(in);
+        cur->borderColor = ElementSerializer::deserializeColor(in);
+        qsizetype borderDotsSize;
+        in>>borderDotsSize;
+        qDebug()<<borderDotsSize<<" bordersize";
+        cur->borderDots.clear();
+        cur->controlDots.clear();
+        int cont=0;
+        for(int i=0;i<borderDotsSize;i++){
+            cur->borderDots.append(ElementSerializer::deserializeGraphicsRectItem(in));
+            if(cont<4){
+                cont++;
+                cur->controlDots.append(cur->borderDots.last());
+            }
+        }
+        cur->resetArrowDots();
+        cur->draw();
+        return cur;
+}
 

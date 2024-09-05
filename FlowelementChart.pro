@@ -1,4 +1,4 @@
-QT       += core gui
+QT       += core gui svg
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -9,16 +9,42 @@ CONFIG += c++17
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    ElementSerializer.cpp \
     canvas.cpp \
+    flowarrowelement.cpp \
+    flowcircleelement.cpp \
     flowelement.cpp \
+    flowdiamondelement.cpp \
+    flowdocuelement.cpp \
+    flowparaelement.cpp \
+    flowplaygroundelement.cpp \
+    flowradiuselement.cpp \
+    flowrectelement.cpp \
+    flowsubelement.cpp \
+    graphicstextitem.cpp \
+    keyeventfilter.cpp \
     main.cpp \
-    mainwidget.cpp
+    mainwidget.cpp \
+    zindexmanager.cpp
 
 HEADERS += \
+    ElementSerializer.h \
     canvas.h \
+    flowarrowelement.h \
+    flowcircleelement.h \
+    flowdiamondelement.h \
+    flowdocuelement.h \
     flowelement.h \
-    mainwidget.h
-
+    graphicstextitem.h \
+    keyeventFilter.h \
+    mainwidget.h \
+    flowparaelement.h \
+    flowplaygroundelement.h \
+    flowradiuselement.h \
+    flowrectelement.h \
+    flowsubelement.h \
+    graphicstextitem.h \
+    zindexmanager.h
 FORMS += \
     mainwidget.ui
 

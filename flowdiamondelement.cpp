@@ -52,7 +52,7 @@ void FlowDiamondElement::draw() {
     mainItem->setPath(path);
     mainItem->setBrush(QBrush(contentColor));
     // 设置默认线条宽度
-    QPen pen(Qt::black);
+    QPen pen(borderColor);
     pen.setWidth(2);
     mainItem->setPen(pen);
 }
@@ -84,6 +84,7 @@ void FlowDiamondElement::mySetScale(int index, double dx, double dy)
 FlowDiamondElement *FlowDiamondElement::deepClone()
 {
     FlowDiamondElement* clonedElement = new FlowDiamondElement();
+    clonedElement->borderColor=this->borderColor;
     clonedElement->borderDots.clear();
     clonedElement->controlDots.clear();
 
@@ -118,13 +119,57 @@ void FlowDiamondElement::calArrowDots(){
     if(controlDots.size() < 4){
         return;
     }
-    arrowDots = controlDots;
+    for(QGraphicsRectItem *controlDot : controlDots){
+        arrowDots.append(new QGraphicsRectItem(QRectF(0, 0, DOT_SIZE, DOT_SIZE), this));
+        arrowDots.last()->setPos(controlDot->pos());
+    }
 }
 
 void FlowDiamondElement::resetArrowDots(){
     if(controlDots.size() < 4){
         return;
     }
-    arrowDots = controlDots;
+    for(int i=0 ; i<arrowDots.size() ; i++){
+        arrowDots[i]->setPos(controlDots[i]->pos());
+    }
+}
+void FlowDiamondElement::serialize(QDataStream &out, const FlowElement &element)
+{
+    // out << element.pos() << element.rotation() << element.scale();
+    // qDebug()<<element.pos() << element.rotation() << element.scale();
+
+    int type=6;
+    out<<type;
+    qDebug()<<type;
+    ElementSerializer::serializeColor(element.contentColor,out);
+    ElementSerializer::serializeColor(element.borderColor,out);
+    out<<element.borderDots.size();
+    for(auto dot:element.borderDots){
+        ElementSerializer::serializeGraphicsRectItem(dot,out);
+    }
+}
+FlowElement* FlowDiamondElement::deSerialize(QDataStream& in) {
+    //此方法应在子类中被重载
+
+    FlowDiamondElement *cur = new FlowDiamondElement();
+    cur->contentColor = ElementSerializer::deserializeColor(in);
+    cur->borderColor = ElementSerializer::deserializeColor(in);
+    qsizetype borderDotsSize;
+    in>>borderDotsSize;
+    qDebug()<<borderDotsSize<<" bordersize";
+    cur->borderDots.clear();
+    cur->controlDots.clear();
+    int cont=0;
+    for(int i=0;i<borderDotsSize;i++){
+        cur->borderDots.append(ElementSerializer::deserializeGraphicsRectItem(in));
+        if(cont<4){
+            cont++;
+            cur->controlDots.append(cur->borderDots.last());
+        }
+    }
+    cur->resetArrowDots();
+    cur->draw();
+
+    return cur;
 }
 

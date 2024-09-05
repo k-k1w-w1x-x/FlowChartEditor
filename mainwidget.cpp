@@ -14,7 +14,7 @@
 
 MainWidget::MainWidget(QWidget *parent)
     : QWidget(parent)
-    , ui(new Ui::MainWidget), canvas(new Canvas(this))
+    , canvas(new Canvas(this)), ui(new Ui::MainWidget)
 {
     canvas->setSceneRect(0, 0, 1600, 1600);
     ui->setupUi(this);
@@ -60,6 +60,7 @@ void MainWidget::init_menu_layout() {
 
     //边框color按钮
     ui->border_color_button->setFixedSize(40,40);
+    connect(ui->border_color_button,&QPushButton::clicked,this,&MainWidget::onBorderColorButtonClicked);
     // 连接边框颜色改变
     // connect(ui->border_color_button,&QPushButton::clicked,this,&MainWidget::onColorButtonClicked);
     QIcon icon2(":/menu/color_change.png");
@@ -69,6 +70,9 @@ void MainWidget::init_menu_layout() {
     ui->searchBox->setFixedSize(400, 35);
     ui->searchButton->setFixedSize(40, 40);
     ui->searchButton->setIcon(QIcon(":/menu/search.png"));
+    connect(ui->searchButton, &QPushButton::clicked, [=](){
+
+    });
 
     menuBar = new QMenuBar(this);
     ui->menuWidget->setLayout(ui->menu_layout);
@@ -89,16 +93,20 @@ void MainWidget::init_menu_layout() {
     fileMenu->addAction(openAction);
     fileMenu->addAction(exportAction);
     connect(saveAction, &QAction::triggered, [=](){
-        QString filePath = QFileDialog::getOpenFileName(this, "选择", "", "All Files (*)");
-        if (!filePath.isEmpty()) {
-            // qDebug() << filePath;
-        }
+        // QString filePath = QFileDialog::getSaveFileName(this, "保存", "", "All Files (*)");
+        // if (!filePath.isEmpty()) {
+        //     qDebug() << filePath;
+        //     onExportButtonClicked();
+        // }
+        onExportButtonClicked();
     });
     connect(openAction, &QAction::triggered, [=](){
-        QString filePath = QFileDialog::getOpenFileName(this, "选择打开文件", "", "All Files (*)");
-        if (!filePath.isEmpty()) {
-            // qDebug() << filePath;
-        }
+        // QString filePath = QFileDialog::getOpenFileName(this, "选择打开文件", "", "All Files (*)");
+        // if (!filePath.isEmpty()) {
+        //     qDebug() << filePath;
+        //     onImportButtonClicked();
+        // }
+        onImportButtonClicked();
     });
     connect(exportAction, &QAction::triggered, [=](){
         QString filePath = QFileDialog::getSaveFileName(nullptr, "选择保存位置", "", "SVG Files (*.svg);;All Files (*)");
@@ -271,25 +279,44 @@ void MainWidget::init_left_button() {
             ui->arrow_button->setStyleSheet("background-color: white;");
             arrow_flag = !arrow_flag;
         }
-    });
 
+        canvas->isArrowing=!canvas->isArrowing;
+        if(!canvas->isArrowing && !canvas->arrows.empty() && canvas->arrows.last()->endDot->scenePos().x() == 0 && canvas->arrows.last()->endDot->scenePos().y() == 0){
+            //需要删除操作
+            qDebug()<<"删除";
+            FlowArrowElement *temp = canvas->arrows.last();
+            canvas->arrows.removeLast();
+            delete(temp);
+        }
+        if(canvas->isArrowing){
+            for(FlowElement *element : canvas->dragSelectedElements){
+                for(QGraphicsRectItem *controlDot:element->controlDots){
+                    controlDot->setVisible(false);
+                }
+                for(QGraphicsRectItem *arrowDot:element->arrowDots){
+                    arrowDot->setVisible(false);
+                }
+            }
+            for(FlowArrowElement *dragSelectedArrow : canvas->dragSelectedArrows){
+                if(dragSelectedArrow->startElementDot){
+                    dragSelectedArrow->startElementDot->setVisible(false);
+                }
+                dragSelectedArrow->startDot->setVisible(false);
+                if(dragSelectedArrow->endElementDot){
+                    dragSelectedArrow->endElementDot->setVisible(false);
+                }
+                dragSelectedArrow->endDot->setVisible(false);
+            }
+        }
+    });
 }
 
 void MainWidget::onColorButtonClicked() {
     // 调用Canvas的draw方法
     canvas->onColorButtonClicked();
-    // // 创建一个 FlowRectElement 并将其添加到 Canvas (QGraphicsScene) 中
-    // FlowRectElement* rectElement = new FlowRectElement();
-    // canvas->addShape(rectElement);
-    //菱形
-    // FlowDiamondElement* diamondElement = new FlowDiamondElement();
-    // canvas->addShape(diamondElement);
-    // FlowParaElement* paraElement = new FlowParaElement();
-    // canvas->addShape(paraElement);
-    // FlowCircleElement* circleElement = new FlowCircleElement();
-    // canvas->addShape(circleElement);
-    // FlowSubElement* subElement = new FlowSubElement();
-    // canvas->addShape(subElement);
+}
+void MainWidget::onBorderColorButtonClicked(){
+    canvas->onBorderColorButtonClicked();
 }
 
 // void MainWidget::onArrowButtonClicked() {
@@ -302,9 +329,19 @@ void MainWidget::onColorButtonClicked() {
 //         arrow_flag = !arrow_flag;
 //     }
 // }
+void MainWidget::onExportButtonClicked() {
+    QString filename = QFileDialog::getSaveFileName(this, "Export Elements", "", "Data Files (*.dat)");
+    if (!filename.isEmpty()) {
+        canvas->exportElements(filename); // 调用 Canvas 的导出方法
+    }
+}
 
-
-
+void MainWidget::onImportButtonClicked() {
+    QString filename = QFileDialog::getOpenFileName(this, "Import Elements", "", "Data Files (*.dat)");
+    if (!filename.isEmpty()) {
+        canvas->importElements(filename); // 调用 Canvas 的 importElements 方法
+    }
+}
 MainWidget::~MainWidget()
 {
     delete ui;

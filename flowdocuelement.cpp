@@ -62,7 +62,7 @@ void FlowDocuElement::draw() {
     mainItem->setBrush(QBrush(contentColor));
 
     // 设置路径的线条样式
-    QPen pen(Qt::black);
+    QPen pen(borderColor);
     pen.setWidth(2);
     mainItem->setPen(pen);
 }
@@ -259,6 +259,7 @@ FlowDocuElement *FlowDocuElement::deepClone()
     clonedElement->borderDots.clear();
     clonedElement->controlDots.clear();
 
+    clonedElement->borderColor=this->borderColor;
     clonedElement->contentColor = this->contentColor;
     clonedElement->selected = this->selected;
 
@@ -278,10 +279,48 @@ FlowDocuElement *FlowDocuElement::deepClone()
             cont++;
         }
     }
-
     clonedElement->setPos(this->pos());
     clonedElement->setRotation(this->rotation());
     clonedElement->setScale(this->scale());
 
     return clonedElement;
+}
+void FlowDocuElement::serialize(QDataStream &out, const FlowElement &element)
+{
+    // out << element.pos() << element.rotation() << element.scale();
+    // qDebug()<<element.pos() << element.rotation() << element.scale();
+
+    int type=5;
+    out<<type;
+    qDebug()<<type;
+    ElementSerializer::serializeColor(element.contentColor,out);
+    ElementSerializer::serializeColor(element.borderColor,out);
+    out<<element.borderDots.size();
+    for(auto dot:element.borderDots){
+        ElementSerializer::serializeGraphicsRectItem(dot,out);
+    }
+}
+FlowElement* FlowDocuElement::deSerialize(QDataStream& in) {
+    //此方法应在子类中被重载
+
+    FlowDocuElement *cur = new FlowDocuElement();
+    cur->contentColor = ElementSerializer::deserializeColor(in);
+    cur->borderColor = ElementSerializer::deserializeColor(in);
+    qsizetype borderDotsSize;
+    in>>borderDotsSize;
+    qDebug()<<borderDotsSize<<" bordersize";
+    cur->borderDots.clear();
+    cur->controlDots.clear();
+    int cont=0;
+    for(int i=0;i<borderDotsSize;i++){
+        cur->borderDots.append(ElementSerializer::deserializeGraphicsRectItem(in));
+        if(cont<4){
+            cont++;
+            cur->controlDots.append(cur->borderDots.last());
+        }
+    }
+    cur->resetArrowDots();
+    cur->draw();
+
+    return cur;
 }

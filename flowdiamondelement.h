@@ -10,6 +10,8 @@ public:
     void calArrowDots();
     void resetArrowDots();
     void draw();
+    void serialize(QDataStream &out, const FlowElement &element);
+    static FlowElement* deSerialize(QDataStream& in);
 };
 
 #endif // FLOWDIAMONDELEMENT_H

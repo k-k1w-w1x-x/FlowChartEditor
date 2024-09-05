@@ -51,7 +51,7 @@ void FlowRadiusElement::draw() {
     mainItem->setBrush(QBrush(contentColor));
 
     // 设置默认线条宽度
-    QPen pen(Qt::black);
+    QPen pen(borderColor);
     pen.setWidth(2);
     mainItem->setPen(pen);
 }
@@ -61,6 +61,7 @@ FlowRadiusElement *FlowRadiusElement::deepClone()
     clonedElement->borderDots.clear();
     clonedElement->controlDots.clear();
 
+    clonedElement->borderColor=this->borderColor;
     clonedElement->contentColor = this->contentColor;
     clonedElement->selected = this->selected;
 
@@ -86,4 +87,43 @@ FlowRadiusElement *FlowRadiusElement::deepClone()
     clonedElement->setScale(this->scale());
 
     return clonedElement;
+}
+void FlowRadiusElement::serialize(QDataStream &out, const FlowElement &element)
+{
+    // out << element.pos() << element.rotation() << element.scale();
+    // qDebug()<<element.pos() << element.rotation() << element.scale();
+
+    int type=1;
+    out<<type;
+    qDebug()<<type;
+    ElementSerializer::serializeColor(element.contentColor,out);
+    ElementSerializer::serializeColor(element.borderColor,out);
+    out<<element.borderDots.size();
+    for(auto dot:element.borderDots){
+        ElementSerializer::serializeGraphicsRectItem(dot,out);
+    }
+}
+FlowElement* FlowRadiusElement::deSerialize(QDataStream& in) {
+    //此方法应在子类中被重载
+
+    FlowRadiusElement *cur = new FlowRadiusElement();
+    cur->contentColor = ElementSerializer::deserializeColor(in);
+    cur->borderColor = ElementSerializer::deserializeColor(in);
+    qsizetype borderDotsSize;
+    in>>borderDotsSize;
+    qDebug()<<borderDotsSize<<" bordersize";
+    cur->borderDots.clear();
+    cur->controlDots.clear();
+    int cont=0;
+    for(int i=0;i<borderDotsSize;i++){
+        cur->borderDots.append(ElementSerializer::deserializeGraphicsRectItem(in));
+        if(cont<4){
+            cont++;
+            cur->controlDots.append(cur->borderDots.last());
+        }
+    }
+    cur->resetArrowDots();
+    cur->draw();
+
+    return cur;
 }

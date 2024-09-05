@@ -13,6 +13,7 @@
 #include "flowradiuselement.h"
 #include "flowdocuelement.h"
 #include "flowplaygroundelement.h"
+#include <QFileDialog>
 #include <QKeyEvent>
 #include <QScrollBar>
 #include <QScrollArea>
@@ -37,6 +38,8 @@ public:
     void init_menu_layout();
     void outputSvg();
 
+    void onExportButtonClicked();
+    void onImportButtonClicked();
 private slots:
     // void update();
     // void createRectangle();
@@ -44,6 +47,7 @@ private slots:
     // void createLine();
     // void createArrow();
     void onColorButtonClicked();
+    void onBorderColorButtonClicked();
     // void onArrowButtonClicked();
 
 signals:

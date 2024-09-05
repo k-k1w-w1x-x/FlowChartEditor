@@ -14,6 +14,8 @@ public:
     void mySetScale(int index,double dx,double dy);
     FlowSubElement* deepClone();
     QGraphicsPathItem *innerItem=new QGraphicsPathItem(this);
+    void serialize(QDataStream &out, const FlowElement &element);
+    static FlowElement *deSerialize(QDataStream &in);
 };
 
 #endif // FLOWSUBELEMENT_H
