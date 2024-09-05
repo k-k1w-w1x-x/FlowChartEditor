@@ -142,6 +142,7 @@ void FlowDiamondElement::serialize(QDataStream &out, const FlowElement &element)
     out<<type;
     qDebug()<<type;
     ElementSerializer::serializeColor(element.contentColor,out);
+    ElementSerializer::serializeColor(element.borderColor,out);
     out<<element.borderDots.size();
     for(auto dot:element.borderDots){
         ElementSerializer::serializeGraphicsRectItem(dot,out);
@@ -152,6 +153,7 @@ FlowElement* FlowDiamondElement::deSerialize(QDataStream& in) {
 
     FlowDiamondElement *cur = new FlowDiamondElement();
     cur->contentColor = ElementSerializer::deserializeColor(in);
+    cur->borderColor = ElementSerializer::deserializeColor(in);
     qsizetype borderDotsSize;
     in>>borderDotsSize;
     qDebug()<<borderDotsSize<<" bordersize";

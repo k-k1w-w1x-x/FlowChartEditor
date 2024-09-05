@@ -62,15 +62,21 @@ void FlowRectElement::serialize(QDataStream &out, const FlowElement &element)
     int type=0;
     out<<type;
     qDebug()<<type;
-    if (element.mainItem) { // 假设 mainItem 是指向 QGraphicsPathItem 的指针
-        ElementSerializer::serializePainterPath(element.mainItem->path(), out); // 序列化路径
-        ElementSerializer::serializePen(element.mainItem->pen(), out); // 序列化画笔
-        ElementSerializer::serializeBrush(element.mainItem->brush(), out); // 序列化画刷
-    }
+    ElementSerializer::serializeColor(element.contentColor,out);
+    ElementSerializer::serializeColor(element.borderColor,out);
     out<<element.borderDots.size();
     for(auto dot:element.borderDots){
         ElementSerializer::serializeGraphicsRectItem(dot,out);
     }
+    // if (element.mainItem) { // 假设 mainItem 是指向 QGraphicsPathItem 的指针
+    //     ElementSerializer::serializePainterPath(element.mainItem->path(), out); // 序列化路径
+    //     ElementSerializer::serializePen(element.mainItem->pen(), out); // 序列化画笔
+    //     ElementSerializer::serializeBrush(element.mainItem->brush(), out); // 序列化画刷
+    // }
+    // out<<element.borderDots.size();
+    // for(auto dot:element.borderDots){
+    //     ElementSerializer::serializeGraphicsRectItem(dot,out);
+    // }
 }
 FlowElement* FlowRectElement::deSerialize(QDataStream& in) {
     //此方法应在子类中被重载
@@ -81,27 +87,42 @@ FlowElement* FlowRectElement::deSerialize(QDataStream& in) {
     // 获取 QGraphicsPathItem 以反序列化 QPainterPath、QPen 和 QBrush
 
     FlowRectElement *cur = new FlowRectElement();
-    if (cur->mainItem) {
-        QPainterPath path = ElementSerializer::deserializePainterPath(in);
-        cur->mainItem->setPath(path);
+    cur->contentColor = ElementSerializer::deserializeColor(in);
+    cur->borderColor = ElementSerializer::deserializeColor(in);
+    // if (cur->mainItem) {
+    //     QPainterPath path = ElementSerializer::deserializePainterPath(in);
+    //     cur->mainItem->setPath(path);
 
-        QPen pen = ElementSerializer::deserializePen(in);
-        cur->mainItem->setPen(pen);
+    //     QPen pen = ElementSerializer::deserializePen(in);
+    //     cur->mainItem->setPen(pen);
 
-        QBrush brush = ElementSerializer::deserializeBrush(in);
-        cur->mainItem->setBrush(brush);
-        cur->contentColor = brush.color();
-    }
+    //     QBrush brush = ElementSerializer::deserializeBrush(in);
+    //     cur->mainItem->setBrush(brush);
+    //     cur->contentColor = brush.color();
+    // }
 
     qsizetype borderDotsSize;
     in>>borderDotsSize;
     cur->borderDots.clear();
-
+    cur->controlDots.clear();
+    int cont=0;
     for(int i=0;i<borderDotsSize;i++){
         cur->borderDots.append(ElementSerializer::deserializeGraphicsRectItem(in));
+        if(cont<4){
+            cont++;
+            cur->controlDots.append(cur->borderDots.last());
+        }
     }
-    cur->controlDots = cur->borderDots;//只对正方形成立
     cur->resetArrowDots();
+    cur->draw();
+
+    // cur->borderDots.clear();
+    // for(int i=0;i<borderDotsSize;i++){
+    //     cur->borderDots.append(ElementSerializer::deserializeGraphicsRectItem(in));
+    // }
+    // cur->controlDots = cur->borderDots;//只对正方形成立
+    // cur->resetArrowDots();
+    // cur->draw();
     // element.setPos(pos);
     // element.setRotation(rotation);
     // element.setScale(scale);

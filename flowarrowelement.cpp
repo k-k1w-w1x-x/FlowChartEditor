@@ -7,10 +7,12 @@ FlowArrowElement::FlowArrowElement(): FlowElement(){
     endDot = new QGraphicsRectItem(QRectF(0, 0, DOT_SIZE, DOT_SIZE), this);
 }
 FlowArrowElement::~FlowArrowElement(){
+    this->startElementDot = nullptr;
+    this->endElementDot = nullptr;
     delete(this->startDot);
-    delete(this->startElementDot);
+    // delete(this->startElementDot);
     delete(this->endDot);
-    delete(this->endElementDot);
+    // delete(this->endElementDot);
 }
 void FlowArrowElement::draw()  {
     // 创建一个 QPainterPath 来绘制箭头
@@ -19,17 +21,20 @@ void FlowArrowElement::draw()  {
     QPointF endPoint = endDot->scenePos() + endDot->rect().center();
     //锁头优先
     if(startElementDot){
+        qDebug()<<"startElementDot is no null";
         startPoint = startElementDot->scenePos() + startElementDot->rect().center();
         startDot->setX(startElementDot->scenePos().x() + startElementDot->rect().center().x());
         startDot->setY(startElementDot->scenePos().y() + startElementDot->rect().center().y());
         qDebug()<<"startDot:"<<startDot->scenePos().x()<<","<<startDot->scenePos().y();
     }
     if(endElementDot){
+        qDebug()<<"endElementDot is no null";
         endPoint = endElementDot->scenePos() + endElementDot->rect().center();
         endDot->setX(endElementDot->scenePos().x() + endElementDot->rect().center().x());
         endDot->setY(endElementDot->scenePos().y() + endElementDot->rect().center().y());
     }
     if(passingPoint.x()==0&&passingPoint.y()==0){
+        qDebug()<<"没passingPoint";
         path.moveTo(startPoint);
         path.lineTo(endPoint);
     }
@@ -85,6 +90,7 @@ void FlowArrowElement::draw()  {
         endElementDot->setBrush(Qt::red);
         endElementDot->setPen(pen);
     }
+    qDebug()<<"draw结束";
 }
 void FlowArrowElement::move(double dx,double dy)
 {
@@ -177,3 +183,33 @@ FlowArrowElement *FlowArrowElement::deepClone()
 
     return clonedElement;
 }
+void FlowArrowElement::serialize(QDataStream &out, const FlowElement &element)
+{
+    // out << element.pos() << element.rotation() << element.scale();
+    // qDebug()<<element.pos() << element.rotation() << element.scale();
+
+    int type=8;
+    out<<type;
+    qDebug()<<type;
+    ElementSerializer::serializeColor(element.borderColor,out);
+    // out<<element.borderDots.size();
+    ElementSerializer::serializeGraphicsRectItem(this->startDot,out);
+    ElementSerializer::serializeGraphicsRectItem(this->endDot,out);
+}
+FlowElement* FlowArrowElement::deSerialize(QDataStream& in) {
+    //此方法应在子类中被重载
+
+    FlowArrowElement *cur = new FlowArrowElement();
+    cur->borderColor = ElementSerializer::deserializeColor(in);
+    // qsizetype borderDotsSize;
+    // in>>borderDotsSize;
+    // qDebug()<<borderDotsSize<<" bordersize";
+    cur->startDot = ElementSerializer::deserializeGraphicsRectItem(in);
+    cur->endDot = ElementSerializer::deserializeGraphicsRectItem(in);
+    cur->startDot->setVisible(false);
+    cur->endDot->setVisible(false);
+    cur->draw();
+
+    return cur;
+}
+

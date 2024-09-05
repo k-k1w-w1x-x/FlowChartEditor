@@ -18,6 +18,8 @@ public:
     QPointF passingPoint;
     FlowArrowElement* deepClone();
     ~FlowArrowElement();
+    void serialize(QDataStream &out, const FlowElement &element);
+    static FlowElement* deSerialize(QDataStream& in);
 };
 
 #endif // FLOWARROWELEMENT_H

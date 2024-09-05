@@ -154,6 +154,7 @@ void FlowPlaygroundElement::serialize(QDataStream &out, const FlowElement &eleme
     out<<type;
     qDebug()<<type;
     ElementSerializer::serializeColor(element.contentColor,out);
+    ElementSerializer::serializeColor(element.borderColor,out);
     out<<element.borderDots.size();
     for(auto dot:element.borderDots){
         ElementSerializer::serializeGraphicsRectItem(dot,out);
@@ -163,6 +164,7 @@ FlowElement* FlowPlaygroundElement::deSerialize(QDataStream& in) {
     //此方法应在子类中被重载
     FlowPlaygroundElement *cur = new FlowPlaygroundElement();
     cur->contentColor = ElementSerializer::deserializeColor(in);
+    cur->borderColor = ElementSerializer::deserializeColor(in);
     qsizetype borderDotsSize;
     in>>borderDotsSize;
     qDebug()<<borderDotsSize<<" bordersize";

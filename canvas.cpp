@@ -593,15 +593,15 @@ void Canvas::onColorButtonClicked()
     //     qDebug() << "No element selected. Color change ignored.";
     // }
 }
-
-
 void Canvas::onBorderColorButtonClicked()
 {
     if(dragSelectedElements.empty() && dragSelectedArrows.empty()){
         qDebug() << "No element selected. Color change ignored.";
         return;
     }
-    QColor color = QColorDialog::getColor(Qt::black, this, "Select Color");
+
+    QColor color = QColorDialog::getColor(Qt::white, this, "Select Border Color");
+
     for(const auto&dragselectedElement:dragSelectedElements){
         // QColor color = QColorDialog::getColor(dragselectedElement->contentColor, this, "Select Color");
         if (color.isValid()) {
@@ -804,10 +804,13 @@ void Canvas::exportElements(const QString& filename) {
         QDataStream out(&file);
 
         // 写入元素数量
-        out << elements.size();
+        out << elements.size()+arrows.size();
         // qDebug()<<"elementsize"<<elements.size();
         // // 遍历并序列化每个元素
         for (FlowElement* element : elements) {
+            element->serialize(out,*element);
+        }
+        for (FlowElement* element : arrows) {
             element->serialize(out,*element);
         }
 
@@ -825,6 +828,15 @@ void Canvas::importElements(const QString& filename) { // 实现 importElements 
     qDebug()<<"start import1";
     if (file.open(QIODevice::ReadOnly)) {
         QDataStream in(&file);
+        for(auto element: arrows){
+            scene->removeItem(element->startDot);
+            scene->removeItem(element->endDot);
+            if(element->mainItem)
+                scene->removeItem(element->mainItem);
+            arrows.removeOne(element);
+            dragSelectedArrows.removeOne(element);
+            delete element;
+        }
         for (auto element : elements) {
             scene->removeItem(element->mainItem);
             if(FlowSubElement* subElement = dynamic_cast<FlowSubElement*>(element)){
@@ -846,6 +858,7 @@ void Canvas::importElements(const QString& filename) { // 实现 importElements 
                 graphicTextItems.removeOne(i);
                 delete i;
         }
+
         qsizetype elementCount;
         in >> elementCount;
         qDebug()<<elementCount;
@@ -878,6 +891,9 @@ void Canvas::importElements(const QString& filename) { // 实现 importElements 
             }
             else if(type==7){
                 element = FlowCircleElement::deSerialize(in);
+            }
+            else{
+                element = FlowArrowElement::deSerialize(in);
             }
 
             addShape(element);
