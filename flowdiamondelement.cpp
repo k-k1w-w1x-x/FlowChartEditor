@@ -4,13 +4,13 @@
 
 FlowDiamondElement::FlowDiamondElement(): FlowElement()
 {
-    borderDots.append(new QGraphicsRectItem(QRectF(0, 0, DOT_SIZE, DOT_SIZE), this));  // 左
+    borderDots.append(new QGraphicsRectItem(QRectF(0, 0, 7, 7), this));  // 左
     borderDots.last()->setPos(150, 150);
-    borderDots.append(new QGraphicsRectItem(QRectF(0, 0, DOT_SIZE, DOT_SIZE), this));  // 上
+    borderDots.append(new QGraphicsRectItem(QRectF(0, 0, 7, 7), this));  // 上
     borderDots.last()->setPos(250, 100);
-    borderDots.append(new QGraphicsRectItem(QRectF(0, 0, DOT_SIZE, DOT_SIZE), this));  // 右
+    borderDots.append(new QGraphicsRectItem(QRectF(0, 0, 7, 7), this));  // 右
     borderDots.last()->setPos(350, 150);
-    borderDots.append(new QGraphicsRectItem(QRectF(0, 0, DOT_SIZE, DOT_SIZE), this));  // 下
+    borderDots.append(new QGraphicsRectItem(QRectF(0, 0, 7, 7), this));  // 下
     borderDots.last()->setPos(250, 200);
 
     controlDots = borderDots;

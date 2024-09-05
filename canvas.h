@@ -56,6 +56,8 @@ public:
     void searchAndReplace(const QString &findStr, const QString &replaceStr);
 
     void pushAll();
+    void onUndo();
+    void onRedo();
 
 
 protected:
@@ -74,6 +76,7 @@ protected:
     void recoverFromHistory();
     void autoAdsorption();
 
+
 private:
     void drawGrid(QPainter &painter, const QRectF &rect);  // 绘制网格线
     void drawBack(QString filepath);
@@ -85,8 +88,7 @@ private:
     QList<GraphicsTextItem*> graphicTextItems;
     bool isDragging=false;
     bool isScaling=false;
-    void onUndo();
-    void onRedo();
+
     void onFind();
     FlowElement* clickedSelectedElement = nullptr;
     int clickedControlDot ;
@@ -97,7 +99,7 @@ private:
     QList<QList<FlowArrowElement*>> arrowsHistory;
     QList<QList<GraphicsTextItem*>> graphicTextItemsHistory;
 
-    int currentHistoryIndex = 0;
+    int currentHistoryIndex = -1;
 
     bool textEditing = false;
 

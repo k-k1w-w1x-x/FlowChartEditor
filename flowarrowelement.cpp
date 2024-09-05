@@ -1,7 +1,7 @@
 #include <flowarrowelement.h>
 #include <QPen>
 #include <cmath>
-#define DOT_SIZE 5
+#define DOT_SIZE 8
 FlowArrowElement::FlowArrowElement(): FlowElement(){
     startDot = new QGraphicsRectItem(QRectF(0, 0, DOT_SIZE, DOT_SIZE), this);
     endDot = new QGraphicsRectItem(QRectF(0, 0, DOT_SIZE, DOT_SIZE), this);
@@ -75,7 +75,7 @@ void FlowArrowElement::draw()  {
 
     // 创建一个 QGraphicsPathItem 来显示箭头
     mainItem->setPath(path);
-    mainItem->setPen(QPen(borderColor, 2));    // 设置箭头的颜色和宽度
+    mainItem->setPen(QPen(borderColor, 3));    // 设置箭头的颜色和宽度
 
 
     QPen pen(Qt::red,1);

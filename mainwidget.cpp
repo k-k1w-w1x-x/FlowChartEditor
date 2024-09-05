@@ -134,6 +134,8 @@ void MainWidget::init_menu_layout() {
             painter.end();  // 完成绘制
         }
     });
+    connect(redoAction,&QAction::triggered,canvas,&Canvas::onRedo);
+    connect(undoAction,&QAction::triggered,canvas,&Canvas::onUndo);
 
     //横线分隔
     fileMenu->addSeparator();
