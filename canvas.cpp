@@ -822,6 +822,16 @@ void Canvas::onDelete() {
         // }
         // elements.removeOne(element);
         // dragSelectedElements.removeOne(element);
+        for(auto arrow:arrows){
+            for(auto arrowDot:element->arrowDots){
+                if(arrow->startElementDot==arrowDot){
+                    arrow->startElementDot = nullptr;
+                }
+                if(arrow->endElementDot==arrowDot){
+                    arrow->endElementDot = nullptr;
+                }
+            }
+        }
         removeFromCanvas(element);
         delete element;
     }
