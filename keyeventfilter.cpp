@@ -23,6 +23,9 @@ bool KeyEventFilter::eventFilter(QObject *obj, QEvent *event)
             case Qt::Key_Y:
                 emit redoTriggered();
                 break;
+            case Qt::Key_X:
+                emit cutTriggered();
+                break;
             case Qt::Key_F:
                 emit findTriggered();
                 break;
