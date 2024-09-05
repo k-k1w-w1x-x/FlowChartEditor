@@ -824,6 +824,9 @@ void Canvas::onDelete() {
                 }
             }
         }
+        for (auto i : graphicTextItems)
+            if (i->followElement == element)
+                i->followElement = nullptr;
         removeFromCanvas(element);
         delete element;
         changed = 1;
@@ -971,6 +974,8 @@ void Canvas::keyPressEvent(QKeyEvent *event)
     }
     if (event->key() == Qt::Key_Shift) {
 
+        bool changed = 0;
+
         qDebug() << "Shift key pressed!";
         for (auto i : graphicTextItems)
             if (i->isSelected())
@@ -987,12 +992,15 @@ void Canvas::keyPressEvent(QKeyEvent *event)
                     QPointF center = (element->controlDots.at(0)->pos() + element->controlDots.at(2)->pos()) / 2;
                     if ((center.x() - pos.x()) * (center.x() - pos.x()) + (center.y() - pos.y()) * (center.y() - pos.y()) < dis)
                     {
+                        changed = 1;
                         i->followElement = element;
                         dis = (center.x() - pos.x()) * (center.x() - pos.x()) + (center.y() - pos.y()) * (center.y() - pos.y());
                     }
                 }
             }
+
         updateTextItems();
+
         for(FlowArrowElement *arrow : arrows){
             if(arrow->mainItem->isSelected()){
                 qDebug()<<"看看锁谁的";
@@ -1034,7 +1042,7 @@ void Canvas::keyPressEvent(QKeyEvent *event)
                     arrow->startElementDot->setVisible(true);
                     arrow->endDot->setVisible(false);
                     arrow->endElementDot->setVisible(true);
-                    pushAll();
+                    changed = 1;
                 }
                 else{
                     qDebug()<<"没找到合适的";
@@ -1043,6 +1051,7 @@ void Canvas::keyPressEvent(QKeyEvent *event)
                 }
             }
         }
+        if (changed) pushAll();
         setCross();
     }
     QGraphicsView::keyPressEvent(event);
