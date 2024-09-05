@@ -8,10 +8,11 @@ class FlowPlaygroundElement: public FlowElement
 public:
     FlowPlaygroundElement();
     void draw();
-    void drawHalfCircle(QPainterPath &path, const QPointF &point1, const QPointF &point2);
+    // void drawHalfCircle(QPainterPath &path, const QPointF &point1, const QPointF &point2);
     FlowPlaygroundElement *deepClone();
     void calArrowDots();
     void resetArrowDots();
+    double crossProduct(QPointF a,QPointF b);
 };
 
 #endif // FLOWPLAYGROUNDELEMENT_H

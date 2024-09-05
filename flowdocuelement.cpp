@@ -66,7 +66,7 @@ void FlowDocuElement::draw() {
     pen.setWidth(2);
     mainItem->setPen(pen);
 }
-void FlowDocuElement::mySetScale(int index, double dx, double dy)
+void FlowDocuElement::mySetScale(int index, double deltax, double deltay)
 {
 
     // if(!inBorder(index)[0]||!inBorder(index)[1])//若越界
@@ -211,47 +211,108 @@ void FlowDocuElement::mySetScale(int index, double dx, double dy)
     //     return;
     // }
     qDebug() << "开始缩放";
-    controlDots.at(index)->moveBy(dx, dy);
+    borderDots.at(index)->moveBy(deltax,deltay);
 
-    if (index == 0) {  // 左上角
-        borderDots.at(1)->moveBy(0, dy);  // 右上角
-        borderDots.at(3)->moveBy(dx, 0);  // 左下角
+    QTransform transform;
+    QTransform transform1;
 
+    QPointF delta(deltax,deltay);
+
+    // double x1 = controlDots.at(0)->x();
+    // double y1 = controlDots.at(0)->y();
+    // double x2 = controlDots.at(1)->x();
+    // double y2 = controlDots.at(1)->y();
+
+    // double costheta = 0 ;
+    // costheta = (x1==x2 && y1==y2)?1:abs(x2 - x1) / (sqrt(pow((x1-x2),2)+pow(y1-y2,2)));
+    // double radians = std::acos(costheta);
+    // // 将弧度转换为角度
+    // double theta = radians * (180.0 / M_PI);
+    double theta = rotangle;
+    qDebug()<<"theta"<<theta;
+    transform.rotate(-theta);
+
+    QPointF transformedPoint = transform.map(delta) ;
+
+    double dx = transformedPoint.x();
+    double dy = transformedPoint.y();
+
+    QPointF q1(dx,0);
+    QPointF q2(0,dy);
+
+    QPointF q3(0.25*dx,0.2*dy);
+    QPointF q4(0.5*dx,0);
+    QPointF q5(0.75*dx,-0.2*dy);
+
+    QPointF q6(0.75*dx,0.2*dy);
+    QPointF q7(0.5*dx,0);
+    QPointF q8(0.25*dx,-0.2*dy);
+
+    QPointF q9(0.75*dx,0.8*dy);
+    QPointF q10(0.5*dx,dy);
+    QPointF q11(0.25*dx,1.2*dy);
+
+    QPointF q12(0.25*dx,0.8*dy);
+    QPointF q13(0.5*dx,dy);
+    QPointF q14(0.75*dx,1.2*dy);
+
+    transform1.rotate(theta);
+    q1 = transform1.map(q1) ;
+    q2 = transform1.map(q2) ;
+
+    q3 = transform1.map(q3) ;
+    q4 = transform1.map(q4) ;
+    q5 = transform1.map(q5) ;
+
+    q6 = transform1.map(q6) ;
+    q7 = transform1.map(q7) ;
+    q8 = transform1.map(q8) ;
+
+    q9 = transform1.map(q9) ;
+    q10 = transform1.map(q10) ;
+    q11 = transform1.map(q11) ;
+
+    q12 = transform1.map(q12) ;
+    q13 = transform1.map(q13) ;
+    q14 = transform1.map(q14) ;
+
+
+
+    if(index==0){
+        borderDots.at(1)->moveBy(q2.x(), q2.y());
+        borderDots.at(3)->moveBy(q1.x(), q1.y());
         // 过渡点
-        borderDots.at(4)->moveBy(dx * 0.25, dy * 0.2);  // 过渡点1
-        borderDots.at(5)->moveBy(dx * 0.5, 0);          // 过渡点2
-        borderDots.at(6)->moveBy(dx * 0.75, -dy * 0.2); // 过渡点3
-
-    } else if (index == 1) {  // 右上角
-        borderDots.at(0)->moveBy(0, dy);  // 左上角
-        borderDots.at(2)->moveBy(dx, 0);  // 右下角
-
-        // 过渡点
-        borderDots.at(4)->moveBy(dx * 0.75, dy * 0.2);  // 过渡点1
-        borderDots.at(5)->moveBy(dx * 0.5, 0);          // 过渡点2
-        borderDots.at(6)->moveBy(dx * 0.25, -dy * 0.2); // 过渡点3
-
-    } else if (index == 2) {  // 右下角
-        borderDots.at(1)->moveBy(dx, 0);  // 右上角
-        borderDots.at(3)->moveBy(0, dy);  // 左下角
-
-        // 过渡点
-        borderDots.at(4)->moveBy(dx * 0.75, dy * 0.8);  // 过渡点1
-        borderDots.at(5)->moveBy(dx * 0.5, dy);          // 过渡点2
-        borderDots.at(6)->moveBy(dx * 0.25, dy * 1.2); // 过渡点3
-
-    } else if (index == 3) {  // 左下角
-        borderDots.at(2)->moveBy(0, dy);  // 右下角
-        borderDots.at(0)->moveBy(dx, 0);  // 左上角
-
-        // 过渡点
-        borderDots.at(4)->moveBy(dx * 0.25, dy * 0.8);  // 过渡点1
-        borderDots.at(5)->moveBy(dx * 0.5, dy);          // 过渡点2
-        borderDots.at(6)->moveBy(dx * 0.75, dy * 1.2); // 过渡点3
+        borderDots.at(4)->moveBy(q3.x(), q3.y());  // 过渡点1
+        borderDots.at(5)->moveBy(q4.x(), q4.y());          // 过渡点2
+        borderDots.at(6)->moveBy(q5.x(), q5.y()); // 过渡点3
     }
+    if(index==1){
+        borderDots.at(0)->moveBy(q2.x(), q2.y());
+        borderDots.at(2)->moveBy(q1.x(), q1.y());
+        // 过渡点
+        borderDots.at(4)->moveBy(q6.x(), q6.y());  // 过渡点1
+        borderDots.at(5)->moveBy(q7.x(), q7.y());          // 过渡点2
+        borderDots.at(6)->moveBy(q8.x(), q8.y()); // 过渡点3
+    }
+    if(index==2){
+        borderDots.at(3)->moveBy(q2.x(), q2.y());
+        borderDots.at(1)->moveBy(q1.x(), q1.y());
+        // 过渡点
+        borderDots.at(4)->moveBy(q9.x(), q9.y());  // 过渡点1
+        borderDots.at(5)->moveBy(q10.x(), q10.y());          // 过渡点2
+        borderDots.at(6)->moveBy(q11.x(), q11.y()); // 过渡点3
+    }
+    if(index==3){
+        borderDots.at(2)->moveBy(q2.x(), q2.y());
+        borderDots.at(0)->moveBy(q1.x(), q1.y());
 
-    // 重绘图形
+        // 过渡点
+        borderDots.at(4)->moveBy(q12.x(), q12.y());  // 过渡点1
+        borderDots.at(5)->moveBy(q13.x(), q13.y());          // 过渡点2
+        borderDots.at(6)->moveBy(q14.x(), q14.y()); // 过渡点3
+    }
     draw();
+
 }
 FlowDocuElement *FlowDocuElement::deepClone()
 {

@@ -483,6 +483,7 @@ void Canvas::mouseReleaseEvent(QMouseEvent *event)
     if (event->button() == Qt::LeftButton) {
         isDragging = false;
         isScaling = false;
+        isRotating = false;
     }
     setDragMode(QGraphicsView::RubberBandDrag);
     QGraphicsView::mouseReleaseEvent(event);
@@ -957,8 +958,16 @@ void Canvas::keyPressEvent(QKeyEvent *event)
     }
 }
 
-void Canvas::keyReleaseEvent(QKeyEvent *event){
-    altpress = false;
+void Canvas::keyReleaseEvent(QKeyEvent *event) {
+    // 检查释放的键是否是 Alt 键
+    if (event->key() == Qt::Key_Alt) {
+        altpress = false;
+        // 在这里处理 Alt 键松开后的逻辑
+        qDebug() << "Alt 键松开";
+    }
+
+    // 调用父类的 keyReleaseEvent 以确保其他按键处理逻辑不会丢失
+    QGraphicsView::keyReleaseEvent(event);
 }
 
 double Canvas::Manhattandis(QGraphicsRectItem *p1,QGraphicsRectItem *p2){

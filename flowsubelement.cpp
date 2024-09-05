@@ -81,7 +81,7 @@ void FlowSubElement::draw(){
 }
 
 
-void FlowSubElement::mySetScale(int index, double dx, double dy) {
+void FlowSubElement::mySetScale(int index, double deltax, double deltay) {
     // if(!inBorder(index)[0]||!inBorder(index)[1])//若越界
     // {
     //     qDebug()<<"越界了";
@@ -234,51 +234,121 @@ void FlowSubElement::mySetScale(int index, double dx, double dy) {
     //     return;
     // }
     // 移动被选中的控制点
-    controlDots.at(index)->moveBy(dx, dy);
+    borderDots.at(index)->moveBy(deltax,deltay);
 
-    if (index == 0) {  // 左上角
-        borderDots.at(1)->moveBy(0, dy);       // 右上角
-        borderDots.at(3)->moveBy(dx, 0);       // 左下角
+    QTransform transform;
+    QTransform transform1;
 
-        // 内部控制点的相应缩放
-        borderDots.at(4)->moveBy(dx * 0.9, dy);   // 内部左上角
-        borderDots.at(5)->moveBy(dx * 0.1, dy);       // 内部右上角
-        borderDots.at(6)->moveBy(dx * 0.1, 0);        // 内部右下角
-        borderDots.at(7)->moveBy(dx * 0.9, 0);    // 内部左下角
+    QPointF delta(deltax,deltay);
 
-    } else if (index == 1) {  // 右上角
-        borderDots.at(0)->moveBy(0, dy);       // 左上角
-        borderDots.at(2)->moveBy(dx, 0);       // 右下角
+    double theta = rotangle;
+    qDebug()<<"theta"<<theta;
+    transform.rotate(-theta);
 
-        // 内部控制点的相应缩放
-        borderDots.at(5)->moveBy(dx * 0.9, dy);   // 内部右上角
-        borderDots.at(4)->moveBy(dx * 0.1, dy);       // 内部左上角
-        borderDots.at(7)->moveBy(dx * 0.1, 0);        // 内部左下角
-        borderDots.at(6)->moveBy(dx * 0.9, 0);    // 内部右下角
+    QPointF transformedPoint = transform.map(delta) ;
 
-    } else if (index == 2) {  // 右下角
-        borderDots.at(3)->moveBy(0, dy);       // 左下角
-        borderDots.at(1)->moveBy(dx, 0);       // 右上角
+    double dx = transformedPoint.x();
+    double dy = transformedPoint.y();
 
-        // 内部控制点的相应缩放
-        borderDots.at(6)->moveBy(dx * 0.9, dy);   // 内部右下角
-        borderDots.at(7)->moveBy(dx * 0.1, dy);       // 内部左下角
-        borderDots.at(4)->moveBy(dx * 0.1, 0);        // 内部左上角
-        borderDots.at(5)->moveBy(dx * 0.9, 0);    // 内部右上角
+    QPointF q1(dx,0);
+    QPointF q2(0,dy);
 
-    } else if (index == 3) {  // 左下角
-        borderDots.at(2)->moveBy(0, dy);       // 右下角
-        borderDots.at(0)->moveBy(dx, 0);       // 左上角
+    QPointF q3(0.9*dx,dy);
+    QPointF q4(0.1*dx,dy);
+    QPointF q5(0.1*dx,0);
+    QPointF q6(0.9*dx,0);
 
-        // 内部控制点的相应缩放
-        borderDots.at(7)->moveBy(dx * 0.9, dy);   // 内部左下角
-        borderDots.at(6)->moveBy(dx * 0.1, dy);       // 内部右下角
-        borderDots.at(5)->moveBy(dx * 0.1, 0);        // 内部右上角
-        borderDots.at(4)->moveBy(dx * 0.9, 0);    // 内部左上角
+    transform1.rotate(theta);
+    q1 = transform1.map(q1) ;
+    q2 = transform1.map(q2) ;
+
+    q3 = transform1.map(q3);
+    q4 = transform1.map(q4);
+    q5 = transform1.map(q5);
+    q6 = transform1.map(q6);
+    if(index==0){
+        borderDots.at(1)->moveBy(q2.x(), q2.y());
+        borderDots.at(3)->moveBy(q1.x(), q1.y());
+
+        borderDots.at(4)->moveBy(q3.x(), q3.y());   // 内部左上角
+        borderDots.at(5)->moveBy(q4.x(), q4.y());       // 内部右上角
+        borderDots.at(6)->moveBy(q5.x(), q5.y());        // 内部右下角
+        borderDots.at(7)->moveBy(q6.x(), q6.y());    // 内部左下角
     }
+    if(index==1){
+        borderDots.at(0)->moveBy(q2.x(), q2.y());
+        borderDots.at(2)->moveBy(q1.x(), q1.y());
+
+        borderDots.at(4)->moveBy(q4.x(), q4.y());   // 内部左上角
+        borderDots.at(5)->moveBy(q3.x(), q3.y());       // 内部右上角
+        borderDots.at(6)->moveBy(q6.x(), q6.y());        // 内部右下角
+        borderDots.at(7)->moveBy(q5.x(), q5.y());    // 内部左下角
+    }
+    if(index==2){
+        borderDots.at(3)->moveBy(q2.x(), q2.y());
+        borderDots.at(1)->moveBy(q1.x(), q1.y());
+
+        borderDots.at(4)->moveBy(q5.x(), q5.y());   // 内部左上角
+        borderDots.at(5)->moveBy(q6.x(), q6.y());       // 内部右上角
+        borderDots.at(6)->moveBy(q3.x(), q3.y());        // 内部右下角
+        borderDots.at(7)->moveBy(q4.x(), q4.y());    // 内部左下角
+    }
+    if(index==3){
+        borderDots.at(2)->moveBy(q2.x(), q2.y());
+        borderDots.at(0)->moveBy(q1.x(), q1.y());
+
+        borderDots.at(4)->moveBy(q6.x(), q6.y());   // 内部左上角
+        borderDots.at(5)->moveBy(q5.x(), q5.y());       // 内部右上角
+        borderDots.at(6)->moveBy(q4.x(), q4.y());        // 内部右下角
+        borderDots.at(7)->moveBy(q3.x(), q3.y());    // 内部左下角
+    }
+    draw();
+    // //before
+    // controlDots.at(index)->moveBy(dx, dy);
+
+    // if (index == 0) {  // 左上角
+    //     borderDots.at(1)->moveBy(0, dy);       // 右上角
+    //     borderDots.at(3)->moveBy(dx, 0);       // 左下角
+
+    //     // 内部控制点的相应缩放
+    //     borderDots.at(4)->moveBy(dx * 0.9, dy);   // 内部左上角
+    //     borderDots.at(5)->moveBy(dx * 0.1, dy);       // 内部右上角
+    //     borderDots.at(6)->moveBy(dx * 0.1, 0);        // 内部右下角
+    //     borderDots.at(7)->moveBy(dx * 0.9, 0);    // 内部左下角
+
+    // } else if (index == 1) {  // 右上角
+    //     borderDots.at(0)->moveBy(0, dy);       // 左上角
+    //     borderDots.at(2)->moveBy(dx, 0);       // 右下角
+
+    //     // 内部控制点的相应缩放
+    //     borderDots.at(5)->moveBy(dx * 0.9, dy);   // 内部右上角
+    //     borderDots.at(4)->moveBy(dx * 0.1, dy);       // 内部左上角
+    //     borderDots.at(7)->moveBy(dx * 0.1, 0);        // 内部左下角
+    //     borderDots.at(6)->moveBy(dx * 0.9, 0);    // 内部右下角
+
+    // } else if (index == 2) {  // 右下角
+    //     borderDots.at(3)->moveBy(0, dy);       // 左下角
+    //     borderDots.at(1)->moveBy(dx, 0);       // 右上角
+
+    //     // 内部控制点的相应缩放
+    //     borderDots.at(6)->moveBy(dx * 0.9, dy);   // 内部右下角
+    //     borderDots.at(7)->moveBy(dx * 0.1, dy);       // 内部左下角
+    //     borderDots.at(4)->moveBy(dx * 0.1, 0);        // 内部左上角
+    //     borderDots.at(5)->moveBy(dx * 0.9, 0);    // 内部右上角
+
+    // } else if (index == 3) {  // 左下角
+    //     borderDots.at(2)->moveBy(0, dy);       // 右下角
+    //     borderDots.at(0)->moveBy(dx, 0);       // 左上角
+
+    //     // 内部控制点的相应缩放
+    //     borderDots.at(7)->moveBy(dx * 0.9, dy);   // 内部左下角
+    //     borderDots.at(6)->moveBy(dx * 0.1, dy);       // 内部右下角
+    //     borderDots.at(5)->moveBy(dx * 0.1, 0);        // 内部右上角
+    //     borderDots.at(4)->moveBy(dx * 0.9, 0);    // 内部左上角
+    // }
 
     // 重绘图形
-    draw();
+    // draw();
 }
 
 FlowSubElement *FlowSubElement::deepClone()
