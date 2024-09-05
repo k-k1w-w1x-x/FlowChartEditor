@@ -126,6 +126,70 @@ void Canvas::addGraphicsTextItem(GraphicsTextItem *element)
     });
 }
 
+void Canvas::autoAdsorption()
+{
+    qDebug() << "Auto adsoring";
+    for (auto i : graphicTextItems)
+    {
+        if (i->followElement != nullptr)
+            continue;
+        QPointF pos = i->pos();
+        pos += QPointF(i->transform().m31(), i->transform().m32());
+        pos += QPointF(i->boundingRect().width() * i->transform().m11() / 2,
+                       i->boundingRect().height() * i->transform().m22() / 2);
+        for (auto element : elements)
+        {
+            QPointF center = (element->controlDots.at(0)->pos() + element->controlDots.at(2)->pos()) / 2;
+            qDebug() << "TEXT DIS " << (center.x() - pos.x()) * (center.x() - pos.x()) + (center.y() - pos.y()) * (center.y() - pos.y());
+            if ((center.x() - pos.x()) * (center.x() - pos.x()) + (center.y() - pos.y()) * (center.y() - pos.y()) < 1000)
+            {
+                i->followElement = element;
+                break;
+            }
+        }
+    }
+    updateTextItems();
+    for (auto arrow : arrows)
+    {
+        FlowElement *stelement = nullptr;
+        if (arrow->startElementDot == nullptr)
+        {
+            for (auto element : elements)
+                for (auto arrowDot : element->arrowDots)
+                {
+                    double tempstman = Manhattandis(arrowDot, arrow->startDot);
+                    qDebug() << "ARROW DIS " << tempstman;
+                    if (tempstman < 1000)
+                    {
+                        arrow->startElementDot = arrowDot;
+                        stelement = element;
+                    }
+                }
+        }
+        if (arrow->endElementDot == nullptr)
+        {
+            for (auto element : elements)
+            {
+                if (stelement == element)
+                    continue;
+                for (auto arrowDot : element->arrowDots)
+                {
+                    double tempendman = Manhattandis(arrowDot, arrow->endDot);
+                    qDebug() << "ARROW DIS " << tempendman;
+                    if (tempendman < 1000)
+                    {
+                        arrow->endElementDot = arrowDot;
+                    }
+                }
+            }
+        }
+        arrow->draw();
+    }
+    scene->update();
+
+    setCross();
+}
+
 void Canvas::mousePressEvent(QMouseEvent *event)
 {
     qDebug()<<"mousePress!";
@@ -247,6 +311,7 @@ void Canvas::mousePressEvent(QMouseEvent *event)
         }
     }
     // 更新场景以反映选中状态的变化
+
     scene->update();
 
     QGraphicsView::mousePressEvent(event);
@@ -489,6 +554,8 @@ void Canvas::mouseReleaseEvent(QMouseEvent *event)
     for (auto it = dragSelectedArrows.rbegin(); it != dragSelectedArrows.rend(); ++it) {
         zindexManager->setHighestZindexForItem(*it);
     }
+    for (auto i : graphicTextItems)
+        zindexManager->setHighestZindexForItem(i);
     if(dragSelectedElements.empty() && dragSelectedArrows.size() == 1){
         FlowArrowElement *clickedArrow = dragSelectedArrows.at(0);
         qDebug()<<"only one arrow";
@@ -528,9 +595,10 @@ void Canvas::mouseReleaseEvent(QMouseEvent *event)
         }
     }
 
-    if (clickmove || clickscale || arrowclickscale)
+    if (clickmove || clickscale || arrowclickscale || arrowclickmove)
         pushAll();
 
+    autoAdsorption();
     scene->update();
 }
 
@@ -560,6 +628,7 @@ void Canvas::onColorButtonClicked()
         }
     if (changed) pushAll();
 }
+
 void Canvas::onBorderColorButtonClicked()
 {
     if(dragSelectedElements.empty() && dragSelectedArrows.empty()){
@@ -646,7 +715,6 @@ void Canvas::onCopy()
     // 遍历选中的图形项，并将它们深拷贝
     for (const auto &item : SelectedElementTemp) {
         FlowElement *clonedElement = item->deepClone(); // 深拷贝元素
-        clonedElement->move(10,10);
         clipboard.append(clonedElement);
     }
 
@@ -665,7 +733,7 @@ void Canvas::onPaste() {
 
     // 遍历剪切板中的元素
     for (FlowElement* element : clipboard) {
-        element->move(10, 10);
+        element->move(50, 50);
         FlowElement* clonedElement = element->deepClone(); // 深拷贝元素
         addShape(clonedElement); // 将深拷贝的元素添加到场景中
         changed = true;
@@ -673,13 +741,14 @@ void Canvas::onPaste() {
 
     for (auto i : textClipboard)
     {
-        i->move(QPointF(10, 10));
+        i->move(QPointF(50, 50));
         GraphicsTextItem *clone = i->deepClone();
         addGraphicsTextItem(clone);
         changed = true;
     }
 
     if (changed) pushAll();
+    autoAdsorption();
 }
 
 void Canvas::mouseDoubleClickEvent(QMouseEvent *event)
@@ -734,7 +803,7 @@ void Canvas::recoverFromHistory()
 
     for (auto i : graphicTextItemsHistory.at(currentHistoryIndex))
         addGraphicsTextItem(i->deepClone());
-
+    autoAdsorption();
     setCross();
     scene->update();
 }
@@ -767,6 +836,7 @@ void Canvas::onFind() {
     qDebug() << "Find action triggered";
     // 具体的查找操作
 }
+
 void Canvas::removeFromCanvas(FlowElement* element){
     if(!dynamic_cast<FlowArrowElement*>(element)){
         scene->removeItem(element->mainItem);
@@ -848,6 +918,7 @@ void Canvas::onCut()
     onCopy();
     onDelete();
 }
+
 void Canvas::exportElements(const QString& filename) {
     QFile file(filename);
     if (file.open(QIODevice::WriteOnly)) {
@@ -958,7 +1029,7 @@ void Canvas::importElements(const QString& filename) { // 实现 importElements 
             GraphicsTextItem* text = GraphicsTextItem::deSerialize(in);
             addGraphicsTextItem(text);
         }
-
+        autoAdsorption();
         file.close();
     } else {
         qWarning("Could not open file for reading.");
@@ -985,7 +1056,7 @@ void Canvas::keyPressEvent(QKeyEvent *event)
                 QPointF pos = i->pos();
                 pos += QPointF(i->transform().m31(), i->transform().m32());
                 pos += QPointF(i->boundingRect().width() * i->transform().m11() / 2,
-                                i->boundingRect().height() * i->transform().m22() / 2);
+                               i->boundingRect().height() * i->transform().m22() / 2);
                 qreal dis = DBL_MAX;
                 for (auto element : elements)
                 {
@@ -1037,6 +1108,7 @@ void Canvas::keyPressEvent(QKeyEvent *event)
                 //没找到合适的，不画
                 if(arrow->startElementDot && arrow->endElementDot){
                     qDebug()<<"小开不算开";
+                    qDebug() << "WTF?" << stman << ' ' << endman;
                     arrow->draw();
                     arrow->startDot->setVisible(false);
                     arrow->startElementDot->setVisible(true);
@@ -1057,8 +1129,9 @@ void Canvas::keyPressEvent(QKeyEvent *event)
     QGraphicsView::keyPressEvent(event);
 }
 
-double Canvas::Manhattandis(QGraphicsRectItem *p1,QGraphicsRectItem *p2){
-    return(abs(p1->scenePos().x()-p2->scenePos().x()) + abs(p1->scenePos().y()-p2->scenePos().y()));
+double Canvas::Manhattandis(QGraphicsRectItem *p1, QGraphicsRectItem *p2) {
+    return (p1->pos().x() - p2->pos().x()) * (p1->pos().x() - p2->pos().x())+
+           (p1->pos().y() - p2->pos().y()) * (p1->pos().y() - p2->pos().y());
 }
 
 void Canvas::drawArrows(){
@@ -1172,6 +1245,7 @@ bool Canvas::isCross(FlowArrowElement *arrow1,FlowArrowElement*arrow2){//判断�
     qDebug()<<"交了";
     return true;
 }
+
 double Canvas::crossProduct(QPointF a,QPointF b){//叉乘
     return a.x() * b.y() - a.y() * b.x();
 }

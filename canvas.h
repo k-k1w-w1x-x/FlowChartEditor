@@ -71,6 +71,7 @@ protected:
     void drawArrows();
     void updateTextItems();
     void recoverFromHistory();
+    void autoAdsorption();
 
 private:
     void drawGrid(QPainter &painter, const QRectF &rect);  // 绘制网格线
