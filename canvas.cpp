@@ -759,21 +759,56 @@ void Canvas::onFind() {
     // 具体的查找操作
 }
 void Canvas::removeFromCanvas(FlowElement* element){
-    scene->removeItem(element->mainItem);
-    if(FlowSubElement* subElement = dynamic_cast<FlowSubElement*>(element)){
-        scene->removeItem(subElement->innerItem);
+    if(!dynamic_cast<FlowArrowElement*>(element)){
+        scene->removeItem(element->mainItem);
+        if(FlowSubElement* subElement = dynamic_cast<FlowSubElement*>(element)){
+            scene->removeItem(subElement->innerItem);
+        }
+        for (auto dot : element->borderDots) {
+            scene->removeItem(dot);
+        }
+        for (auto dot : element->arrowDots) {
+            scene->removeItem(dot);
+        }
+        elements.removeOne(element);
+        dragSelectedElements.removeOne(element);
     }
-    for (auto dot : element->borderDots) {
-        scene->removeItem(dot);
+    else{
+        FlowArrowElement* arrowElement = dynamic_cast<FlowArrowElement*>(element);
+        scene->removeItem(arrowElement->startDot);
+        scene->removeItem(arrowElement->endDot);
+        if(arrowElement->mainItem)
+            scene->removeItem(arrowElement->mainItem);
+        arrows.removeOne(arrowElement);
+        dragSelectedArrows.removeOne(arrowElement);
+        if(arrowElement->startElementDot){
+            QPen pen(Qt::black,1);
+            arrowElement->startElementDot->setBrush(Qt::black);
+            arrowElement->startElementDot->setPen(pen);
+            arrowElement->startElementDot->setVisible(false);
+        }
+        if(arrowElement->endElementDot){
+            QPen pen(Qt::black,1);
+            arrowElement->endElementDot->setBrush(Qt::black);
+            arrowElement->endElementDot->setPen(pen);
+            arrowElement->endElementDot->setVisible(false);
+        }
+
     }
-    for (auto dot : element->arrowDots) {
-        scene->removeItem(dot);
-    }
-    elements.removeOne(element);
-    dragSelectedElements.removeOne(element);
+
 }
 void Canvas::onDelete() {
     qDebug() << "Delete action triggered";
+    for(auto element: dragSelectedArrows){
+        // scene->removeItem(element->startDot);
+        // scene->removeItem(element->endDot);
+        // if(element->mainItem)
+        //     scene->removeItem(element->mainItem);
+        // arrows.removeOne(element);
+        // dragSelectedArrows.removeOne(element);
+        removeFromCanvas(element);
+        delete element;
+    }
     for (auto element : dragSelectedElements) {
         // scene->removeItem(element->mainItem);
         // if(FlowSubElement* subElement = dynamic_cast<FlowSubElement*>(element)){
@@ -797,6 +832,7 @@ void Canvas::onDelete() {
             graphicTextItems.removeOne(i);
             delete i;
         }
+
 }
 void Canvas::exportElements(const QString& filename) {
     QFile file(filename);
@@ -835,6 +871,10 @@ void Canvas::importElements(const QString& filename) { // 实现 importElements 
                 scene->removeItem(element->mainItem);
             arrows.removeOne(element);
             dragSelectedArrows.removeOne(element);
+            if(element->startElementDot)
+            element->startElementDot->setVisible(false);
+            if(element->endElementDot)
+            element->endElementDot->setVisible(false);
             delete element;
         }
         for (auto element : elements) {
@@ -848,7 +888,6 @@ void Canvas::importElements(const QString& filename) { // 实现 importElements 
             for (auto dot : element->arrowDots) {
                 scene->removeItem(dot);
             }
-
             elements.removeOne(element);
             dragSelectedElements.removeOne(element);
             delete element;
