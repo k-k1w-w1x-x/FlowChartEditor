@@ -52,6 +52,8 @@ public:
     bool isCross(FlowArrowElement *arrow1,FlowArrowElement*arrow2);
     double crossProduct(QPointF a,QPointF b);
 
+    void pushAll();
+
 
 protected:
     void drawBackground(QPainter *painter, const QRectF &rect) override;
@@ -84,10 +86,18 @@ private:
     int clickedControlDot ;
     ZIndexManager* zindexManager;
     int arrowClickedContronDot = 0;
+    QList<QList<FlowElement*>> elementsHistory;
+    QList<QList<GraphicsTextItem*>> graphicTextItemsHistory;
+
+    QList<QList<FlowElement*>> elementsTemp;
+    QList<QList<GraphicsTextItem*>> graphicTextItemsTemp;
+    bool textEditing = false;
+
 public slots:
     void onColorButtonClicked();
     void onBorderColorButtonClicked();
     void setCross();
+
 };
 
 #endif // CANVAS_H

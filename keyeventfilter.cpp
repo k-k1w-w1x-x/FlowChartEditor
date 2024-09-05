@@ -13,20 +13,19 @@ bool KeyEventFilter::eventFilter(QObject *obj, QEvent *event)
             switch (keyEvent->key()) {
             case Qt::Key_C:
                 emit copyTriggered();
-                qDebug() << "Ctrl+C Pressed";
-                return true;
+                break;
             case Qt::Key_V:
                 emit pasteTriggered();
-                return true;
+                break;
             case Qt::Key_Z:
                 emit undoTriggered();
-                return true;
+                break;
             case Qt::Key_Y:
                 emit redoTriggered();
-                return true;
+                break;
             case Qt::Key_F:
                 emit findTriggered();
-                return true;
+                break;
             case Qt::Key_Backspace:
                 emit deleteTriggered();
             default:

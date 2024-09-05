@@ -78,11 +78,14 @@ void MainWidget::init_menu_layout() {
     ui->menuWidget->setLayout(ui->menu_layout);
     ui->menu_layout->setMenuBar(menuBar);
 
+    redoAction = new QAction(QIcon(":/menu/redo.png"),"Redo", this);
+    undoAction = new QAction(QIcon(":/menu/undo.png"),"Redo", this);
+
     // 创建菜单
     fileMenu = menuBar->addMenu("File");
     editMenu = menuBar->addMenu("Edit");
-    undoMenu = menuBar->addMenu(QIcon(":/menu/undo.png"),"");
-    redoMenu = menuBar->addMenu(QIcon(":/menu/redo.png"),"");
+    menuBar->addAction(undoAction);
+    menuBar->addAction(redoAction);
 
     // filemenu创建菜单项
     exportAction = new QAction(QIcon(":/menu/export.png"),"Export", this);
@@ -168,8 +171,6 @@ void MainWidget::init_menu_layout() {
         canvas->background_set = false;
         canvas->update();
     });
-    //redo按钮信号!!!!
-    //connect(redoMenu, &QMenu::aboutToShow, this, &QWidget::close);
 
     //Action按钮信号!!!
     //connect(saveAction, &QAction::triggered, this, &QWidget::close);
@@ -186,6 +187,7 @@ void MainWidget::init_left_button() {
     connect(ui->rect_button, &QPushButton::clicked, [=](){
         FlowRectElement* rectElement = new FlowRectElement();
         canvas->addShape(rectElement);
+        canvas->pushAll();
     });
     connect(ui->rect_button, &QPushButton::pressed, [=]() {
         ui->rect_button->setStyleSheet("background-color: lightgrey;");
@@ -202,6 +204,7 @@ void MainWidget::init_left_button() {
     connect(ui->rect3_button, &QPushButton::clicked, [=](){
         FlowDocuElement* documentElement = new FlowDocuElement();
         canvas->addShape(documentElement);
+        canvas->pushAll();
     });
 
     //菱形
@@ -212,6 +215,7 @@ void MainWidget::init_left_button() {
     connect(ui->rhombus_button, &QPushButton::clicked, [=](){
         FlowDiamondElement* diamondElement = new FlowDiamondElement();
         canvas->addShape(diamondElement);
+        canvas->pushAll();
     });
 
     //平行四边形
@@ -222,6 +226,7 @@ void MainWidget::init_left_button() {
     connect(ui->parallelogram_button, &QPushButton::clicked, [=](){
         FlowParaElement* paraElement = new FlowParaElement();
         canvas->addShape(paraElement);
+        canvas->pushAll();
     });
 
     //圆形
@@ -232,6 +237,7 @@ void MainWidget::init_left_button() {
     connect(ui->circle_button, &QPushButton::clicked, [=](){
         FlowCircleElement* circleElement = new FlowCircleElement();
         canvas->addShape(circleElement);
+        canvas->pushAll();
     });
 
     //子流程矩形
@@ -242,6 +248,7 @@ void MainWidget::init_left_button() {
     connect(ui->rect2_button, &QPushButton::clicked, [=](){
         FlowSubElement* subElement = new FlowSubElement();
         canvas->addShape(subElement);
+        canvas->pushAll();
     });
 
 
@@ -253,6 +260,7 @@ void MainWidget::init_left_button() {
     connect(ui->rect4_button, &QPushButton::clicked, [=](){
         FlowPlaygroundElement* playgroundElement = new FlowPlaygroundElement();
         canvas->addShape(playgroundElement);
+        canvas->pushAll();
     });
 
     //圆角矩形
@@ -263,6 +271,7 @@ void MainWidget::init_left_button() {
     connect(ui->roundrect_button, &QPushButton::clicked, [=](){
         FlowRadiusElement* radiusElement = new FlowRadiusElement();
         canvas->addShape(radiusElement);
+        canvas->pushAll();
     });
 
     //arrow按钮
