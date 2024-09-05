@@ -11,14 +11,18 @@
 GraphicsTextItem::GraphicsTextItem(QGraphicsItem *parent)
     : QGraphicsTextItem(parent) {}
 
-GraphicsTextItem::GraphicsTextItem(const QString &text, QGraphicsItem *parent, FlowElement *follow)
+GraphicsTextItem::GraphicsTextItem(const QString &text, QGraphicsItem *parent, FlowElement *follow, bool activeCreate)
     : QGraphicsTextItem(text, parent)
     , followElement(follow)
+    , first(activeCreate)
 {
     this->setFlags(QGraphicsItem::ItemIsSelectable);
     setSelected(true);
     setAcceptHoverEvents(true);
-    setTextInteractionFlags(Qt::TextEditorInteraction);
+
+    QTransform t;
+    t.scale(1.5, 1.5);
+    setTransform(t);
 
     scaling = resizing = 0;
 }
@@ -47,6 +51,11 @@ void GraphicsTextItem::focusOutEvent(QFocusEvent *event)
 
 void GraphicsTextItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
 {
+    if (first)
+    {
+        first = false;
+        return;
+    }
     if (textInteractionFlags() == Qt::NoTextInteraction && event->button() == Qt::LeftButton)
     {
         emit enterTextEditor();
@@ -174,7 +183,8 @@ void GraphicsTextItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
             }
             QTransform transform;
             transform.translate(deltax, deltay);
-            transform.scale(width / initialWidth * initialTransform.m11(), height / initialHeight * initialTransform.m22());
+            transform.scale(qMax(width / initialWidth * initialTransform.m11(), 1.5),
+                            qMax(height / initialHeight * initialTransform.m22(), 1.5));
             setTransform(transform);
             update();
         }
@@ -191,7 +201,8 @@ void GraphicsTextItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
             }
             QTransform transform;
             transform.translate(deltax, deltay);
-            transform.scale(width / initialWidth * initialTransform.m11(), height / initialHeight * initialTransform.m22());
+            transform.scale(qMax(width / initialWidth * initialTransform.m11(), 1.5),
+                            qMax(height / initialHeight * initialTransform.m22(), 1.5));
             setTransform(transform);
             update();
         }
@@ -208,7 +219,8 @@ void GraphicsTextItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
             }
             QTransform transform;
             transform.translate(deltax, deltay);
-            transform.scale(width / initialWidth * initialTransform.m11(), height / initialHeight * initialTransform.m22());
+            transform.scale(qMax(width / initialWidth * initialTransform.m11(), 1.5),
+                            qMax(height / initialHeight * initialTransform.m22(), 1.5));
             setTransform(transform);
             update();
         }
@@ -220,7 +232,8 @@ void GraphicsTextItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
                 height += pos.y() - initialScenePos.y();
             QTransform transform;
             transform.translate(deltax, deltay);
-            transform.scale(width / initialWidth * initialTransform.m11(), height / initialHeight * initialTransform.m22());
+            transform.scale(qMax(width / initialWidth * initialTransform.m11(), 1.5),
+                            qMax(height / initialHeight * initialTransform.m22(), 1.5));
             setTransform(transform);
             update();
         }

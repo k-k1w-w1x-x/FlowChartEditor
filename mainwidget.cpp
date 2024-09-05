@@ -11,6 +11,7 @@
 #include <QFileDialog>
 #include <QLineEdit>
 #include <QSvgGenerator>
+#include <QInputDialog>
 
 MainWidget::MainWidget(QWidget *parent)
     : QWidget(parent)
@@ -347,3 +348,12 @@ MainWidget::~MainWidget()
 {
     delete ui;
 }
+
+void MainWidget::on_searchButton_clicked()
+{
+    bool ok = false;
+    QString str = QInputDialog::getText(this, tr("查找和替换"), tr("请输入要替换成的字符串"), QLineEdit::Normal, tr(""), &ok);
+    if (ok)
+        canvas->searchAndReplace(ui->searchBox->text(), str);
+}
+

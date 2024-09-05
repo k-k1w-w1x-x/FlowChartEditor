@@ -53,6 +53,7 @@ public:
     double Manhattandis(QGraphicsRectItem *p1,QGraphicsRectItem *p2);
     bool isCross(FlowArrowElement *arrow1,FlowArrowElement*arrow2);
     double crossProduct(QPointF a,QPointF b);
+    void searchAndReplace(const QString &findStr, const QString &replaceStr);
 
     void pushAll();
 

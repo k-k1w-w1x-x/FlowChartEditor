@@ -196,6 +196,11 @@ void Canvas::autoAdsorption()
 
 void Canvas::mousePressEvent(QMouseEvent *event)
 {
+    if (textEditing)
+    {
+        QGraphicsView::mousePressEvent(event);
+        return;
+    }
     qDebug()<<"mousePress!";
     if(isArrowing){
         return;
@@ -324,6 +329,11 @@ void Canvas::mousePressEvent(QMouseEvent *event)
 
 void Canvas::mouseMoveEvent(QMouseEvent *event)
 {
+    if (textEditing)
+    {
+        QGraphicsView::mouseMoveEvent(event);
+        return;
+    }
     if(isArrowing){
         return;
     }
@@ -442,6 +452,11 @@ void Canvas::mouseMoveEvent(QMouseEvent *event)
 
 void Canvas::mouseReleaseEvent(QMouseEvent *event)
 {
+    if (textEditing)
+    {
+        QGraphicsView::mouseReleaseEvent(event);
+        return;
+    }
     //储存被选中的箭头
     if(!clickmove && !clickscale &&!isArrowing){
         dragSelectedArrows.clear();
@@ -768,7 +783,7 @@ void Canvas::mouseDoubleClickEvent(QMouseEvent *event)
             for (auto i :elements)
                 if(i->mainItem->contains(pos))
                     follow = i;
-            GraphicsTextItem *textItem = new GraphicsTextItem("Text here.", nullptr, follow);
+            GraphicsTextItem *textItem = new GraphicsTextItem("Text here.", nullptr, follow, 1);
             textItem->setPos(pos);
             addGraphicsTextItem(textItem);
         }
@@ -1254,4 +1269,18 @@ bool Canvas::isCross(FlowArrowElement *arrow1,FlowArrowElement*arrow2){//判断�
 
 double Canvas::crossProduct(QPointF a,QPointF b){//叉乘
     return a.x() * b.y() - a.y() * b.x();
+}
+
+void Canvas::searchAndReplace(const QString &findStr, const QString &replaceStr)
+{
+    qDebug() << findStr << ' ' << replaceStr;
+
+    for (auto i : graphicTextItems)
+    {
+        QString str = i->toPlainText();
+        str.replace(findStr, replaceStr);
+        i->setPlainText(str);
+    }
+
+    scene->update();
 }

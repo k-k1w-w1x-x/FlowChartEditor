@@ -9,7 +9,7 @@ class GraphicsTextItem : public QGraphicsTextItem
     Q_OBJECT
 public:
     GraphicsTextItem(QGraphicsItem *parent = nullptr);
-    GraphicsTextItem(const QString &text, QGraphicsItem *parent = nullptr, FlowElement *follow = nullptr);
+    GraphicsTextItem(const QString &text, QGraphicsItem *parent = nullptr, FlowElement *follow = nullptr, bool activeCreate = false);
     ~GraphicsTextItem();
     QRectF boundingRect() const override;
     void move(QPointF delta);
@@ -39,7 +39,7 @@ private:
     QPointF initialScenePos;
     QTransform initialTransform;
     qreal initialWidth, initialHeight;
-
+    bool first = false;
 };
 
 #endif // GRAPHICSTEXTITEM_H
