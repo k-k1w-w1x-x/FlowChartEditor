@@ -8,6 +8,8 @@ public:
     FlowCircleElement();
     void draw();
     FlowCircleElement *deepClone();
+    void serialize(QDataStream &out, const FlowElement &element);
+    static FlowElement* deSerialize(QDataStream& in);
 };
 
 #endif // FLOWCIRCLEELEMENT_H

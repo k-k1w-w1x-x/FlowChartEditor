@@ -93,3 +93,40 @@ FlowCircleElement *FlowCircleElement::deepClone()
 
     return clonedElement;
 }
+void FlowCircleElement::serialize(QDataStream &out, const FlowElement &element)
+{
+    // out << element.pos() << element.rotation() << element.scale();
+    // qDebug()<<element.pos() << element.rotation() << element.scale();
+
+    int type=7;
+    out<<type;
+    qDebug()<<type;
+    ElementSerializer::serializeColor(element.contentColor,out);
+    out<<element.borderDots.size();
+    for(auto dot:element.borderDots){
+        ElementSerializer::serializeGraphicsRectItem(dot,out);
+    }
+}
+FlowElement* FlowCircleElement::deSerialize(QDataStream& in) {
+    //此方法应在子类中被重载
+
+    FlowCircleElement *cur = new FlowCircleElement();
+    cur->contentColor = ElementSerializer::deserializeColor(in);
+    qsizetype borderDotsSize;
+    in>>borderDotsSize;
+    qDebug()<<borderDotsSize<<" bordersize";
+    cur->borderDots.clear();
+    cur->controlDots.clear();
+    int cont=0;
+    for(int i=0;i<borderDotsSize;i++){
+        cur->borderDots.append(ElementSerializer::deserializeGraphicsRectItem(in));
+        if(cont<4){
+            cont++;
+            cur->controlDots.append(cur->borderDots.last());
+        }
+    }
+    cur->resetArrowDots();
+    cur->draw();
+
+    return cur;
+}

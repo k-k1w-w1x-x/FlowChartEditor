@@ -61,6 +61,7 @@ void FlowRectElement::serialize(QDataStream &out, const FlowElement &element)
     // 获取 QGraphicsPathItem 以序列化 QPainterPath、QPen 和 QBrush
     int type=0;
     out<<type;
+    qDebug()<<type;
     if (element.mainItem) { // 假设 mainItem 是指向 QGraphicsPathItem 的指针
         ElementSerializer::serializePainterPath(element.mainItem->path(), out); // 序列化路径
         ElementSerializer::serializePen(element.mainItem->pen(), out); // 序列化画笔
@@ -73,9 +74,6 @@ void FlowRectElement::serialize(QDataStream &out, const FlowElement &element)
 }
 FlowElement* FlowRectElement::deSerialize(QDataStream& in) {
     //此方法应在子类中被重载
-    // QPointF pos;
-    // qreal rotation;
-    // qreal scale;
 
     // 反序列化通用属性
     // in >> pos >> rotation >> scale;

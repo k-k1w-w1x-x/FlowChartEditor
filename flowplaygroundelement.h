@@ -12,6 +12,8 @@ public:
     FlowPlaygroundElement *deepClone();
     void calArrowDots();
     void resetArrowDots();
+    void serialize(QDataStream &out, const FlowElement &element);
+    static FlowElement* deSerialize(QDataStream& in);
 };
 
 #endif // FLOWPLAYGROUNDELEMENT_H

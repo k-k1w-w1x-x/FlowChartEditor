@@ -170,3 +170,22 @@ QGraphicsRectItem* ElementSerializer::deserializeGraphicsRectItem(QDataStream& i
 
     return item;
 }
+void ElementSerializer::serializeColor(const QColor& color, QDataStream& out) {
+    // 将 QColor 的红色、绿色、蓝色和透明度值序列化
+    out << color.red() << color.green() << color.blue() << color.alpha();
+    qDebug() << "serializeColor" << color;
+}
+QColor ElementSerializer::deserializeColor(QDataStream& in) {
+    int red, green, blue, alpha;
+    in >> red >> green >> blue >> alpha;
+
+    // 检查流状态
+    if (in.status() != QDataStream::Ok) {
+        qWarning() << "Error reading color data from stream";
+        return QColor(); // 返回一个默认的 QColor
+    }
+
+    QColor color(red, green, blue, alpha);
+    qDebug() << "deserializeColor" << color;
+    return color;
+}

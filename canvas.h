@@ -3,15 +3,20 @@
 
 #include <QGraphicsView>
 #include <QGraphicsScene>
-#include "flowelement.h"
-#include "flowsubelement.h"
 #include "graphicstextitem.h"
 #include"keyeventFilter.h"
 #include<zindexmanager.h>
 #include<QFile>
 #include<flowrectelement.h>
 #include "flowarrowelement.h"
-
+#include<flowradiuselement.h>
+#include "flowelement.h"
+#include "flowsubelement.h"
+#include<flowcircleelement.h>
+#include<flowdiamondelement.h>
+#include<flowdocuelement.h>
+#include<flowparaelement.h>
+#include<flowplaygroundelement.h>
 class Canvas : public QGraphicsView
 {
     Q_OBJECT

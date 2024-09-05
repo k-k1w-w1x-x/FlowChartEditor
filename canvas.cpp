@@ -668,7 +668,6 @@ void Canvas::onCopy()
         if (i->isSelected())
         {
             textClipboard.push_back(i->deepClone());
-            qDebug() << 11111;
         }
 
 /*
@@ -849,16 +848,37 @@ void Canvas::importElements(const QString& filename) { // 实现 importElements 
         }
         qsizetype elementCount;
         in >> elementCount;
-        // qDebug()<<elementCount;
+        qDebug()<<elementCount;
         for (int i = 0; i < elementCount; ++i) {
             int type;
             in>>type;
+            qDebug()<<type;
             FlowElement* element;
             if(type==0){
                 element = FlowRectElement::deSerialize(in);
             }
-            // FlowElement* element = new FlowElement();  // 需要根据实际类型创建适当的子类对象
-            // in >> *element;  // 使用重载的 >> 操作符进行反序列化
+            else
+            if(type==1){
+                element = FlowRadiusElement::deSerialize(in);
+            }
+            else if(type==2){
+                element = FlowSubElement::deSerialize(in);
+            }
+            else if(type==3){
+                element = FlowPlaygroundElement::deSerialize(in);
+            }
+            else if(type==4){
+                element = FlowParaElement::deSerialize(in);
+            }
+            else if(type==5){
+                element = FlowDocuElement::deSerialize(in);
+            }
+            else if(type==6){
+                element = FlowDiamondElement::deSerialize(in);
+            }
+            else if(type==7){
+                element = FlowCircleElement::deSerialize(in);
+            }
 
             addShape(element);
             // scene->addItem(element->mainItem);

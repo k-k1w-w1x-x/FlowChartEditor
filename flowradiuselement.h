@@ -8,6 +8,8 @@ public:
     FlowRadiusElement();
     void draw();
     FlowRadiusElement *deepClone();
+    static FlowElement *deSerialize(QDataStream &in);
+    void serialize(QDataStream &out, const FlowElement &element);
 };
 
 #endif // FLOWRADIUSELEMENT_H

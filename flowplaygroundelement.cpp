@@ -145,3 +145,38 @@ void FlowPlaygroundElement::resetArrowDots(){
     arrowDots.at(3)->setX(controlDots[0]->scenePos().x() + (controlDots[0]->scenePos().y() - controlDots[3]->scenePos().y())/2);
     arrowDots.at(3)->setY((controlDots[0]->scenePos().y() + controlDots[3]->scenePos().y())/2);
 }
+void FlowPlaygroundElement::serialize(QDataStream &out, const FlowElement &element)
+{
+    // out << element.pos() << element.rotation() << element.scale();
+    // qDebug()<<element.pos() << element.rotation() << element.scale();
+
+    int type=3;
+    out<<type;
+    qDebug()<<type;
+    ElementSerializer::serializeColor(element.contentColor,out);
+    out<<element.borderDots.size();
+    for(auto dot:element.borderDots){
+        ElementSerializer::serializeGraphicsRectItem(dot,out);
+    }
+}
+FlowElement* FlowPlaygroundElement::deSerialize(QDataStream& in) {
+    //此方法应在子类中被重载
+    FlowPlaygroundElement *cur = new FlowPlaygroundElement();
+    cur->contentColor = ElementSerializer::deserializeColor(in);
+    qsizetype borderDotsSize;
+    in>>borderDotsSize;
+    qDebug()<<borderDotsSize<<" bordersize";
+    cur->borderDots.clear();
+    cur->controlDots.clear();
+    int cont=0;
+    for(int i=0;i<borderDotsSize;i++){
+        cur->borderDots.append(ElementSerializer::deserializeGraphicsRectItem(in));
+        if(cont<4){
+            cont++;
+            cur->controlDots.append(cur->borderDots.last());
+        }
+    }
+    cur->resetArrowDots();
+    cur->draw();
+    return cur;
+}
