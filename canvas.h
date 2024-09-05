@@ -35,6 +35,7 @@ public:
     QGraphicsScene *scene;
     explicit Canvas(QWidget *parent = nullptr);
     void addShape(FlowElement *element);
+    void addGraphicsTextItem(GraphicsTextItem *element);
     void setGridSpacing(int spacing);  // 设置网格间隔
     void setGridColor(const QColor &color);  // 设置网格颜色
     void exportElements(const QString& filename);
@@ -67,6 +68,7 @@ protected:
     void mouseDoubleClickEvent(QMouseEvent *event) override;
     void keyPressEvent(QKeyEvent *event);
     void drawArrows();
+    void recoverFromHistory();
 
 private:
     void drawGrid(QPainter &painter, const QRectF &rect);  // 绘制网格线
@@ -86,11 +88,13 @@ private:
     int clickedControlDot ;
     ZIndexManager* zindexManager;
     int arrowClickedContronDot = 0;
+
     QList<QList<FlowElement*>> elementsHistory;
+    QList<QList<FlowArrowElement*>> arrowsHistory;
     QList<QList<GraphicsTextItem*>> graphicTextItemsHistory;
 
-    QList<QList<FlowElement*>> elementsTemp;
-    QList<QList<GraphicsTextItem*>> graphicTextItemsTemp;
+    int currentHistoryIndex = 0;
+
     bool textEditing = false;
 
 public slots:

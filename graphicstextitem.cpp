@@ -258,7 +258,6 @@ GraphicsTextItem* GraphicsTextItem::deepClone()
     GraphicsTextItem *ret = new GraphicsTextItem(toPlainText());
     ret->setTransform(transform());
     ret->setPos(this->pos());
-    // ret->move(QPointF(10, 10));
     return ret;
 }
 
