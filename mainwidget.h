@@ -84,6 +84,9 @@ private:
     QAction *backgroundAction;
     QAction *back_returnAction;
 
+    QAction *redoAction;
+    QAction *undoAction;
+
     QGridLayout *mainLayout;
     QVBoxLayout *topLayout;
     QVBoxLayout *leftLayout;

@@ -78,11 +78,14 @@ void MainWidget::init_menu_layout() {
     ui->menuWidget->setLayout(ui->menu_layout);
     ui->menu_layout->setMenuBar(menuBar);
 
+    redoAction = new QAction(QIcon(":/menu/redo.png"),"Redo", this);
+    undoAction = new QAction(QIcon(":/menu/undo.png"),"Redo", this);
+
     // 创建菜单
     fileMenu = menuBar->addMenu("File");
     editMenu = menuBar->addMenu("Edit");
-    undoMenu = menuBar->addMenu(QIcon(":/menu/undo.png"),"");
-    redoMenu = menuBar->addMenu(QIcon(":/menu/redo.png"),"");
+    menuBar->addAction(undoAction);
+    menuBar->addAction(redoAction);
 
     // filemenu创建菜单项
     exportAction = new QAction(QIcon(":/menu/export.png"),"Export", this);
@@ -168,8 +171,6 @@ void MainWidget::init_menu_layout() {
         canvas->background_set = false;
         canvas->update();
     });
-    //redo按钮信号!!!!
-    //connect(redoMenu, &QMenu::aboutToShow, this, &QWidget::close);
 
     //Action按钮信号!!!
     //connect(saveAction, &QAction::triggered, this, &QWidget::close);
