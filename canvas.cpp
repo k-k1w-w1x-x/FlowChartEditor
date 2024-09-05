@@ -124,6 +124,7 @@ void Canvas::addGraphicsTextItem(GraphicsTextItem *element)
         textEditing = false;
         pushAll();
     });
+    element->setZValue(998244353);
 }
 
 void Canvas::mousePressEvent(QMouseEvent *event)
@@ -486,9 +487,8 @@ void Canvas::mouseReleaseEvent(QMouseEvent *event)
     for (auto it = dragSelectedElements.rbegin(); it != dragSelectedElements.rend(); ++it) {
         zindexManager->setHighestZindexForItem(*it);
     }
-    for(const auto element:graphicTextItems){
-        if(element->isSelected())
-        zindexManager->setHighestZindexForItem(element);
+    for (auto it = dragSelectedArrows.rbegin(); it != dragSelectedArrows.rend(); ++it) {
+        zindexManager->setHighestZindexForItem(*it);
     }
     if(dragSelectedElements.empty() && dragSelectedArrows.size() == 1){
         FlowArrowElement *clickedArrow = dragSelectedArrows.at(0);
