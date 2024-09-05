@@ -97,7 +97,7 @@ private:
     QList<QList<FlowArrowElement*>> arrowsHistory;
     QList<QList<GraphicsTextItem*>> graphicTextItemsHistory;
 
-    int currentHistoryIndex = 0;
+    int currentHistoryIndex = -1;
 
     bool textEditing = false;
 
