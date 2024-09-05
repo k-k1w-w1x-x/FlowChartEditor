@@ -212,6 +212,12 @@ void Canvas::mousePressEvent(QMouseEvent *event)
     clickscale = false;
     mouseclick = true;
     elementClicked = false;
+    if(altpress && dragSelectedArrows.empty() && dragSelectedElements.size() == 1){
+        QPointF clickedPoint = mapToScene(event->pos());
+        lastMousePosition = clickedPoint;
+        isRotating = true;
+        return;
+    }
     QPointF clickedPoint = mapToScene(event->pos());
     if(isScaling && dragSelectedElements.size() == 1 ){
         qDebug()<<"判断一下";
@@ -335,6 +341,28 @@ void Canvas::mouseMoveEvent(QMouseEvent *event)
     if (textEditing)
     {
         QGraphicsView::mouseMoveEvent(event);
+        return;}
+    if(altpress && isRotating && dragSelectedArrows.empty() && dragSelectedElements.size() == 1){
+        qDebug()<<"start rotate";
+        double centerPosx = 0.0;
+        double centerPosy = 0.0;
+        for(QGraphicsRectItem *controlDot : dragSelectedElements.at(0)->controlDots){
+            centerPosx += controlDot->scenePos().x();
+            centerPosy += controlDot->scenePos().y();
+            qDebug()<<"xxx:"<<controlDot->scenePos().x()<<"yyy:"<<controlDot->scenePos().y();
+        }
+        centerPosx/=4;
+        centerPosy/=4;
+        qDebug()<<"centerPosx"<<centerPosx<<"centerPosy"<<centerPosy;
+        QPointF currentPosition = mapToScene(event->pos());
+        QPointF offset = currentPosition - lastMousePosition;
+        QPointF *centerPoint = new QPointF(0,0);
+        centerPoint->setX(centerPosx);
+        centerPoint->setY(centerPosy);
+        dragSelectedElements.at(0)->myRotate(lastMousePosition,centerPoint,offset.x(),offset.y());
+        lastMousePosition = currentPosition;
+        drawArrows();
+        setCross();
         return;
     }
     if(isArrowing){
@@ -507,6 +535,7 @@ void Canvas::mouseReleaseEvent(QMouseEvent *event)
     if (event->button() == Qt::LeftButton) {
         isDragging = false;
         isScaling = false;
+        isRotating = false;
     }
     setDragMode(QGraphicsView::RubberBandDrag);
     QGraphicsView::mouseReleaseEvent(event);
@@ -1148,6 +1177,21 @@ void Canvas::keyPressEvent(QKeyEvent *event)
         setCross();
     }
     QGraphicsView::keyPressEvent(event);
+    if(event->key() == Qt::Key_Alt){
+        altpress = true;
+    }
+}
+
+void Canvas::keyReleaseEvent(QKeyEvent *event) {
+    // 检查释放的键是否是 Alt 键
+    if (event->key() == Qt::Key_Alt) {
+        altpress = false;
+        // 在这里处理 Alt 键松开后的逻辑
+        qDebug() << "Alt 键松开";
+    }
+
+    // 调用父类的 keyReleaseEvent 以确保其他按键处理逻辑不会丢失
+    QGraphicsView::keyReleaseEvent(event);
 }
 
 double Canvas::Manhattandis(QGraphicsRectItem *p1, QGraphicsRectItem *p2) {

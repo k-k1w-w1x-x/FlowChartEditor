@@ -189,3 +189,14 @@ QColor ElementSerializer::deserializeColor(QDataStream& in) {
     qDebug() << "deserializeColor" << color;
     return color;
 }
+void ElementSerializer::serializeDouble(const double& color, QDataStream& out) {
+
+    out << color;
+    qDebug() << "serializeDouble" << color;
+}
+double ElementSerializer::deserializeDouble(QDataStream& in) {
+    double ans;
+    in >> ans;
+    qDebug() << "deserializeDouble" << ans;
+    return ans;
+}

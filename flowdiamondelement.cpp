@@ -57,28 +57,59 @@ void FlowDiamondElement::draw() {
     mainItem->setPen(pen);
 }
 
-void FlowDiamondElement::mySetScale(int index, double dx, double dy)
+void FlowDiamondElement::mySetScale(int index, double deltax, double deltay)
 {
-    qDebug() << "开始缩放";
-    if (index == 0) {  // 左
-        controlDots.at(0)->moveBy(dx, 0);
-        controlDots.at(3)->moveBy(dx*0.5, 0);
-        controlDots.at(1)->moveBy(dx*0.5, 0);
-    } else if (index == 1) {  // 上
-        controlDots.at(1)->moveBy(0, dy);
-        controlDots.at(2)->moveBy(0, dy*0.5);
-        controlDots.at(0)->moveBy(0, dy*0.5);
-    } else if (index == 2) {  // 右
-        controlDots.at(2)->moveBy(dx, 0);
-        controlDots.at(3)->moveBy(dx*0.5, 0);
-        controlDots.at(1)->moveBy(dx*0.5, 0);
-    }  else if (index == 3) {  // 下
-        controlDots.at(3)->moveBy(0, dy);
-        controlDots.at(2)->moveBy(0, dy*0.5);
-        controlDots.at(0)->moveBy(0, dy*0.5);
-    }
+    QTransform transform;
+    QTransform transform1;
 
-    // 重绘图形
+    QPointF delta(deltax,deltay);
+
+    // double x1 = controlDots.at(0)->x();
+    // double y1 = controlDots.at(0)->y();
+    // double x2 = controlDots.at(1)->x();
+    // double y2 = controlDots.at(1)->y();
+
+    // double costheta = 0 ;
+    // costheta = (x1==x2 && y1==y2)?1:abs(x2 - x1) / (sqrt(pow((x1-x2),2)+pow(y1-y2,2)));
+    // double radians = std::acos(costheta);
+    // // 将弧度转换为角度
+    // double theta = radians * (180.0 / M_PI);
+    double theta = rotangle;
+    qDebug()<<"theta"<<theta;
+    transform.rotate(-theta);
+
+    QPointF transformedPoint = transform.map(delta) ;
+
+    double dx = transformedPoint.x();
+    double dy = transformedPoint.y();
+
+    QPointF q1(dx,0);
+    QPointF q2(0,dy);
+
+    transform1.rotate(theta);
+    q1 = transform1.map(q1) ;
+    q2 = transform1.map(q2) ;
+
+    if(index==0){
+        borderDots.at(0)->moveBy(q1.x(),q1.y());
+        borderDots.at(1)->moveBy(0.5*q1.x(), 0.5*q1.y());
+        borderDots.at(3)->moveBy(0.5*q1.x(), 0.5*q1.y());
+    }
+    if(index==1){
+        borderDots.at(1)->moveBy(q2.x(),q2.y());
+        borderDots.at(0)->moveBy(0.5*q2.x(), 0.5*q2.y());
+        borderDots.at(2)->moveBy(0.5*q2.x(), 0.5*q2.y());
+    }
+    if(index==2){
+        borderDots.at(2)->moveBy(q1.x(),q1.y());
+        borderDots.at(3)->moveBy(0.5*q1.x(),0.5*q1.y());
+        borderDots.at(1)->moveBy(0.5*q1.x(), 0.5*q1.y());
+    }
+    if(index==3){
+        borderDots.at(3)->moveBy(q2.x(),q2.y());
+        borderDots.at(0)->moveBy(0.5*q2.x(), 0.5*q2.y());
+        borderDots.at(2)->moveBy(0.5*q2.x(), 0.5*q2.y());
+    }
     draw();
 }
 FlowDiamondElement *FlowDiamondElement::deepClone()
@@ -94,6 +125,7 @@ FlowDiamondElement *FlowDiamondElement::deepClone()
     clonedElement->mainItem->setPath(this->mainItem->path());
     clonedElement->mainItem->setBrush(this->mainItem->brush());
     clonedElement->mainItem->setPen(this->mainItem->pen());
+    clonedElement->rotangle = this->rotangle;
 
     int cont=0;
     for (QGraphicsRectItem* borderDot : this->borderDots) {
@@ -141,6 +173,7 @@ void FlowDiamondElement::serialize(QDataStream &out, const FlowElement &element)
     int type=6;
     out<<type;
     qDebug()<<type;
+    ElementSerializer::serializeDouble(element.rotangle,out);
     ElementSerializer::serializeColor(element.contentColor,out);
     ElementSerializer::serializeColor(element.borderColor,out);
     out<<element.borderDots.size();
@@ -152,6 +185,8 @@ FlowElement* FlowDiamondElement::deSerialize(QDataStream& in) {
     //此方法应在子类中被重载
 
     FlowDiamondElement *cur = new FlowDiamondElement();
+
+    cur->rotangle = ElementSerializer::deserializeDouble(in);
     cur->contentColor = ElementSerializer::deserializeColor(in);
     cur->borderColor = ElementSerializer::deserializeColor(in);
     qsizetype borderDotsSize;

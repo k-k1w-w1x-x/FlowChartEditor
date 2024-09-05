@@ -48,6 +48,7 @@ public:
     bool mouseclick = false;
     bool elementClicked = false;
     bool isArrowing = false;
+    bool altpress = false;
     QList<FlowElement*> dragSelectedElements ;
     QList<FlowArrowElement*> dragSelectedArrows;
     double Manhattandis(QGraphicsRectItem *p1,QGraphicsRectItem *p2);
@@ -71,6 +72,7 @@ protected:
     void mouseMoveEvent(QMouseEvent *event) override;
     void mouseDoubleClickEvent(QMouseEvent *event) override;
     void keyPressEvent(QKeyEvent *event);
+    void keyReleaseEvent(QKeyEvent *event);
     void drawArrows();
     void updateTextItems();
     void recoverFromHistory();
@@ -88,7 +90,7 @@ private:
     QList<GraphicsTextItem*> graphicTextItems;
     bool isDragging=false;
     bool isScaling=false;
-
+    bool isRotating=false;
     void onFind();
     FlowElement* clickedSelectedElement = nullptr;
     int clickedControlDot ;

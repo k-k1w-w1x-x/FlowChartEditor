@@ -73,7 +73,7 @@ FlowCircleElement *FlowCircleElement::deepClone()
     clonedElement->mainItem->setPath(this->mainItem->path());
     clonedElement->mainItem->setBrush(this->mainItem->brush());
     clonedElement->mainItem->setPen(this->mainItem->pen());
-
+    clonedElement->rotangle = this->rotangle;
     int cont=0;
     for (QGraphicsRectItem* borderDot : this->borderDots) {
         QGraphicsRectItem* newDot = new QGraphicsRectItem(borderDot->rect());
@@ -101,6 +101,7 @@ void FlowCircleElement::serialize(QDataStream &out, const FlowElement &element)
     int type=7;
     out<<type;
     qDebug()<<type;
+    ElementSerializer::serializeDouble(element.rotangle,out);
     ElementSerializer::serializeColor(element.contentColor,out);
     ElementSerializer::serializeColor(element.borderColor,out);
     out<<element.borderDots.size();
@@ -112,6 +113,8 @@ FlowElement* FlowCircleElement::deSerialize(QDataStream& in) {
     //此方法应在子类中被重载
 
     FlowCircleElement *cur = new FlowCircleElement();
+
+    cur->rotangle = ElementSerializer::deserializeDouble(in);
     cur->contentColor = ElementSerializer::deserializeColor(in);
     cur->borderColor = ElementSerializer::deserializeColor(in);
     qsizetype borderDotsSize;
