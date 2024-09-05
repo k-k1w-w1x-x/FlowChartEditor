@@ -68,6 +68,7 @@ protected:
     void mouseDoubleClickEvent(QMouseEvent *event) override;
     void keyPressEvent(QKeyEvent *event);
     void drawArrows();
+    void updateTextItems();
     void recoverFromHistory();
 
 private:

@@ -27,7 +27,7 @@ Canvas::Canvas(QWidget *parent)
     this->installEventFilter(keyEventFilter);
 
     // 初始化ZIndexManager
-    zindexManager = new ZIndexManager();
+    zindexManager = new ZIndexManager(nullptr, &graphicTextItems);
 
     // 连接 KeyEventFilter 的信号到相应的槽函数
     connect(keyEventFilter, &KeyEventFilter::copyTriggered, this, &Canvas::onCopy);
@@ -124,7 +124,6 @@ void Canvas::addGraphicsTextItem(GraphicsTextItem *element)
         textEditing = false;
         pushAll();
     });
-    element->setZValue(998244353);
 }
 
 void Canvas::mousePressEvent(QMouseEvent *event)
@@ -693,7 +692,11 @@ void Canvas::mouseDoubleClickEvent(QMouseEvent *event)
         QGraphicsTextItem *item = qgraphicsitem_cast<QGraphicsTextItem*>(scene->itemAt(pos, QTransform()));
         if (item == nullptr)
         {
-            GraphicsTextItem *textItem = new GraphicsTextItem("Text here.");
+            FlowElement *follow = nullptr;
+            for (auto i :elements)
+                if(i->mainItem->contains(pos))
+                    follow = i;
+            GraphicsTextItem *textItem = new GraphicsTextItem("Text here.", nullptr, follow);
             textItem->setPos(pos);
             addGraphicsTextItem(textItem);
         }
@@ -963,6 +966,27 @@ void Canvas::keyPressEvent(QKeyEvent *event)
     if (event->key() == Qt::Key_Shift) {
 
         qDebug() << "Shift key pressed!";
+        for (auto i : graphicTextItems)
+            if (i->isSelected())
+            {
+                if (i->followElement != nullptr)
+                    continue;
+                QPointF pos = i->pos();
+                pos += QPointF(i->transform().m31(), i->transform().m32());
+                pos += QPointF(i->boundingRect().width() * i->transform().m11() / 2,
+                                i->boundingRect().height() * i->transform().m22() / 2);
+                qreal dis = DBL_MAX;
+                for (auto element : elements)
+                {
+                    QPointF center = (element->controlDots.at(0)->pos() + element->controlDots.at(2)->pos()) / 2;
+                    if ((center.x() - pos.x()) * (center.x() - pos.x()) + (center.y() - pos.y()) * (center.y() - pos.y()) < dis)
+                    {
+                        i->followElement = element;
+                        dis = (center.x() - pos.x()) * (center.x() - pos.x()) + (center.y() - pos.y()) * (center.y() - pos.y());
+                    }
+                }
+            }
+        updateTextItems();
         for(FlowArrowElement *arrow : arrows){
             if(arrow->mainItem->isSelected()){
                 qDebug()<<"看看锁谁的";
@@ -1023,9 +1047,16 @@ double Canvas::Manhattandis(QGraphicsRectItem *p1,QGraphicsRectItem *p2){
 }
 
 void Canvas::drawArrows(){
+    updateTextItems();
     for(FlowArrowElement *arrow:arrows){
         arrow->draw();
     }
+}
+
+void Canvas::updateTextItems()
+{
+    for (auto i : graphicTextItems)
+        i->follow();
 }
 
 void Canvas::setCross(){

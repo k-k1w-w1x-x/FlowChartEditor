@@ -1,10 +1,11 @@
 #include "zindexmanager.h"
 
-ZIndexManager::ZIndexManager(QObject *parent ) : QObject(parent) {}
+ZIndexManager::ZIndexManager(QObject *parent, QList<GraphicsTextItem*> *graphicTextItems)
+    : QObject(parent), gTextItems(graphicTextItems){}
 
 void ZIndexManager::setHighestZindexForItem(FlowElement *flowelement)
 {
-    ++maxZIndex;
+    maxZIndex += 2;
     flowelement->mainItem->setZValue(maxZIndex);
     if(FlowSubElement* subElement = dynamic_cast<FlowSubElement*>(flowelement)){
         subElement->innerItem->setZValue(maxZIndex);
@@ -15,9 +16,15 @@ void ZIndexManager::setHighestZindexForItem(FlowElement *flowelement)
     for(const auto&dot:flowelement->arrowDots){
         dot->setZValue(maxZIndex);
     }
+    for (auto i : *gTextItems)
+        if (i->followElement == flowelement)
+            i->setZValue(maxZIndex + 1);
 };
 void ZIndexManager::setHighestZindexForItem(GraphicsTextItem *textelement)
 {
-    ++maxZIndex;
-    textelement->setZValue(maxZIndex);
+    if (textelement->followElement == nullptr)
+    {
+        maxZIndex += 2;
+        textelement->setZValue(maxZIndex);
+    }
 };

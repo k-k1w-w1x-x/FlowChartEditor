@@ -13,7 +13,7 @@ class ZIndexManager : public QObject {
 
 public:
     // 构造函数
-    explicit ZIndexManager(QObject *parent = nullptr);
+    explicit ZIndexManager(QObject *parent = nullptr, QList<GraphicsTextItem*> *graphicTextItems = nullptr);
 
     // // 添加一个 QGraphicsItem，并设置它的 z-index
     void setHighestZindexForItem(FlowElement* flowelement);
@@ -23,6 +23,7 @@ public:
 
 private:
     qreal maxZIndex=0;
+    QList<GraphicsTextItem*> *gTextItems;
 };
 
 #endif // ZINDEXMANAGER_H
