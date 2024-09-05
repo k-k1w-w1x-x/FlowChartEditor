@@ -91,13 +91,13 @@ void MainWidget::init_menu_layout() {
     connect(saveAction, &QAction::triggered, [=](){
         QString filePath = QFileDialog::getOpenFileName(this, "选择", "", "All Files (*)");
         if (!filePath.isEmpty()) {
-            qDebug() << filePath;
+            // qDebug() << filePath;
         }
     });
     connect(openAction, &QAction::triggered, [=](){
         QString filePath = QFileDialog::getOpenFileName(this, "选择打开文件", "", "All Files (*)");
         if (!filePath.isEmpty()) {
-            qDebug() << filePath;
+            // qDebug() << filePath;
         }
     });
     connect(exportAction, &QAction::triggered, [=](){
@@ -149,7 +149,7 @@ void MainWidget::init_menu_layout() {
             "",
             "Image Files (*.png *.jpg *.bmp *.jpeg)");
         if (!filePath.isEmpty()) {
-            qDebug() << filePath;
+            // qDebug() << filePath;
             canvas->background_path = filePath;
             canvas->background_set = true;
             canvas->update();//update会调用drawbackground方法
@@ -178,6 +178,12 @@ void MainWidget::init_left_button() {
     connect(ui->rect_button, &QPushButton::clicked, [=](){
         FlowRectElement* rectElement = new FlowRectElement();
         canvas->addShape(rectElement);
+    });
+    connect(ui->rect_button, &QPushButton::pressed, [=]() {
+        ui->rect_button->setStyleSheet("background-color: lightgrey;");
+    });
+    connect(ui->rect_button, &QPushButton::pressed, [=]() {
+        ui->rect_button->setStyleSheet("background-color: white;");
     });
 
     //文档矩形
@@ -256,6 +262,16 @@ void MainWidget::init_left_button() {
     QIcon icon9(":/type/arrow.png");
     ui->arrow_button->setIcon(icon9);
     ui->arrow_button->setIconSize(QSize(32, 32));
+    connect(ui->arrow_button, &QPushButton::clicked, [=](){
+        if (!arrow_flag) {
+            ui->arrow_button->setStyleSheet("background-color: lightgrey;");
+            arrow_flag = !arrow_flag;
+        }
+        else {
+            ui->arrow_button->setStyleSheet("background-color: white;");
+            arrow_flag = !arrow_flag;
+        }
+    });
 
 }
 

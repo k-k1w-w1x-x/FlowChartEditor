@@ -57,7 +57,7 @@ private:
 
     Ui::MainWidget *ui;
 
-    // bool arrow_flag = true;
+    bool arrow_flag = false;
 
     QVBoxLayout *sidebarLayout;
     QPushButton *rectangleButton;

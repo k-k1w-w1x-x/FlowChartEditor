@@ -391,6 +391,7 @@ void Canvas::onCopy()
     // 遍历选中的图形项，并将它们深拷贝
     for (const auto &item : SelectedElementTemp) {
         FlowElement *clonedElement = item->deepClone(); // 深拷贝元素
+        clonedElement->move(10,10);
         clipboard.append(clonedElement);
     }
 
@@ -398,7 +399,6 @@ void Canvas::onCopy()
         if (i->isSelected())
         {
             textClipboard.push_back(i->deepClone());
-            qDebug() << 11111;
         }
 
 /*
@@ -429,12 +429,11 @@ void Canvas::onPaste() {
     // 遍历剪切板中的元素
     for (FlowElement* element : clipboard) {
         FlowElement* clonedElement = element->deepClone(); // 深拷贝元素
-        // clipboard.clear();
-        // clipboard.append(clonedElement);
+        clipboard.append(clonedElement);
         if (clonedElement) {
             // 将粘贴的元素稍微偏移位置
             clonedElement->move(10, 10); // 向右下偏移 10 像素
-            addShape(clonedElement); // 将深拷贝的元素添加到场景中
+            addShape(element); // 将深拷贝的元素添加到场景中
             qDebug() << "粘贴了一个元素";
         } else {
             qDebug() << "deepClone 失败，无法粘贴该元素";
