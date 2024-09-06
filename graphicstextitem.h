@@ -33,6 +33,9 @@ protected:
 signals:
     void enterTextEditor();
     void leaveTextEditor();
+    void enterTextResize();
+    void leaveTextResize();
+    void textMoved();
 
 private:
     int scaling, resizing;
@@ -40,6 +43,7 @@ private:
     QTransform initialTransform;
     qreal initialWidth, initialHeight;
     bool first = false;
+    bool moved = 0;
 };
 
 #endif // GRAPHICSTEXTITEM_H

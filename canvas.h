@@ -104,6 +104,7 @@ private:
     int currentHistoryIndex = -1;
 
     bool textEditing = false;
+    bool textResizing = false;
 
 public slots:
     void onColorButtonClicked();
