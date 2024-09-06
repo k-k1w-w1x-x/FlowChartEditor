@@ -226,7 +226,6 @@ void FlowElement::resetArrowDots(){
 }
 
 bool* FlowElement::inBorder(int idx){
-
     qDebug()<<"判断越界";
     int oppIdx = (idx+2) % 4;
     if(idx == 0){//左上

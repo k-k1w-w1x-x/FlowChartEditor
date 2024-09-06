@@ -258,7 +258,47 @@ GraphicsTextItem* GraphicsTextItem::deepClone()
     GraphicsTextItem *ret = new GraphicsTextItem(toPlainText());
     ret->setTransform(transform());
     ret->setPos(this->pos());
+
     return ret;
+}
+
+void GraphicsTextItem::serialize(QDataStream &out, const GraphicsTextItem &element)
+{
+    // int type=9;
+    // out<<type;
+    out << this->toPlainText();
+    out << this->transform();
+    out << this->pos();
+    qDebug() << "serializeGraphicsTextItem:"
+             << "Text:" << this->toPlainText()
+             << "Transform:" << this->transform()
+             << "Position:" << this->pos();
+}
+GraphicsTextItem* GraphicsTextItem::deSerialize(QDataStream &in) {
+    // 创建一个新的 GraphicsTextItem 对象
+    GraphicsTextItem *cur = new GraphicsTextItem("");
+
+    // 反序列化文本内容
+    QString text;
+    in >> text;
+    cur->setPlainText(text);
+
+    // 反序列化变换矩阵
+    QTransform transform;
+    in >> transform;
+    cur->setTransform(transform);
+
+    // 反序列化位置
+    QPointF position;
+    in >> position;
+    cur->setPos(position);
+
+    qDebug() << "deSerializeGraphicsTextItem:"
+             << "Text:" << text
+             << "Transform:" << transform
+             << "Position:" << position;
+
+    return cur;
 }
 
 #endif // GRAPHICSTEXTITEM_CPP

@@ -837,6 +837,10 @@ void Canvas::exportElements(const QString& filename) {
         for (FlowElement* element : arrows) {
             element->serialize(out,*element);
         }
+        out<< graphicTextItems.size();
+        for(auto text:graphicTextItems){
+            text->serialize(out,text);
+        }
 
         file.close();
     } else {
@@ -884,7 +888,7 @@ void Canvas::importElements(const QString& filename) { // 实现 importElements 
                 delete i;
         }
 
-        qsizetype elementCount;
+        qsizetype elementCount,textCount;
         in >> elementCount;
         qDebug()<<elementCount;
         for (int i = 0; i < elementCount; ++i) {
@@ -922,6 +926,11 @@ void Canvas::importElements(const QString& filename) { // 实现 importElements 
             }
 
             addShape(element);
+        }
+        in>>textCount;
+        for(int i=0;i<textCount;i++){
+            GraphicsTextItem* text = GraphicsTextItem::deSerialize(in);
+            addGraphicsTextItem(text);
         }
 
         file.close();

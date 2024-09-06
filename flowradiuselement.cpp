@@ -124,6 +124,5 @@ FlowElement* FlowRadiusElement::deSerialize(QDataStream& in) {
     }
     cur->resetArrowDots();
     cur->draw();
-
     return cur;
 }
