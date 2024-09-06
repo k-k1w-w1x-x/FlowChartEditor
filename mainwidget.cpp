@@ -304,6 +304,10 @@ void MainWidget::init_left_button() {
         }
         if(canvas->isLining){
             canvas->isLining = false;
+            if(!canvas->arrows.empty()&&(canvas->arrows.last()->endDot->scenePos().x()==0)&&(canvas->arrows.last()->endDot->scenePos().y()==0)){
+                delete canvas->arrows.last();
+                canvas->arrows.removeLast();
+            }
         }
         canvas->isArrowing=!canvas->isArrowing;
         if(!canvas->isArrowing && !canvas->arrows.empty() && canvas->arrows.last()->endDot->scenePos().x() == 0 && canvas->arrows.last()->endDot->scenePos().y() == 0){
@@ -356,6 +360,10 @@ void MainWidget::init_left_button() {
         }
         if(canvas->isArrowing){
             canvas->isArrowing = false;
+            if(!canvas->arrows.empty()&&(canvas->arrows.last()->endDot->scenePos().x()==0)&&(canvas->arrows.last()->endDot->scenePos().y()==0)){
+                delete canvas->arrows.last();
+                canvas->arrows.removeLast();
+            }
         }
         canvas->isLining=!canvas->isLining;
         if(!canvas->isLining && !canvas->arrows.empty() && canvas->arrows.last()->endDot->scenePos().x() == 0 && canvas->arrows.last()->endDot->scenePos().y() == 0){
