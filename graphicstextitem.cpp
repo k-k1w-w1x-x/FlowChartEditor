@@ -184,8 +184,8 @@ void GraphicsTextItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
             }
             QTransform transform;
             transform.translate(deltax, deltay);
-            transform.scale(qMax(width / initialWidth * initialTransform.m11(), 1.5),
-                            qMax(height / initialHeight * initialTransform.m22(), 1.5));
+            transform.scale(qMax(width / initialWidth * initialTransform.m11(), 1.0),
+                            qMax(height / initialHeight * initialTransform.m22(), 1.0));
             setTransform(transform);
             update();
         }
@@ -202,8 +202,8 @@ void GraphicsTextItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
             }
             QTransform transform;
             transform.translate(deltax, deltay);
-            transform.scale(qMax(width / initialWidth * initialTransform.m11(), 1.5),
-                            qMax(height / initialHeight * initialTransform.m22(), 1.5));
+            transform.scale(qMax(width / initialWidth * initialTransform.m11(), 1.0),
+                            qMax(height / initialHeight * initialTransform.m22(), 1.0));
             setTransform(transform);
             update();
         }
@@ -220,8 +220,8 @@ void GraphicsTextItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
             }
             QTransform transform;
             transform.translate(deltax, deltay);
-            transform.scale(qMax(width / initialWidth * initialTransform.m11(), 1.5),
-                            qMax(height / initialHeight * initialTransform.m22(), 1.5));
+            transform.scale(qMax(width / initialWidth * initialTransform.m11(), 1.0),
+                            qMax(height / initialHeight * initialTransform.m22(), 1.0));
             setTransform(transform);
             update();
         }
@@ -233,8 +233,8 @@ void GraphicsTextItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
                 height += pos.y() - initialScenePos.y();
             QTransform transform;
             transform.translate(deltax, deltay);
-            transform.scale(qMax(width / initialWidth * initialTransform.m11(), 1.5),
-                            qMax(height / initialHeight * initialTransform.m22(), 1.5));
+            transform.scale(qMax(width / initialWidth * initialTransform.m11(), 1.0),
+                            qMax(height / initialHeight * initialTransform.m22(), 1.0));
             setTransform(transform);
             update();
         }

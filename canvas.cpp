@@ -166,6 +166,7 @@ void Canvas::addGraphicsTextItem(GraphicsTextItem *element)
     connect(element, &GraphicsTextItem::textMoved, this, [=](){
         pushAll();
     });
+    zindexManager->setHighestZindexForItem(element);
 }
 
 void Canvas::autoAdsorption()
