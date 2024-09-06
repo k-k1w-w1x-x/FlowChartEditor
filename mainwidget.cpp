@@ -52,6 +52,11 @@ MainWidget::MainWidget(QWidget *parent)
     init_menu_layout();
 }
 
+void MainWidget::closeEvent(QCloseEvent *event) {
+    canvas->exportElements("TEMP.dat");
+    QWidget::closeEvent(event);
+}
+
 void MainWidget::init_menu_layout() {
     //填充color按钮
     ui->color_button->setFixedSize(40,40);
@@ -143,7 +148,8 @@ void MainWidget::init_menu_layout() {
     fileMenu->addAction(exitAction);
     //退出增加保存操作
     connect(exitAction, &QAction::triggered, [=](){
-        //保存操作
+        canvas->exportElements("TEMP.dat");
+        this->close();
     });
 
     // editmenu创建菜单项
@@ -233,7 +239,7 @@ void MainWidget::init_left_button() {
         canvas->pushAll();
     });
 
-    //// 圆形
+    // 圆形 //
     ui->circle_button->setFixedSize(60,50);
     QIcon icon5(":/type/circle.png");
     ui->circle_button->setIcon(icon5);

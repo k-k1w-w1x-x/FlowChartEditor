@@ -37,7 +37,7 @@ public:
     void init_top_button();
     void init_menu_layout();
     void outputSvg();
-
+    void closeEvent(QCloseEvent *event) override ;
     void onExportButtonClicked();
     void onImportButtonClicked();
 private slots:
