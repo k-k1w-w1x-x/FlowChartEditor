@@ -233,7 +233,7 @@ void MainWidget::init_left_button() {
         canvas->pushAll();
     });
 
-    //圆形
+    //// 圆形
     ui->circle_button->setFixedSize(60,50);
     QIcon icon5(":/type/circle.png");
     ui->circle_button->setIcon(icon5);
