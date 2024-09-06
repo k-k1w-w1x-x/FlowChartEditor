@@ -19,6 +19,7 @@ signals:
     void redoTriggered();
     void findTriggered();
     void deleteTriggered();
+    void cutTriggered();
 
 protected:
     bool eventFilter(QObject *obj, QEvent *event) override;

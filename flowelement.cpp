@@ -2,6 +2,7 @@
 #include <QPainter>
 #include <QDebug>
 #define DOT_SIZE 5
+#define MIN_DISTANCE 0.0000001
 FlowElement::FlowElement() {
     mainItem = new QGraphicsPathItem(this);
 }
@@ -71,106 +72,136 @@ QRectF FlowElement::boundingRect() const {
     return QRectF(150, 100, 100, 100);  // 根据你的需求调整大小和位置
 }
 
-void FlowElement::mySetScale(int index,double dx,double dy)//默认4个控制点，如果不是需要重写，规定从左上角开始顺时针
+void FlowElement::mySetScale(int index,double deltax,double deltay)//默认4个控制点，如果不是需要重写，规定从左上角开始顺时针
 {
     qDebug()<<"开始缩放";
-    if(!inBorder(index)[0]||!inBorder(index)[1])//若越界
-    {
-        qDebug()<<"越界了";
-        int oppIdx = (index+2) % 4;//对角点
-        if((!inBorder(index)[0])&&(!inBorder(index)[1])){//xy都越界
-            qDebug()<<"xy都越界";
-            dx = deltax[index];
-            dy = deltay[index];
-            double x = controlDots.at(oppIdx)->scenePos().x();
-            double y = controlDots.at(oppIdx)->scenePos().y();
-            controlDots.at(index)->setPos(x+dx,y+dy);
-            if(index==0){
-                borderDots.at(1)->setPos(x+0, y+dy);
-                borderDots.at(3)->setPos(x+dx, y+0);
-            }
-            if(index==1){
-                borderDots.at(0)->setPos(x+0, y+dy);
-                borderDots.at(2)->setPos(x+dx, y+0);
-            }
-            if(index==2){
-                borderDots.at(3)->setPos(x+0, y+dy);
-                borderDots.at(1)->setPos(x+dx, y+0);
-            }
-            if(index==3){
-                borderDots.at(2)->setPos(x+0, y+dy);
-                borderDots.at(0)->setPos(x+dx, y+0);
-            }
-        }
-        else if(!inBorder(index)[0]&&inBorder(index)[1]){//仅x越界
-            qDebug()<<"仅x越界";
-            dx = deltax[index];
-            double x = controlDots.at(oppIdx)->scenePos().x();
-            double y = controlDots.at(index)->scenePos().y();
-            double oppY = controlDots.at(oppIdx)->scenePos().y();
-            controlDots.at(index)->setPos(x+dx,y+dy);
-            if(index==0){
-                borderDots.at(1)->setPos(x+0, y+dy);
-                borderDots.at(3)->setPos(x+dx, oppY+0);
-            }
-            if(index==1){
-                borderDots.at(0)->setPos(x+0, y+dy);
-                borderDots.at(2)->setPos(x+dx, oppY+0);
-            }
-            if(index==2){
-                borderDots.at(3)->setPos(x+0, y+dy);
-                borderDots.at(1)->setPos(x+dx, oppY+0);
-            }
-            if(index==3){
-                borderDots.at(2)->setPos(x+0, y+dy);
-                borderDots.at(0)->setPos(x+dx, oppY+0);
-            }
-        }
-        else if(inBorder(index)[0] && !inBorder(index)[1]){//仅y越界
-            qDebug()<<"y越界";
-            dy = deltay[index];
-            double x=controlDots.at(index)->scenePos().x();
-            double oppX=controlDots.at(oppIdx)->scenePos().x();
-            double y=controlDots.at(oppIdx)->scenePos().y();
-            controlDots.at(index)->setPos(x+dx,y+dy);
-            if(index==0){
-                borderDots.at(1)->setPos(oppX+0, y+dy);
-                borderDots.at(3)->setPos(x+dx, y+0);
-            }
-            if(index==1){
-                borderDots.at(0)->setPos(oppX+0, y+dy);
-                borderDots.at(2)->setPos(x+dx, y+0);
-            }
-            if(index==2){
-                borderDots.at(3)->setPos(oppX+0, y+dy);
-                borderDots.at(1)->setPos(x+dx, y+0);
-            }
-            if(index==3){
-                borderDots.at(2)->setPos(oppX+0, y+dy);
-                borderDots.at(0)->setPos(x+dx, y+0);
-            }
-        }
-        draw();
-        return;
-    }
-    qDebug()<<"正常缩放";
+    // if(!inBorder(index)[0]||!inBorder(index)[1])//若越界
+    // {
+    //     qDebug()<<"越界了";
+    //     int oppIdx = (index+2) % 4;//对角点
+    //     if((!inBorder(index)[0])&&(!inBorder(index)[1])){//xy都越界
+    //         qDebug()<<"xy都越界";
+    //         dx = deltax[index];
+    //         dy = deltay[index];
+    //         double x = controlDots.at(oppIdx)->scenePos().x();
+    //         double y = controlDots.at(oppIdx)->scenePos().y();
+    //         controlDots.at(index)->setPos(x+dx,y+dy);
+    //         if(index==0){
+    //             borderDots.at(1)->setPos(x+0, y+dy);
+    //             borderDots.at(3)->setPos(x+dx, y+0);
+    //         }
+    //         if(index==1){
+    //             borderDots.at(0)->setPos(x+0, y+dy);
+    //             borderDots.at(2)->setPos(x+dx, y+0);
+    //         }
+    //         if(index==2){
+    //             borderDots.at(3)->setPos(x+0, y+dy);
+    //             borderDots.at(1)->setPos(x+dx, y+0);
+    //         }
+    //         if(index==3){
+    //             borderDots.at(2)->setPos(x+0, y+dy);
+    //             borderDots.at(0)->setPos(x+dx, y+0);
+    //         }
+    //     }
+    //     else if(!inBorder(index)[0]&&inBorder(index)[1]){//仅x越界
+    //         qDebug()<<"仅x越界";
+    //         dx = deltax[index];
+    //         double x = controlDots.at(oppIdx)->scenePos().x();
+    //         double y = controlDots.at(index)->scenePos().y();
+    //         double oppY = controlDots.at(oppIdx)->scenePos().y();
+    //         controlDots.at(index)->setPos(x+dx,y+dy);
+    //         if(index==0){
+    //             borderDots.at(1)->setPos(x+0, y+dy);
+    //             borderDots.at(3)->setPos(x+dx, oppY+0);
+    //         }
+    //         if(index==1){
+    //             borderDots.at(0)->setPos(x+0, y+dy);
+    //             borderDots.at(2)->setPos(x+dx, oppY+0);
+    //         }
+    //         if(index==2){
+    //             borderDots.at(3)->setPos(x+0, y+dy);
+    //             borderDots.at(1)->setPos(x+dx, oppY+0);
+    //         }
+    //         if(index==3){
+    //             borderDots.at(2)->setPos(x+0, y+dy);
+    //             borderDots.at(0)->setPos(x+dx, oppY+0);
+    //         }
+    //     }
+    //     else if(inBorder(index)[0] && !inBorder(index)[1]){//仅y越界
+    //         qDebug()<<"y越界";
+    //         dy = deltay[index];
+    //         double x=controlDots.at(index)->scenePos().x();
+    //         double oppX=controlDots.at(oppIdx)->scenePos().x();
+    //         double y=controlDots.at(oppIdx)->scenePos().y();
+    //         controlDots.at(index)->setPos(x+dx,y+dy);
+    //         if(index==0){
+    //             borderDots.at(1)->setPos(oppX+0, y+dy);
+    //             borderDots.at(3)->setPos(x+dx, y+0);
+    //         }
+    //         if(index==1){
+    //             borderDots.at(0)->setPos(oppX+0, y+dy);
+    //             borderDots.at(2)->setPos(x+dx, y+0);
+    //         }
+    //         if(index==2){
+    //             borderDots.at(3)->setPos(oppX+0, y+dy);
+    //             borderDots.at(1)->setPos(x+dx, y+0);
+    //         }
+    //         if(index==3){
+    //             borderDots.at(2)->setPos(oppX+0, y+dy);
+    //             borderDots.at(0)->setPos(x+dx, y+0);
+    //         }
+    //     }
+    //     draw();
+    //     return;
+    // }
+    qDebug()<<"index:"<<index;
+    borderDots.at(index)->moveBy(deltax,deltay);
 
-    controlDots.at(index)->moveBy(dx, dy);
+    QTransform transform;
+    QTransform transform1;
+
+    QPointF delta(deltax,deltay);
+
+    // double x1 = controlDots.at(0)->x();
+    // double y1 = controlDots.at(0)->y();
+    // double x2 = controlDots.at(1)->x();
+    // double y2 = controlDots.at(1)->y();
+
+    // double costheta = 0 ;
+    // costheta = (x1==x2 && y1==y2)?1:abs(x2 - x1) / (sqrt(pow((x1-x2),2)+pow(y1-y2,2)));
+    // double radians = std::acos(costheta);
+    // // 将弧度转换为角度
+    // double theta = radians * (180.0 / M_PI);
+    double theta = rotangle;
+    qDebug()<<"theta"<<theta;
+    transform.rotate(-theta);
+
+    QPointF transformedPoint = transform.map(delta) ;
+
+    double dx = transformedPoint.x();
+    double dy = transformedPoint.y();
+
+    QPointF q1(dx,0);
+    QPointF q2(0,dy);
+    transform1.rotate(theta);
+    q1 = transform1.map(q1) ;
+    q2 = transform1.map(q2) ;
+
     if(index==0){
-        borderDots.at(1)->moveBy(0, dy);
-        borderDots.at(3)->moveBy(dx, 0);
+        borderDots.at(1)->moveBy(q2.x(), q2.y());
+        borderDots.at(3)->moveBy(q1.x(), q1.y());
     }
     if(index==1){
-        borderDots.at(0)->moveBy(0, dy);
-        borderDots.at(2)->moveBy(dx, 0);
+        borderDots.at(0)->moveBy(q2.x(), q2.y());
+        borderDots.at(2)->moveBy(q1.x(), q1.y());
     }
     if(index==2){
-        borderDots.at(3)->moveBy(0, dy);
-        borderDots.at(1)->moveBy(dx, 0);
+        borderDots.at(3)->moveBy(q2.x(), q2.y());
+        borderDots.at(1)->moveBy(q1.x(), q1.y());
     }
     if(index==3){
-        borderDots.at(2)->moveBy(0, dy);
-        borderDots.at(0)->moveBy(dx, 0);
+        borderDots.at(2)->moveBy(q2.x(), q2.y());
+        borderDots.at(0)->moveBy(q1.x(), q1.y());
     }
     draw();
 }
@@ -225,28 +256,110 @@ void FlowElement::resetArrowDots(){
     }
 }
 
-bool* FlowElement::inBorder(int idx){
-    qDebug()<<"判断越界";
-    int oppIdx = (idx+2) % 4;
-    if(idx == 0){//左上
-        isInBorder[0]= controlDots[idx]->scenePos().x() <= controlDots[oppIdx]->scenePos().x();
-        isInBorder[1]= controlDots[idx]->scenePos().y() <= controlDots[oppIdx]->scenePos().y();
-        return(isInBorder);
+// bool* FlowElement::inBorder(int idx){
+
+//     qDebug()<<"判断越界";
+//     int oppIdx = (idx+2) % 4;
+//     if(idx == 0){//左上
+//         isInBorder[0]= controlDots[idx]->scenePos().x() <= controlDots[oppIdx]->scenePos().x();
+//         isInBorder[1]= controlDots[idx]->scenePos().y() <= controlDots[oppIdx]->scenePos().y();
+//         return(isInBorder);
+//     }
+//     if(idx == 1){//右上
+//         isInBorder[0]= controlDots[idx]->scenePos().x() >= controlDots[oppIdx]->scenePos().x();
+//         isInBorder[1]= controlDots[idx]->scenePos().y() <= controlDots[oppIdx]->scenePos().y();
+//         return(isInBorder);
+//     }
+//     if(idx == 2){//右下
+//         isInBorder[0]=controlDots[idx]->scenePos().x() >= controlDots[oppIdx]->scenePos().x();
+//         isInBorder[1]=controlDots[idx]->scenePos().y() >= controlDots[oppIdx]->scenePos().y();
+//         qDebug()<<"true???"<<isInBorder[0]<<isInBorder[1];
+//         return(isInBorder);
+//     }
+//     if(idx == 3){//左下
+//         isInBorder[0]=controlDots[idx]->scenePos().x() <= controlDots[oppIdx]->scenePos().x();
+//         isInBorder[1]=controlDots[idx]->scenePos().y() >= controlDots[oppIdx]->scenePos().y();
+//         return(isInBorder);
+//     }
+// }
+
+void FlowElement::myRotate(QPointF mousePos,QPointF *centerPos,double dx,double dy){
+    bool fail = false;
+
+    double sqr1 = pow((mousePos.x()- centerPos->x()),2) + pow((mousePos.y()- centerPos->y()),2);
+    double sqr2 = pow((mousePos.x()+ dx - centerPos->x()),2) + pow((mousePos.y() + dy - centerPos->y()),2);
+    double sqr3 = pow(dx,2) + pow(dy,2);
+    if(sqr1*sqr2 < MIN_DISTANCE){
+        qDebug()<<"归零";
+        return;
     }
-    if(idx == 1){//右上
-        isInBorder[0]= controlDots[idx]->scenePos().x() >= controlDots[oppIdx]->scenePos().x();
-        isInBorder[1]= controlDots[idx]->scenePos().y() <= controlDots[oppIdx]->scenePos().y();
-        return(isInBorder);
-    }
-    if(idx == 2){//右下
-        isInBorder[0]=controlDots[idx]->scenePos().x() >= controlDots[oppIdx]->scenePos().x();
-        isInBorder[1]=controlDots[idx]->scenePos().y() >= controlDots[oppIdx]->scenePos().y();
-        qDebug()<<"true???"<<isInBorder[0]<<isInBorder[1];
-        return(isInBorder);
-    }
-    if(idx == 3){//左下
-        isInBorder[0]=controlDots[idx]->scenePos().x() <= controlDots[oppIdx]->scenePos().x();
-        isInBorder[1]=controlDots[idx]->scenePos().y() >= controlDots[oppIdx]->scenePos().y();
-        return(isInBorder);
-    }
+    double costheta = (sqr1 + sqr2 - sqr3) / (2 * sqrt(sqr1 * sqr2));
+    double sintheta = sqrt(1 - costheta*costheta);
+    double radians = std::acos(costheta);
+    // 将弧度转换为角度
+    double theta = radians * (180.0 / M_PI);
+    qDebug()<<"theta:"<<theta;
+    // if(sqr1<=MIN_DISTANCE||sqr2<=MIN_DISTANCE){
+    //     qDebug()<<"归零";
+    //     return;
+    // }
+    rotate(theta);
+    qDebug()<<"dx:"<<dx<<"dy:"<<dy;
+    qDebug()<<"centerx:"<<centerPos->x()<<"centery:"<<centerPos->y();
+    // for(QGraphicsRectItem *borderDot : borderDots){
+    //     double x1=centerPos->x()-borderDot->x();
+    //     double y1=borderDot->y()-centerPos->y();
+    //     double r = sqrt(pow(x1,2)+pow(y1,2));
+    //     if(r == 0){
+    //         fail =true;
+    //     }
+    //     qDebug()<<"x1:"<<borderDot->x()<<"y1:"<<borderDot->y();
+    //     double cosalpha = x1 / r;
+    //     double sinalpha = y1 / r;
+    //     qDebug()<<"cosalpha:"<<cosalpha<<"sinalpha:"<<sinalpha;
+    //     double costhetaplusalpha = costheta*cosalpha - sintheta*sinalpha;
+    //     double sinthetaplusalpha = sintheta*cosalpha + costheta*sinalpha;
+    //     qDebug()<<"costhetaplusalpha:"<<costhetaplusalpha<<"sinthetaplusalpha:"<<sinthetaplusalpha;
+    //     double newdx = x1 - r*costhetaplusalpha;
+    //     double newdy = r*sinthetaplusalpha - y1;
+    //     qDebug()<<"newdx:"<<newdx<<"newdy:"<<newdy;
+    //     borderDot->moveBy(newdx,newdy);
+    // }
+    // if(!fail){
+    //     draw();
+    // }
+
 }
+
+
+void FlowElement::rotate(double angleDegrees) {
+    // 计算图形的中心
+    QPointF center(0, 0);
+    for (QGraphicsRectItem *dot : controlDots) {
+        center += dot->scenePos();
+    }
+    center /= controlDots.size();  // 平均值作为中心
+    QTransform transform;
+
+    transform.translate(center.x(), center.y());    // 平移到中心点
+    qDebug()<<angleDegrees;
+    transform.rotate(angleDegrees);               // 旋转
+    transform.translate(-center.x(), -center.y());  // 平移回原始坐标系
+    rotangle += angleDegrees;
+    // 旋转所有控制点
+    // for (QGraphicsRectItem *dot : controlDots) {
+    //     QPointF newPos = transform.map(dot->scenePos());
+    //     dot->setPos(newPos);
+    // }
+
+    // 旋转所有边界点
+    for (QGraphicsRectItem *dot : borderDots) {
+        QPointF newPos = transform.map(dot->scenePos());
+        qDebug()<<newPos;
+        dot->setPos(newPos);
+    }
+
+    // 重新绘制图形
+    draw();
+}
+

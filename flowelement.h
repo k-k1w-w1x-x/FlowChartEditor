@@ -29,9 +29,9 @@ public:
     QVector<QGraphicsRectItem*> arrowDots;
     bool selected = false;
     QColor contentColor = Qt::white;
-    int deltax[4]={-3,3,3,-3};
-    int deltay[4]={-3,-3,3,3};
-    bool isInBorder[2]={true,true};
+    // int deltax[4]={-3,3,3,-3};
+    // int deltay[4]={-3,-3,3,3};
+    // bool isInBorder[2]={true,true};
     QColor borderColor = Qt::black;
 
     virtual QRectF boundingRect() const override; // 定义边界矩形
@@ -40,9 +40,12 @@ public:
     virtual void serialize(QDataStream& out, const FlowElement& element){};
     static FlowElement* deSerialize(QDataStream& in) ;
     virtual void mySetScale(int index,double dx,double dy) ; //放大缩小 重命名了scale()函数
-    bool* inBorder(int idx);
+    // bool* inBorder(int idx);
     void calArrowDots();
     void resetArrowDots();
+    void myRotate(QPointF mousePos,QPointF *centerPos,double dx,double dy);
+    void rotate(double angleDegrees);
+    double rotangle;
 
 protected:
 

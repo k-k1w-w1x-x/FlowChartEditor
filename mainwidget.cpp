@@ -11,11 +11,13 @@
 #include <QFileDialog>
 #include <QLineEdit>
 #include <QSvgGenerator>
+#include <QInputDialog>
 
 MainWidget::MainWidget(QWidget *parent)
     : QWidget(parent)
     , canvas(new Canvas(this)), ui(new Ui::MainWidget)
 {
+
     canvas->setSceneRect(0, 0, 2000, 1600);
     ui->setupUi(this);
 
@@ -133,6 +135,8 @@ void MainWidget::init_menu_layout() {
             painter.end();  // 完成绘制
         }
     });
+    connect(redoAction,&QAction::triggered,canvas,&Canvas::onRedo);
+    connect(undoAction,&QAction::triggered,canvas,&Canvas::onUndo);
 
     //横线分隔
     fileMenu->addSeparator();
@@ -274,6 +278,11 @@ void MainWidget::init_left_button() {
         canvas->pushAll();
     });
 
+
+    QIcon icon10(":/type/round_rect.png");
+    ui->roundrect_button->setIcon(icon10);
+    ui->roundrect_button->setIconSize(QSize(32, 32));
+
     //arrow按钮
     ui->arrow_button->setFixedSize(60,50);
     QIcon icon9(":/type/arrow.png");
@@ -324,20 +333,11 @@ void MainWidget::onColorButtonClicked() {
     // 调用Canvas的draw方法
     canvas->onColorButtonClicked();
 }
+
 void MainWidget::onBorderColorButtonClicked(){
     canvas->onBorderColorButtonClicked();
 }
 
-// void MainWidget::onArrowButtonClicked() {
-//     if (arrow_flag) {
-//         emit arrow_first_click();
-//         arrow_flag = !arrow_flag;
-//     }
-//     else {
-//         emit arrow_second_click();
-//         arrow_flag = !arrow_flag;
-//     }
-// }
 void MainWidget::onExportButtonClicked() {
     QString filename = QFileDialog::getSaveFileName(this, "Export Elements", "", "Data Files (*.dat)");
     if (!filename.isEmpty()) {
@@ -351,7 +351,17 @@ void MainWidget::onImportButtonClicked() {
         canvas->importElements(filename); // 调用 Canvas 的 importElements 方法
     }
 }
+
 MainWidget::~MainWidget()
 {
     delete ui;
 }
+
+void MainWidget::on_searchButton_clicked()
+{
+    bool ok = false;
+    QString str = QInputDialog::getText(this, tr("查找和替换"), tr("请输入要替换成的字符串"), QLineEdit::Normal, tr(""), &ok);
+    if (ok)
+        canvas->searchAndReplace(ui->searchBox->text(), str);
+}
+

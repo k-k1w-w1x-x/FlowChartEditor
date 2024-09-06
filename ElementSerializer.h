@@ -33,6 +33,8 @@ public:
     static QGraphicsRectItem* deserializeGraphicsRectItem(QDataStream& in);
     static void serializeColor(const QColor &color, QDataStream &out);
     static QColor deserializeColor(QDataStream &in);
+    static void serializeDouble(const double &color, QDataStream &out);
+    static double deserializeDouble(QDataStream &in);
 };
 
 #endif // ELEMENTSERIALIZER_H

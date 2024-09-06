@@ -9,11 +9,23 @@
 #include<keyeventFilter.h>
 #include <qgraphicsitem.h>
 #include <float.h>
+#include <QApplication>
+#include <QTimer>
 
 Canvas::Canvas(QWidget *parent)
     : QGraphicsView(parent),  gridSpacing(20),
     gridColor(Qt::lightGray), clickedSelectedElement(nullptr), isDragging(false)
 {
+    // 创建定时器
+    QTimer *timer = new QTimer(this);
+
+    // 连接定时器的超时信号到槽函数
+    connect(timer, &QTimer::timeout, this, &Canvas::checkAltKey);
+
+    // 每50毫秒触发一次
+    timer->start(50);
+    setFocusPolicy(Qt::StrongFocus);
+
     setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
     scene = new QGraphicsScene(this);
     setScene(scene);
@@ -27,7 +39,7 @@ Canvas::Canvas(QWidget *parent)
     this->installEventFilter(keyEventFilter);
 
     // 初始化ZIndexManager
-    zindexManager = new ZIndexManager();
+    zindexManager = new ZIndexManager(nullptr, &graphicTextItems);
 
     // 连接 KeyEventFilter 的信号到相应的槽函数
     connect(keyEventFilter, &KeyEventFilter::copyTriggered, this, &Canvas::onCopy);
@@ -36,7 +48,7 @@ Canvas::Canvas(QWidget *parent)
     connect(keyEventFilter, &KeyEventFilter::redoTriggered, this, &Canvas::onRedo);
     connect(keyEventFilter, &KeyEventFilter::findTriggered, this, &Canvas::onFind);
     connect(keyEventFilter, &KeyEventFilter::deleteTriggered, this, &Canvas::onDelete);
-
+    connect(keyEventFilter, &KeyEventFilter::cutTriggered,this,&Canvas::onCut);
     pushAll();
 }
 
@@ -93,6 +105,10 @@ void Canvas::addShape(FlowElement *element)
         if (FlowArrowElement* arrowElement = dynamic_cast<FlowArrowElement*>(element)){
             scene->addItem(arrowElement->mainItem);
             arrowElement->mainItem->setFlag(QGraphicsItem::ItemIsSelectable, true);
+            //创建时默认不显示红点
+            arrowElement->startDot->setVisible(0);
+            arrowElement->endDot->setVisible(0);
+
             scene->addItem(arrowElement->startDot);
             scene->addItem(arrowElement->endDot);
             arrows.append(arrowElement);
@@ -108,6 +124,7 @@ void Canvas::addShape(FlowElement *element)
             scene->addItem(arrowDot);
             arrowDot->setVisible(false);
         }
+        zindexManager->setHighestZindexForItem(element);
         element->draw();
     }
 }
@@ -126,8 +143,79 @@ void Canvas::addGraphicsTextItem(GraphicsTextItem *element)
     });
 }
 
+void Canvas::autoAdsorption()
+{
+    qDebug() << "Auto adsoring";
+    for (auto i : graphicTextItems)
+    {
+        i->follow();
+        if (i->followElement != nullptr)
+            continue;
+        QPointF pos = i->pos();
+        pos += QPointF(i->transform().m31(), i->transform().m32());
+        pos += QPointF(i->boundingRect().width() * i->transform().m11() / 2,
+                       i->boundingRect().height() * i->transform().m22() / 2);
+        for (auto element : elements)
+        {
+            QPointF center = (element->controlDots.at(0)->pos() + element->controlDots.at(2)->pos()) / 2;
+            qDebug() << "TEXT DIS " << (center.x() - pos.x()) * (center.x() - pos.x()) + (center.y() - pos.y()) * (center.y() - pos.y());
+            if ((center.x() - pos.x()) * (center.x() - pos.x()) + (center.y() - pos.y()) * (center.y() - pos.y()) < 1000)
+            {
+                i->followElement = element;
+                break;
+            }
+        }
+        i->follow();
+    }
+    updateTextItems();
+    for (auto arrow : arrows)
+    {
+        FlowElement *stelement = nullptr;
+        if (arrow->startElementDot == nullptr)
+        {
+            for (auto element : elements)
+                for (auto arrowDot : element->arrowDots)
+                {
+                    double tempstman = Manhattandis(arrowDot, arrow->startDot);
+                    qDebug() << "ARROW DIS " << tempstman;
+                    if (tempstman < 1000)
+                    {
+                        arrow->startElementDot = arrowDot;
+                        stelement = element;
+                    }
+                }
+        }
+        if (arrow->endElementDot == nullptr)
+        {
+            for (auto element : elements)
+            {
+                if (stelement == element)
+                    continue;
+                for (auto arrowDot : element->arrowDots)
+                {
+                    double tempendman = Manhattandis(arrowDot, arrow->endDot);
+                    qDebug() << "ARROW DIS " << tempendman;
+                    if (tempendman < 1000)
+                    {
+                        arrow->endElementDot = arrowDot;
+                    }
+                }
+            }
+        }
+        arrow->draw();
+    }
+    scene->update();
+
+    setCross();
+}
+
 void Canvas::mousePressEvent(QMouseEvent *event)
 {
+    if (textEditing)
+    {
+        QGraphicsView::mousePressEvent(event);
+        return;
+    }
     qDebug()<<"mousePress!";
     if(isArrowing){
         return;
@@ -136,6 +224,12 @@ void Canvas::mousePressEvent(QMouseEvent *event)
     clickscale = false;
     mouseclick = true;
     elementClicked = false;
+    if(altpress && dragSelectedArrows.empty() && dragSelectedElements.size() == 1){
+        QPointF clickedPoint = mapToScene(event->pos());
+        lastMousePosition = clickedPoint;
+        isRotating = true;
+        return;
+    }
     QPointF clickedPoint = mapToScene(event->pos());
     if(isScaling && dragSelectedElements.size() == 1 ){
         qDebug()<<"判断一下";
@@ -247,6 +341,7 @@ void Canvas::mousePressEvent(QMouseEvent *event)
         }
     }
     // 更新场景以反映选中状态的变化
+
     scene->update();
 
     QGraphicsView::mousePressEvent(event);
@@ -255,6 +350,33 @@ void Canvas::mousePressEvent(QMouseEvent *event)
 
 void Canvas::mouseMoveEvent(QMouseEvent *event)
 {
+    if (textEditing)
+    {
+        QGraphicsView::mouseMoveEvent(event);
+        return;}
+    if(altpress && isRotating && dragSelectedArrows.empty() && dragSelectedElements.size() == 1){
+        qDebug()<<"start rotate";
+        double centerPosx = 0.0;
+        double centerPosy = 0.0;
+        for(QGraphicsRectItem *controlDot : dragSelectedElements.at(0)->controlDots){
+            centerPosx += controlDot->scenePos().x();
+            centerPosy += controlDot->scenePos().y();
+            qDebug()<<"xxx:"<<controlDot->scenePos().x()<<"yyy:"<<controlDot->scenePos().y();
+        }
+        centerPosx/=4;
+        centerPosy/=4;
+        qDebug()<<"centerPosx"<<centerPosx<<"centerPosy"<<centerPosy;
+        QPointF currentPosition = mapToScene(event->pos());
+        QPointF offset = currentPosition - lastMousePosition;
+        QPointF *centerPoint = new QPointF(0,0);
+        centerPoint->setX(centerPosx);
+        centerPoint->setY(centerPosy);
+        dragSelectedElements.at(0)->myRotate(lastMousePosition,centerPoint,offset.x(),offset.y());
+        lastMousePosition = currentPosition;
+        drawArrows();
+        setCross();
+        return;
+    }
     if(isArrowing){
         return;
     }
@@ -373,6 +495,11 @@ void Canvas::mouseMoveEvent(QMouseEvent *event)
 
 void Canvas::mouseReleaseEvent(QMouseEvent *event)
 {
+    if (textEditing)
+    {
+        QGraphicsView::mouseReleaseEvent(event);
+        return;
+    }
     //储存被选中的箭头
     if(!clickmove && !clickscale &&!isArrowing){
         dragSelectedArrows.clear();
@@ -396,10 +523,10 @@ void Canvas::mouseReleaseEvent(QMouseEvent *event)
         if( arrows.empty() || (!arrows.last()->endDot->scenePos().x() == 0 && !arrows.last()->endDot->scenePos().y() == 0) ){
             qDebug()<<"开始画箭头";
             arrows.append(new FlowArrowElement);
-            arrows.last()->startDot->setPos( mapToScene(event->pos()));
+            arrows.last()->startDot->setPos(mapToScene(event->pos()));
         }
         else{
-            arrows.last()->endDot->setPos( mapToScene(event->pos()));
+            arrows.last()->endDot->setPos(mapToScene(event->pos()));
             arrows.last()->draw();
             scene->addItem(arrows.last()->mainItem);
             arrows.last()->mainItem->setFlag(QGraphicsItem::ItemIsSelectable, true);
@@ -409,6 +536,7 @@ void Canvas::mouseReleaseEvent(QMouseEvent *event)
             arrows.last()->endDot->setVisible(false);
             setCross();
             pushAll();
+            autoAdsorption();
         }
         return;
     }
@@ -419,6 +547,7 @@ void Canvas::mouseReleaseEvent(QMouseEvent *event)
     if (event->button() == Qt::LeftButton) {
         isDragging = false;
         isScaling = false;
+        isRotating = false;
     }
     setDragMode(QGraphicsView::RubberBandDrag);
     QGraphicsView::mouseReleaseEvent(event);
@@ -486,10 +615,9 @@ void Canvas::mouseReleaseEvent(QMouseEvent *event)
     for (auto it = dragSelectedElements.rbegin(); it != dragSelectedElements.rend(); ++it) {
         zindexManager->setHighestZindexForItem(*it);
     }
-    for(const auto element:graphicTextItems){
-        if(element->isSelected())
-        zindexManager->setHighestZindexForItem(element);
-    }
+    for (auto i : graphicTextItems)
+        if (i->isSelected())
+            zindexManager->setHighestZindexForItem(i);
     if(dragSelectedElements.empty() && dragSelectedArrows.size() == 1){
         FlowArrowElement *clickedArrow = dragSelectedArrows.at(0);
         qDebug()<<"only one arrow";
@@ -529,18 +657,20 @@ void Canvas::mouseReleaseEvent(QMouseEvent *event)
         }
     }
 
-    if (clickmove || clickscale || arrowclickscale)
+    if (clickmove || clickscale || arrowclickscale || arrowclickmove)
         pushAll();
 
+    autoAdsorption();
     scene->update();
 }
 
 void Canvas::onColorButtonClicked()
 {
-    if(!clickedSelectedElement){
-        qDebug() << "No element selected. Color change ignored.";
-        return;
-    }
+    // if(!clickedSelectedElement){
+    //     qDebug() << "No element selected. Color change ignored.";
+    //     return;
+    // }
+    bool changed = 0;
     QColor color = QColorDialog::getColor(Qt::white, this, "Select Color");
     for(const auto&dragselectedElement:dragSelectedElements){
         // QColor color = QColorDialog::getColor(dragselectedElement->contentColor, this, "Select Color");
@@ -548,9 +678,19 @@ void Canvas::onColorButtonClicked()
             dragselectedElement->contentColor = color;  // 设置选中元素的颜色
             dragselectedElement->draw();
             scene->update();  // 触发重绘，将元素颜色更新
+            changed = 1;
         }
     }
+    for (auto i : graphicTextItems)
+        if (i->isSelected() && color.isValid())
+        {
+            i->setDefaultTextColor(color);
+            scene->update();  // 触发重绘，将元素颜色更新
+            changed = 1;
+        }
+    if (changed) pushAll();
 }
+
 void Canvas::onBorderColorButtonClicked()
 {
     if(dragSelectedElements.empty() && dragSelectedArrows.empty()){
@@ -558,6 +698,7 @@ void Canvas::onBorderColorButtonClicked()
         return;
     }
 
+    bool changed = 0;
     QColor color = QColorDialog::getColor(Qt::white, this, "Select Border Color");
 
     for(const auto&dragselectedElement:dragSelectedElements){
@@ -566,6 +707,7 @@ void Canvas::onBorderColorButtonClicked()
             dragselectedElement->borderColor = color;  // 设置选中元素的颜色
             dragselectedElement->draw();
             scene->update();  // 触发重绘，将元素颜色更新
+            changed = 1;
         }
     }
     for(const auto&dragselectedArrow:dragSelectedArrows){
@@ -574,8 +716,10 @@ void Canvas::onBorderColorButtonClicked()
             dragselectedArrow->borderColor = color;  // 设置选中元素的颜色
             dragselectedArrow->draw();
             scene->update();  // 触发重绘，将元素颜色更新
+            changed = 1;
         }
     }
+    if (changed) pushAll();
 }
 //键盘操作
 
@@ -633,7 +777,6 @@ void Canvas::onCopy()
     // 遍历选中的图形项，并将它们深拷贝
     for (const auto &item : SelectedElementTemp) {
         FlowElement *clonedElement = item->deepClone(); // 深拷贝元素
-        clonedElement->move(10,10);
         clipboard.append(clonedElement);
     }
 
@@ -652,7 +795,7 @@ void Canvas::onPaste() {
 
     // 遍历剪切板中的元素
     for (FlowElement* element : clipboard) {
-        element->move(10, 10);
+        element->move(50, 50);
         FlowElement* clonedElement = element->deepClone(); // 深拷贝元素
         addShape(clonedElement); // 将深拷贝的元素添加到场景中
         changed = true;
@@ -660,13 +803,14 @@ void Canvas::onPaste() {
 
     for (auto i : textClipboard)
     {
-        i->move(QPointF(10, 10));
+        i->move(QPointF(50, 50));
         GraphicsTextItem *clone = i->deepClone();
         addGraphicsTextItem(clone);
         changed = true;
     }
 
     if (changed) pushAll();
+    autoAdsorption();
 }
 
 void Canvas::mouseDoubleClickEvent(QMouseEvent *event)
@@ -679,7 +823,11 @@ void Canvas::mouseDoubleClickEvent(QMouseEvent *event)
         QGraphicsTextItem *item = qgraphicsitem_cast<QGraphicsTextItem*>(scene->itemAt(pos, QTransform()));
         if (item == nullptr)
         {
-            GraphicsTextItem *textItem = new GraphicsTextItem("Text here.");
+            FlowElement *follow = nullptr;
+            for (auto i :elements)
+                if(i->mainItem->contains(pos))
+                    follow = i;
+            GraphicsTextItem *textItem = new GraphicsTextItem("Text here.", nullptr, follow, 1);
             textItem->setPos(pos);
             addGraphicsTextItem(textItem);
         }
@@ -717,7 +865,7 @@ void Canvas::recoverFromHistory()
 
     for (auto i : graphicTextItemsHistory.at(currentHistoryIndex))
         addGraphicsTextItem(i->deepClone());
-
+    autoAdsorption();
     setCross();
     scene->update();
 }
@@ -750,6 +898,7 @@ void Canvas::onFind() {
     qDebug() << "Find action triggered";
     // 具体的查找操作
 }
+
 void Canvas::removeFromCanvas(FlowElement* element){
     if(!dynamic_cast<FlowArrowElement*>(element)){
         scene->removeItem(element->mainItem);
@@ -807,6 +956,9 @@ void Canvas::onDelete() {
                 }
             }
         }
+        for (auto i : graphicTextItems)
+            if (i->followElement == element)
+                i->followElement = nullptr;
         removeFromCanvas(element);
         delete element;
         changed = 1;
@@ -822,6 +974,13 @@ void Canvas::onDelete() {
     if (changed) pushAll();
 
 }
+
+void Canvas::onCut()
+{
+    onCopy();
+    onDelete();
+}
+
 void Canvas::exportElements(const QString& filename) {
     QFile file(filename);
     if (file.open(QIODevice::WriteOnly)) {
@@ -932,7 +1091,7 @@ void Canvas::importElements(const QString& filename) { // 实现 importElements 
             GraphicsTextItem* text = GraphicsTextItem::deSerialize(in);
             addGraphicsTextItem(text);
         }
-
+        autoAdsorption();
         file.close();
     } else {
         qWarning("Could not open file for reading.");
@@ -948,7 +1107,33 @@ void Canvas::keyPressEvent(QKeyEvent *event)
     }
     if (event->key() == Qt::Key_Shift) {
 
+        bool changed = 0;
+
         qDebug() << "Shift key pressed!";
+        for (auto i : graphicTextItems)
+            if (i->isSelected())
+            {
+                if (i->followElement != nullptr)
+                    continue;
+                QPointF pos = i->pos();
+                pos += QPointF(i->transform().m31(), i->transform().m32());
+                pos += QPointF(i->boundingRect().width() * i->transform().m11() / 2,
+                               i->boundingRect().height() * i->transform().m22() / 2);
+                qreal dis = DBL_MAX;
+                for (auto element : elements)
+                {
+                    QPointF center = (element->controlDots.at(0)->pos() + element->controlDots.at(2)->pos()) / 2;
+                    if ((center.x() - pos.x()) * (center.x() - pos.x()) + (center.y() - pos.y()) * (center.y() - pos.y()) < dis)
+                    {
+                        changed = 1;
+                        i->followElement = element;
+                        dis = (center.x() - pos.x()) * (center.x() - pos.x()) + (center.y() - pos.y()) * (center.y() - pos.y());
+                    }
+                }
+            }
+
+        updateTextItems();
+
         for(FlowArrowElement *arrow : arrows){
             if(arrow->mainItem->isSelected()){
                 qDebug()<<"看看锁谁的";
@@ -985,12 +1170,13 @@ void Canvas::keyPressEvent(QKeyEvent *event)
                 //没找到合适的，不画
                 if(arrow->startElementDot && arrow->endElementDot){
                     qDebug()<<"小开不算开";
+                    qDebug() << "WTF?" << stman << ' ' << endman;
                     arrow->draw();
                     arrow->startDot->setVisible(false);
                     arrow->startElementDot->setVisible(true);
                     arrow->endDot->setVisible(false);
                     arrow->endElementDot->setVisible(true);
-                    pushAll();
+                    changed = 1;
                 }
                 else{
                     qDebug()<<"没找到合适的";
@@ -999,22 +1185,49 @@ void Canvas::keyPressEvent(QKeyEvent *event)
                 }
             }
         }
+        if (changed) pushAll();
         setCross();
     }
     QGraphicsView::keyPressEvent(event);
+    if(event->key() == Qt::Key_Alt){
+        altpress = true;
+    }
 }
 
-double Canvas::Manhattandis(QGraphicsRectItem *p1,QGraphicsRectItem *p2){
-    return(abs(p1->scenePos().x()-p2->scenePos().x()) + abs(p1->scenePos().y()-p2->scenePos().y()));
+void Canvas::keyReleaseEvent(QKeyEvent *event) {
+    // 检查释放的键是否是 Alt 键
+    if (event->key() == Qt::Key_Alt) {
+        altpress = false;
+        // 在这里处理 Alt 键松开后的逻辑
+        qDebug() << "Alt 键松开";
+    }
+
+    // 调用父类的 keyReleaseEvent 以确保其他按键处理逻辑不会丢失
+    QGraphicsView::keyReleaseEvent(event);
+}
+
+double Canvas::Manhattandis(QGraphicsRectItem *p1, QGraphicsRectItem *p2) {
+    return (p1->pos().x() - p2->pos().x()) * (p1->pos().x() - p2->pos().x())+
+           (p1->pos().y() - p2->pos().y()) * (p1->pos().y() - p2->pos().y());
 }
 
 void Canvas::drawArrows(){
+    updateTextItems();
     for(FlowArrowElement *arrow:arrows){
         arrow->draw();
     }
 }
 
+void Canvas::updateTextItems()
+{
+    for (auto i : graphicTextItems)
+        i->follow();
+}
+
 void Canvas::setCross(){
+    for (auto i : arrows)
+        i->mainItem->setZValue(998244353);
+
     qDebug()<<"调用setCross";
     for(int i = 0; i <= arrows.size() - 1; i++){
         int flag = 0;
@@ -1100,18 +1313,43 @@ bool Canvas::isCross(FlowArrowElement *arrow1,FlowArrowElement*arrow2){//判断�
         d=arrow2->endElementDot->scenePos();
     }
 
-    if(fmax(c.x(),d.x())<fmin(a.x(),b.x())||fmax(a.x(),b.x())<fmin(c.x(),d.x())||fmax(c.y(),d.y())<fmin(a.y(),b.y())||fmax(a.y(),b.y())<fmin(c.y(),d.y()))
+    if(fmax(c.x(),d.x())<=fmin(a.x(),b.x())||fmax(a.x(),b.x())<=fmin(c.x(),d.x())||fmax(c.y(),d.y())<=fmin(a.y(),b.y())||fmax(a.y(),b.y())<=fmin(c.y(),d.y()))
     {
         qDebug()<<"没交1";
         return false;
     }
-    if(crossProduct(b-d,c-d)*crossProduct(a-c,c-d) > 0||crossProduct(d-b,a-b)*crossProduct(c-b,a-b)>0){
+    if(crossProduct(b-d,c-d)*crossProduct(a-c,c-d) >= 0||crossProduct(d-b,a-b)*crossProduct(c-b,a-b) >= 0){
         qDebug()<<"没交2";
         return false;
     }
     qDebug()<<"交了";
     return true;
 }
+
 double Canvas::crossProduct(QPointF a,QPointF b){//叉乘
     return a.x() * b.y() - a.y() * b.x();
+}
+
+void Canvas::searchAndReplace(const QString &findStr, const QString &replaceStr)
+{
+    qDebug() << findStr << ' ' << replaceStr;
+
+    for (auto i : graphicTextItems)
+    {
+        QString str = i->toPlainText();
+        str.replace(findStr, replaceStr);
+        i->setPlainText(str);
+    }
+
+    scene->update();
+}
+
+
+void Canvas::checkAltKey() {
+    // 检测Shift键是否被按下
+    if (QApplication::keyboardModifiers() & Qt::AltModifier) {
+        qDebug() << "Alt key is pressed!";
+    } else {
+        altpress = false;
+    }
 }

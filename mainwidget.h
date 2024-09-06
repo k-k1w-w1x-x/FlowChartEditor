@@ -50,6 +50,8 @@ private slots:
     void onBorderColorButtonClicked();
     // void onArrowButtonClicked();
 
+    void on_searchButton_clicked();
+
 signals:
     //arrow_flag为true
     void arrow_first_click();

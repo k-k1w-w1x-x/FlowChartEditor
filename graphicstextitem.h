@@ -2,19 +2,22 @@
 #define GRAPHICSTEXTITEM_H
 
 #include <QGraphicsTextItem>
+#include "flowelement.h"
 
 class GraphicsTextItem : public QGraphicsTextItem
 {
     Q_OBJECT
 public:
     GraphicsTextItem(QGraphicsItem *parent = nullptr);
-    GraphicsTextItem(const QString &text, QGraphicsItem *parent = nullptr);
+    GraphicsTextItem(const QString &text, QGraphicsItem *parent = nullptr, FlowElement *follow = nullptr, bool activeCreate = false);
     ~GraphicsTextItem();
     QRectF boundingRect() const override;
     void move(QPointF delta);
     GraphicsTextItem* deepClone();
     void serialize(QDataStream& out, const GraphicsTextItem& element);
     static GraphicsTextItem* deSerialize(QDataStream& in) ;
+    FlowElement *followElement;
+    void follow();
 
 protected:
     void focusOutEvent(QFocusEvent *event) override;
@@ -26,6 +29,7 @@ protected:
     void mouseMoveEvent(QGraphicsSceneMouseEvent *event) override;
     void mouseReleaseEvent(QGraphicsSceneMouseEvent *event) override;
 
+
 signals:
     void enterTextEditor();
     void leaveTextEditor();
@@ -35,7 +39,7 @@ private:
     QPointF initialScenePos;
     QTransform initialTransform;
     qreal initialWidth, initialHeight;
-
+    bool first = false;
 };
 
 #endif // GRAPHICSTEXTITEM_H

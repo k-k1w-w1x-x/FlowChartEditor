@@ -11,13 +11,18 @@
 GraphicsTextItem::GraphicsTextItem(QGraphicsItem *parent)
     : QGraphicsTextItem(parent) {}
 
-GraphicsTextItem::GraphicsTextItem(const QString &text, QGraphicsItem *parent)
+GraphicsTextItem::GraphicsTextItem(const QString &text, QGraphicsItem *parent, FlowElement *follow, bool activeCreate)
     : QGraphicsTextItem(text, parent)
+    , followElement(follow)
+    , first(activeCreate)
 {
     this->setFlags(QGraphicsItem::ItemIsSelectable);
     setSelected(true);
     setAcceptHoverEvents(true);
-    setTextInteractionFlags(Qt::TextEditorInteraction);
+
+    QTransform t;
+    t.scale(1.5, 1.5);
+    setTransform(t);
 
     scaling = resizing = 0;
 }
@@ -35,6 +40,7 @@ void GraphicsTextItem::focusOutEvent(QFocusEvent *event)
 {
     if (event->reason() != Qt::PopupFocusReason)
     {
+        follow();
         qDebug() << "!!!!";
         setPlainText(toPlainText());
         setTextInteractionFlags(Qt::NoTextInteraction);
@@ -45,6 +51,11 @@ void GraphicsTextItem::focusOutEvent(QFocusEvent *event)
 
 void GraphicsTextItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
 {
+    if (first)
+    {
+        first = false;
+        return;
+    }
     if (textInteractionFlags() == Qt::NoTextInteraction && event->button() == Qt::LeftButton)
     {
         emit enterTextEditor();
@@ -56,14 +67,15 @@ void GraphicsTextItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
 
 void GraphicsTextItem::keyPressEvent(QKeyEvent *event)
 {
-    if (event->key() == Qt::Key_Return || event->key() == Qt::Key_Enter)
-    {
-        setPlainText(toPlainText());
-        setTextInteractionFlags(Qt::NoTextInteraction);
-        setSelected(false);
-        clearFocus();
-    }
+    // if (event->key() == Qt::Key_Return || event->key() == Qt::Key_Enter)
+    // {
+    //     setPlainText(toPlainText());
+    //     setTextInteractionFlags(Qt::NoTextInteraction);
+    //     setSelected(false);
+    //     clearFocus();
+    // }
     QGraphicsTextItem::keyPressEvent(event);
+    follow();
 }
 
 void GraphicsTextItem::hoverMoveEvent(QGraphicsSceneHoverEvent *event)
@@ -171,7 +183,8 @@ void GraphicsTextItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
             }
             QTransform transform;
             transform.translate(deltax, deltay);
-            transform.scale(width / initialWidth * initialTransform.m11(), height / initialHeight * initialTransform.m22());
+            transform.scale(qMax(width / initialWidth * initialTransform.m11(), 1.5),
+                            qMax(height / initialHeight * initialTransform.m22(), 1.5));
             setTransform(transform);
             update();
         }
@@ -188,7 +201,8 @@ void GraphicsTextItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
             }
             QTransform transform;
             transform.translate(deltax, deltay);
-            transform.scale(width / initialWidth * initialTransform.m11(), height / initialHeight * initialTransform.m22());
+            transform.scale(qMax(width / initialWidth * initialTransform.m11(), 1.5),
+                            qMax(height / initialHeight * initialTransform.m22(), 1.5));
             setTransform(transform);
             update();
         }
@@ -205,7 +219,8 @@ void GraphicsTextItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
             }
             QTransform transform;
             transform.translate(deltax, deltay);
-            transform.scale(width / initialWidth * initialTransform.m11(), height / initialHeight * initialTransform.m22());
+            transform.scale(qMax(width / initialWidth * initialTransform.m11(), 1.5),
+                            qMax(height / initialHeight * initialTransform.m22(), 1.5));
             setTransform(transform);
             update();
         }
@@ -217,7 +232,8 @@ void GraphicsTextItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
                 height += pos.y() - initialScenePos.y();
             QTransform transform;
             transform.translate(deltax, deltay);
-            transform.scale(width / initialWidth * initialTransform.m11(), height / initialHeight * initialTransform.m22());
+            transform.scale(qMax(width / initialWidth * initialTransform.m11(), 1.5),
+                            qMax(height / initialHeight * initialTransform.m22(), 1.5));
             setTransform(transform);
             update();
         }
@@ -233,13 +249,29 @@ void GraphicsTextItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
             setTransform(transform);
             update();
         }
+    follow();
     QGraphicsTextItem::mouseMoveEvent(event);
 }
 
 void GraphicsTextItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
     scaling = resizing = 0;
+    follow();
     QGraphicsTextItem::mouseReleaseEvent(event);
+}
+
+void GraphicsTextItem::follow()
+{
+    if (followElement != nullptr)
+    {
+        QPointF eps(boundingRect().width() * transform().m11() / 2,
+                    boundingRect().height() * transform().m22() / 2);
+        QTransform t;
+        t.scale(transform().m11(), transform().m22());
+        setTransform(t);
+        setPos((followElement->controlDots.at(0)->pos() + followElement->controlDots.at(2)->pos()) / 2 - eps);
+        setZValue(followElement->mainItem->zValue() + 1);
+    }
 }
 
 void GraphicsTextItem::move(QPointF delta)
@@ -258,21 +290,21 @@ GraphicsTextItem* GraphicsTextItem::deepClone()
     GraphicsTextItem *ret = new GraphicsTextItem(toPlainText());
     ret->setTransform(transform());
     ret->setPos(this->pos());
-
+    ret->setDefaultTextColor(this->defaultTextColor());
     return ret;
 }
 
 void GraphicsTextItem::serialize(QDataStream &out, const GraphicsTextItem &element)
 {
-    // int type=9;
-    // out<<type;
     out << this->toPlainText();
     out << this->transform();
     out << this->pos();
+    out << this->defaultTextColor();
     qDebug() << "serializeGraphicsTextItem:"
              << "Text:" << this->toPlainText()
              << "Transform:" << this->transform()
-             << "Position:" << this->pos();
+             << "Position:" << this->pos()
+             << "Color:" << this->defaultTextColor();
 }
 GraphicsTextItem* GraphicsTextItem::deSerialize(QDataStream &in) {
     // 创建一个新的 GraphicsTextItem 对象
@@ -293,10 +325,16 @@ GraphicsTextItem* GraphicsTextItem::deSerialize(QDataStream &in) {
     in >> position;
     cur->setPos(position);
 
+    // 反序列化颜色
+    QColor color;
+    in >> color;
+    cur->setDefaultTextColor(color);
+
     qDebug() << "deSerializeGraphicsTextItem:"
              << "Text:" << text
              << "Transform:" << transform
-             << "Position:" << position;
+             << "Position:" << position
+             << "Color:" << color;
 
     return cur;
 }

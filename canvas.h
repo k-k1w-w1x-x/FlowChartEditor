@@ -28,6 +28,7 @@ public:
     void onCopy();
     void onPaste();
     void onDelete();
+    void onCut();
 
     QList<FlowElement*> clipboard;
     QList<GraphicsTextItem*> textClipboard;
@@ -47,13 +48,17 @@ public:
     bool mouseclick = false;
     bool elementClicked = false;
     bool isArrowing = false;
+    bool altpress = false;
     QList<FlowElement*> dragSelectedElements ;
     QList<FlowArrowElement*> dragSelectedArrows;
     double Manhattandis(QGraphicsRectItem *p1,QGraphicsRectItem *p2);
     bool isCross(FlowArrowElement *arrow1,FlowArrowElement*arrow2);
     double crossProduct(QPointF a,QPointF b);
+    void searchAndReplace(const QString &findStr, const QString &replaceStr);
 
     void pushAll();
+    void onUndo();
+    void onRedo();
 
 
 protected:
@@ -67,8 +72,12 @@ protected:
     void mouseMoveEvent(QMouseEvent *event) override;
     void mouseDoubleClickEvent(QMouseEvent *event) override;
     void keyPressEvent(QKeyEvent *event);
+    void keyReleaseEvent(QKeyEvent *event);
     void drawArrows();
+    void updateTextItems();
     void recoverFromHistory();
+    void autoAdsorption();
+
 
 private:
     void drawGrid(QPainter &painter, const QRectF &rect);  // 绘制网格线
@@ -81,8 +90,7 @@ private:
     QList<GraphicsTextItem*> graphicTextItems;
     bool isDragging=false;
     bool isScaling=false;
-    void onUndo();
-    void onRedo();
+    bool isRotating=false;
     void onFind();
     FlowElement* clickedSelectedElement = nullptr;
     int clickedControlDot ;
@@ -93,7 +101,7 @@ private:
     QList<QList<FlowArrowElement*>> arrowsHistory;
     QList<QList<GraphicsTextItem*>> graphicTextItemsHistory;
 
-    int currentHistoryIndex = 0;
+    int currentHistoryIndex = -1;
 
     bool textEditing = false;
 
@@ -101,7 +109,7 @@ public slots:
     void onColorButtonClicked();
     void onBorderColorButtonClicked();
     void setCross();
-
+    void checkAltKey();
 };
 
 #endif // CANVAS_H

@@ -1,7 +1,7 @@
 #include <flowarrowelement.h>
 #include <QPen>
 #include <cmath>
-#define DOT_SIZE 5
+#define DOT_SIZE 8
 FlowArrowElement::FlowArrowElement(): FlowElement(){
     startDot = new QGraphicsRectItem(QRectF(0, 0, DOT_SIZE, DOT_SIZE), this);
     endDot = new QGraphicsRectItem(QRectF(0, 0, DOT_SIZE, DOT_SIZE), this);
@@ -19,6 +19,7 @@ void FlowArrowElement::draw()  {
     QPainterPath path;
     QPointF startPoint = startDot->scenePos() + startDot->rect().center();
     QPointF endPoint = endDot->scenePos() + endDot->rect().center();
+
     //锁头优先
     if(startElementDot){
         qDebug()<<"startElementDot is no null";
@@ -74,7 +75,7 @@ void FlowArrowElement::draw()  {
 
     // 创建一个 QGraphicsPathItem 来显示箭头
     mainItem->setPath(path);
-    mainItem->setPen(QPen(borderColor, 2));    // 设置箭头的颜色和宽度
+    mainItem->setPen(QPen(borderColor, 3));    // 设置箭头的颜色和宽度
 
 
     QPen pen(Qt::red,1);
@@ -99,11 +100,13 @@ void FlowArrowElement::move(double dx,double dy)
     if(startElementDot){
         //把锁头时的值赋给位置点
         startDot->scenePos() = startElementDot->scenePos();
+        startElementDot->setVisible(0);
         //解除锁头
         startElementDot = nullptr;
     }
     if(endElementDot){
         endDot->scenePos() = endElementDot->scenePos();
+        endElementDot->setVisible(0);
         endElementDot = nullptr;
     }
     startDot->moveBy(dx,dy);
@@ -165,11 +168,11 @@ FlowArrowElement *FlowArrowElement::deepClone()
     newStartDot->setBrush(startDot->brush());
     newStartDot->setPen(startDot->pen());
     newStartDot->setPos(startDot->pos());
-
+    newStartDot->setVisible(newStartDot->isVisible());
     newEndDot->setBrush(endDot->brush());
     newEndDot->setPen(endDot->pen());
     newEndDot->setPos(endDot->pos());
-
+    newEndDot->setVisible(newEndDot->isVisible());
     clonedElement->startDot = newStartDot;
     clonedElement->endDot = newEndDot;
 
