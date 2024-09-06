@@ -41,7 +41,6 @@ void GraphicsTextItem::focusOutEvent(QFocusEvent *event)
     if (event->reason() != Qt::PopupFocusReason)
     {
         follow();
-        qDebug() << "!!!!";
         setPlainText(toPlainText());
         setTextInteractionFlags(Qt::NoTextInteraction);
         emit leaveTextEditor();
@@ -154,6 +153,8 @@ void GraphicsTextItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
             resizing = 3;
         if (bottomRight.contains(pos))
             resizing = 4;
+        if (resizing)
+            emit enterTextResize();
         initialScenePos = event->scenePos();
         initialTransform = transform();
         initialWidth = boundingRect().width() * initialTransform.m11();
@@ -243,6 +244,8 @@ void GraphicsTextItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
             setCursor(Qt::SizeAllCursor);
             qreal deltax = initialTransform.m31() + pos.x() - initialScenePos.x(),
                 deltay = initialTransform.m32() + pos.y() - initialScenePos.y();
+            if (abs(deltax) > (1e-5) || abs(deltay) > (1e-5))
+                moved = 1;
             QTransform transform;
             transform.translate(deltax, deltay);
             transform.scale(initialTransform.m11(), initialTransform.m22());
@@ -255,6 +258,13 @@ void GraphicsTextItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 
 void GraphicsTextItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
+    if (resizing)
+        emit leaveTextResize();
+    if (moved)
+    {
+        emit textMoved();
+        moved = 0;
+    }
     scaling = resizing = 0;
     follow();
     QGraphicsTextItem::mouseReleaseEvent(event);

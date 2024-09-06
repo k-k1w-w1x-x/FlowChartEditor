@@ -141,6 +141,16 @@ void Canvas::addGraphicsTextItem(GraphicsTextItem *element)
         textEditing = false;
         pushAll();
     });
+    connect(element, &GraphicsTextItem::enterTextResize, this, [=](){
+        textResizing = true;
+    });
+    connect(element, &GraphicsTextItem::leaveTextResize, this, [=](){
+        textResizing = false;
+        pushAll();
+    });
+    connect(element, &GraphicsTextItem::textMoved, this, [=](){
+        pushAll();
+    });
 }
 
 void Canvas::autoAdsorption()
@@ -211,7 +221,7 @@ void Canvas::autoAdsorption()
 
 void Canvas::mousePressEvent(QMouseEvent *event)
 {
-    if (textEditing)
+    if (textEditing || textResizing)
     {
         QGraphicsView::mousePressEvent(event);
         return;
@@ -347,13 +357,13 @@ void Canvas::mousePressEvent(QMouseEvent *event)
     QGraphicsView::mousePressEvent(event);
 }
 
-
 void Canvas::mouseMoveEvent(QMouseEvent *event)
 {
-    if (textEditing)
+    if (textEditing || textResizing)
     {
         QGraphicsView::mouseMoveEvent(event);
-        return;}
+        return;
+    }
     if(altpress && isRotating && dragSelectedArrows.empty() && dragSelectedElements.size() == 1){
         qDebug()<<"start rotate";
         double centerPosx = 0.0;
@@ -543,6 +553,8 @@ void Canvas::mouseReleaseEvent(QMouseEvent *event)
 
     mouseclick = false;
     qDebug()<<"mouseRelease!";
+    if (isRotating)
+        pushAll();
     QPointF releasedPoint = mapToScene(event->pos());
     if (event->button() == Qt::LeftButton) {
         isDragging = false;
@@ -772,8 +784,6 @@ void Canvas::onCopy()
     clipboard.clear();
     textClipboard.clear();
 
-
-
     // 遍历选中的图形项，并将它们深拷贝
     for (const auto &item : SelectedElementTemp) {
         FlowElement *clonedElement = item->deepClone(); // 深拷贝元素
@@ -827,9 +837,11 @@ void Canvas::mouseDoubleClickEvent(QMouseEvent *event)
             for (auto i :elements)
                 if(i->mainItem->contains(pos))
                     follow = i;
-            GraphicsTextItem *textItem = new GraphicsTextItem("Text here.", nullptr, follow, 1);
+            GraphicsTextItem *textItem = new GraphicsTextItem("Text here.", nullptr, follow, (follow == nullptr));
             textItem->setPos(pos);
             addGraphicsTextItem(textItem);
+            textItem->follow();
+            pushAll();
         }
     }
     QGraphicsView::mouseDoubleClickEvent(event);
