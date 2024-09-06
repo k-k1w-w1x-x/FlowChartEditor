@@ -9,6 +9,7 @@
 #include<QFile>
 #include<flowrectelement.h>
 #include "flowarrowelement.h"
+#include "flowlineelement.h"
 #include<flowradiuselement.h>
 #include "flowelement.h"
 #include "flowsubelement.h"
@@ -33,6 +34,7 @@ public:
     QList<FlowElement*> clipboard;
     QList<GraphicsTextItem*> textClipboard;
     QList<FlowArrowElement*> arrows;
+    QList<FlowLineElement*> lines;
     QGraphicsScene *scene;
     explicit Canvas(QWidget *parent = nullptr);
     void addShape(FlowElement *element);
@@ -48,6 +50,7 @@ public:
     bool mouseclick = false;
     bool elementClicked = false;
     bool isArrowing = false;
+    bool isLining = false;
     bool altpress = false;
     QList<FlowElement*> dragSelectedElements ;
     QList<FlowArrowElement*> dragSelectedArrows;

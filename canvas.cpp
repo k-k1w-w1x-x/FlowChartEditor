@@ -115,6 +115,21 @@ void Canvas::addShape(FlowElement *element)
             setCross();
             return;
         }
+
+        if (FlowLineElement* arrowElement = dynamic_cast<FlowLineElement*>(element)){
+            scene->addItem(arrowElement->mainItem);
+            arrowElement->mainItem->setFlag(QGraphicsItem::ItemIsSelectable, true);
+            //创建时默认不显示红点
+            arrowElement->startDot->setVisible(0);
+            arrowElement->endDot->setVisible(0);
+
+            scene->addItem(arrowElement->startDot);
+            scene->addItem(arrowElement->endDot);
+            arrows.append(arrowElement);
+            setCross();
+            return;
+        }
+
         elements.append(element);
         for (auto controlDot : element->controlDots) {
             scene->addItem(controlDot);
@@ -228,6 +243,9 @@ void Canvas::mousePressEvent(QMouseEvent *event)
     }
     qDebug()<<"mousePress!";
     if(isArrowing){
+        return;
+    }
+    if(isLining){
         return;
     }
     clickmove = false;
@@ -390,6 +408,9 @@ void Canvas::mouseMoveEvent(QMouseEvent *event)
     if(isArrowing){
         return;
     }
+    if(isLining){
+        return;
+    }
     if(!mouseclick){
         QGraphicsView::mouseMoveEvent(event);
         return;
@@ -511,7 +532,7 @@ void Canvas::mouseReleaseEvent(QMouseEvent *event)
         return;
     }
     //储存被选中的箭头
-    if(!clickmove && !clickscale &&!isArrowing){
+    if(!clickmove && !clickscale &&!isArrowing &&!isLining){
         dragSelectedArrows.clear();
         arrowClickedContronDot = 0;
         for(FlowArrowElement *arrow : arrows){
@@ -550,6 +571,29 @@ void Canvas::mouseReleaseEvent(QMouseEvent *event)
         }
         return;
     }
+
+    if(isLining){
+        if( arrows.empty() || (!arrows.last()->endDot->scenePos().x() == 0 && !arrows.last()->endDot->scenePos().y() == 0) ){
+            qDebug()<<"开始画箭头";
+            arrows.append(new FlowLineElement);
+            arrows.last()->startDot->setPos(mapToScene(event->pos()));
+        }
+        else{
+            arrows.last()->endDot->setPos(mapToScene(event->pos()));
+            arrows.last()->draw();
+            scene->addItem(arrows.last()->mainItem);
+            arrows.last()->mainItem->setFlag(QGraphicsItem::ItemIsSelectable, true);
+            scene->addItem(arrows.last()->startDot);
+            scene->addItem(arrows.last()->endDot);
+            arrows.last()->startDot->setVisible(false);
+            arrows.last()->endDot->setVisible(false);
+            setCross();
+            pushAll();
+            autoAdsorption();
+        }
+        return;
+    }
+
 
     mouseclick = false;
     qDebug()<<"mouseRelease!";
@@ -1092,8 +1136,11 @@ void Canvas::importElements(const QString& filename) { // 实现 importElements 
             else if(type==7){
                 element = FlowCircleElement::deSerialize(in);
             }
-            else{
+            else if(type==8){
                 element = FlowArrowElement::deSerialize(in);
+            }
+            else{
+                element = FlowLineElement::deSerialize(in);
             }
 
             addShape(element);
@@ -1237,15 +1284,16 @@ void Canvas::updateTextItems()
 }
 
 void Canvas::setCross(){
-    for (auto i : arrows)
-        i->mainItem->setZValue(998244353);
-
+    int temp = 0;
+    for (auto i : arrows){
+        i->mainItem->setZValue(998244353+temp);
+        temp++;
+    }
     qDebug()<<"调用setCross";
     for(int i = 0; i <= arrows.size() - 1; i++){
         int flag = 0;
         for(int j = 0; j <= arrows.size() - 1; j++){
             if(i!=j && isCross(arrows[i],arrows[j])){
-                flag++;
                 qDebug()<<"计算交点";
                 double x1 = arrows[i]->startDot->x();
                 double y1 = arrows[i]->startDot->y();
@@ -1279,18 +1327,17 @@ void Canvas::setCross(){
                 double b2 = y3 - k2 * x3;
                 double x = (b2 - b1)/(k1 - k2);
                 double y = k1 * x + b1;
-                qDebug()<<"x1:"<<x1<<",y1"<<y1;
-                qDebug()<<"x2:"<<x2<<",y2"<<y2;
-                qDebug()<<"x3:"<<x3<<",y3"<<y3;
-                qDebug()<<"x4:"<<x4<<",y4"<<y4;
-                qDebug()<<"k1:"<<k1<<",k2"<<k2;
-                qDebug()<<"b1:"<<b1<<",b2"<<b2;
-                qDebug()<<"交点:"<<x<<","<<y;
-
-                arrows[i]->passingPoint.setX(x);
-                arrows[i]->passingPoint.setY(y);
-                arrows[j]->passingPoint.setX(x);
-                arrows[j]->passingPoint.setY(y);
+                if(arrows[i]->mainItem->zValue()>=arrows[j]->mainItem->zValue()){
+                    arrows[i]->passingPoint.setX(x);
+                    arrows[i]->passingPoint.setY(y);
+                }
+                else{
+                    arrows[j]->passingPoint.setX(x);
+                    arrows[j]->passingPoint.setY(y);
+                }
+                if(arrows[i]->passingPoint.x() == x && arrows[i]->passingPoint.y() == y){
+                    flag++;
+                }
             }
             arrows[i]->draw();
             arrows[j]->draw();
@@ -1302,9 +1349,7 @@ void Canvas::setCross(){
             arrows[i]->draw();
         }
     }
-
 }
-
 bool Canvas::isCross(FlowArrowElement *arrow1,FlowArrowElement*arrow2){//判断是否相交
     qDebug()<<"调用isCross";
     QPointF a = arrow1->startDot->scenePos().toPoint();

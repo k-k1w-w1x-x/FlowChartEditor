@@ -287,12 +287,18 @@ void MainWidget::init_left_button() {
         if (!arrow_flag) {
             ui->arrow_button->setStyleSheet("background-color: lightgrey;");
             arrow_flag = !arrow_flag;
+            if (line_flag) {
+                line_button->setStyleSheet("background-color: white;");
+                line_flag = !line_flag;
+            }
         }
         else {
             ui->arrow_button->setStyleSheet("background-color: white;");
             arrow_flag = !arrow_flag;
         }
-
+        if(canvas->isLining){
+            canvas->isLining = false;
+        }
         canvas->isArrowing=!canvas->isArrowing;
         if(!canvas->isArrowing && !canvas->arrows.empty() && canvas->arrows.last()->endDot->scenePos().x() == 0 && canvas->arrows.last()->endDot->scenePos().y() == 0){
             //需要删除操作
@@ -329,6 +335,51 @@ void MainWidget::init_left_button() {
     QIcon icon10(":/type/line.png");
     line_button->setIcon(icon10);
     line_button->setIconSize(QSize(32, 32));
+    connect(line_button, &QPushButton::clicked, [=](){
+        if (!line_flag) {
+            line_button->setStyleSheet("background-color: lightgrey;");
+            line_flag = !line_flag;
+            if (arrow_flag) {
+                ui->arrow_button->setStyleSheet("background-color: white;");
+                arrow_flag = !arrow_flag;
+            }
+        }
+        else {
+            line_button->setStyleSheet("background-color: white;");
+            line_flag = !line_flag;
+        }
+        if(canvas->isArrowing){
+            canvas->isArrowing = false;
+        }
+        canvas->isLining=!canvas->isLining;
+        if(!canvas->isLining && !canvas->arrows.empty() && canvas->arrows.last()->endDot->scenePos().x() == 0 && canvas->arrows.last()->endDot->scenePos().y() == 0){
+            //需要删除操作
+            qDebug()<<"删除";
+            FlowArrowElement *temp = canvas->arrows.last();
+            canvas->arrows.removeLast();
+            delete(temp);
+        }
+        if(canvas->isLining){
+            for(FlowElement *element : canvas->dragSelectedElements){
+                for(QGraphicsRectItem *controlDot:element->controlDots){
+                    controlDot->setVisible(false);
+                }
+                for(QGraphicsRectItem *arrowDot:element->arrowDots){
+                    arrowDot->setVisible(false);
+                }
+            }
+            for(FlowArrowElement *dragSelectedArrow : canvas->dragSelectedArrows){
+                if(dragSelectedArrow->startElementDot){
+                    dragSelectedArrow->startElementDot->setVisible(false);
+                }
+                dragSelectedArrow->startDot->setVisible(false);
+                if(dragSelectedArrow->endElementDot){
+                    dragSelectedArrow->endElementDot->setVisible(false);
+                }
+                dragSelectedArrow->endDot->setVisible(false);
+            }
+        }
+    });
 }
 
 void MainWidget::onColorButtonClicked() {

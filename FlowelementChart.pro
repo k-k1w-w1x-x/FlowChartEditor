@@ -16,6 +16,7 @@ SOURCES += \
     flowelement.cpp \
     flowdiamondelement.cpp \
     flowdocuelement.cpp \
+    flowlineelement.cpp \
     flowparaelement.cpp \
     flowplaygroundelement.cpp \
     flowradiuselement.cpp \
@@ -35,6 +36,7 @@ HEADERS += \
     flowdiamondelement.h \
     flowdocuelement.h \
     flowelement.h \
+    flowlineelement.h \
     graphicstextitem.h \
     keyeventFilter.h \
     mainwidget.h \
