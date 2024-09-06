@@ -10,5 +10,6 @@
         <file>rect4.png</file>
         <file>arrow.png</file>
         <file>round_rect.png</file>
+        <file>line.png</file>
     </qresource>
 </RCC>

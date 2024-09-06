@@ -122,11 +122,11 @@
         </item>
         <item row="0" column="0">
          <layout class="QHBoxLayout" name="horizontalLayout">
-          <item alignment="Qt::AlignmentFlag::AlignLeft">
+          <item>
            <widget class="QLineEdit" name="searchBox"/>
           </item>
-          <item alignment="Qt::AlignmentFlag::AlignLeft">
-           <widget class="QPushButton" name="searchButton">
+          <item>
+           <widget class="QPushButton" name="searchbutton">
             <property name="text">
              <string/>
             </property>

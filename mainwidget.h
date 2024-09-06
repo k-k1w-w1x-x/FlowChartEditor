@@ -65,11 +65,12 @@ private:
 
     bool arrow_flag = false;
 
-    QVBoxLayout *sidebarLayout;
-    QPushButton *rectangleButton;
-    QPushButton *diamondButton;
-    QPushButton *lineButton;
-    QPushButton *arrowButton;
+    // QVBoxLayout *sidebarLayout;
+    // QPushButton *rectangleButton;
+    // QPushButton *diamondButton;
+    // QPushButton *lineButton;
+    // QPushButton *arrowButton;
+    QPushButton *line_button;
 
     QMenuBar *menuBar;
     QMenu *fileMenu;

@@ -278,11 +278,6 @@ void MainWidget::init_left_button() {
         canvas->pushAll();
     });
 
-
-    QIcon icon10(":/type/round_rect.png");
-    ui->roundrect_button->setIcon(icon10);
-    ui->roundrect_button->setIconSize(QSize(32, 32));
-
     //arrow按钮
     ui->arrow_button->setFixedSize(60,50);
     QIcon icon9(":/type/arrow.png");
@@ -327,6 +322,13 @@ void MainWidget::init_left_button() {
             }
         }
     });
+
+    line_button = new QPushButton(this);
+    ui->leftLayout->addWidget(line_button);
+    line_button->setFixedSize(60,50);
+    QIcon icon10(":/type/line.png");
+    line_button->setIcon(icon10);
+    line_button->setIconSize(QSize(32, 32));
 }
 
 void MainWidget::onColorButtonClicked() {
