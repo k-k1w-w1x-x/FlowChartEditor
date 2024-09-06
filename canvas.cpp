@@ -531,6 +531,31 @@ void Canvas::mouseReleaseEvent(QMouseEvent *event)
         QGraphicsView::mouseReleaseEvent(event);
         return;
     }
+    if (dragSelectedElements.size() == 0 && dragSelectedArrows.size() == 1)
+    {
+        for (auto i : arrows)
+            if (i != dragSelectedArrows.at(0))
+            {
+                if (dragSelectedArrows.at(0)->endElementDot == nullptr)
+                {
+                    double dis = Manhattandis(i->endDot, dragSelectedArrows.at(0)->endDot);
+                    if (dis < 1000)
+                        dragSelectedArrows.at(0)->endDot->setPos(i->endDot->scenePos());
+                    dis = Manhattandis(i->startDot, dragSelectedArrows.at(0)->endDot);
+                    if (dis < 1000)
+                        dragSelectedArrows.at(0)->endDot->setPos(i->startDot->scenePos());
+                }
+                if (dragSelectedArrows.at(0)->startElementDot == nullptr)
+                {
+                    double dis = Manhattandis(i->endDot, dragSelectedArrows.at(0)->startDot);
+                    if (dis < 1000)
+                        dragSelectedArrows.at(0)->startDot->setPos(i->endDot->scenePos());
+                    dis = Manhattandis(i->startDot, dragSelectedArrows.at(0)->startDot);
+                    if (dis < 1000)
+                        dragSelectedArrows.at(0)->startDot->setPos(i->startDot->scenePos());
+                }
+            }
+    }
     //储存被选中的箭头
     if(!clickmove && !clickscale &&!isArrowing &&!isLining){
         dragSelectedArrows.clear();
