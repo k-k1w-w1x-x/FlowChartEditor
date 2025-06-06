@@ -6,6 +6,8 @@
 ---
 
 ### **项目简介**
+**请在此处查看完整的**[项目介绍](https://www.canva.cn/design/DAGplD7g8sc/1T_WZNv6eBSP_Lre2Vn22Q/edit?utm_content=DAGplD7g8sc&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutton)
+
 
 本项目是**北京理工大学软件工程实践小学期课程作业**的一部分。开发周期为**一周**。项目旨在提升学生的开发能力与软件工程实践经验。
 本编辑器实现了流程图中常见元素的创建，移动，缩放，旋转，变色等功能。实现了文本框相关功能。支持常见的快捷键操作，选中的线条或文本框可以通过shift吸附到周围的元素。
